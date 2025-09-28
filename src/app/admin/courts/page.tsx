@@ -1,0 +1,519 @@
+'use client'
+
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import { motion } from 'framer-motion'
+import { 
+  Plus, 
+  Search, 
+  Filter, 
+  Edit, 
+  Trash2, 
+  Eye, 
+  MoreHorizontal,
+  MapPin,
+  Star,
+  Settings,
+  Power,
+  PowerOff
+} from 'lucide-react'
+import { Header } from '@/components/layout/Header'
+import { Footer } from '@/components/layout/Footer'
+import { AdminLayout } from '@/components/layout/AdminLayout'
+import { Button } from '@/components/ui/Button'
+import { useAuth } from '@/components/providers/AuthProvider'
+import { getCourtTypeIcon } from '@/lib/utils'
+import { supabase } from '@/lib/supabase'
+import toast from 'react-hot-toast'
+
+export default function AdminCourtsPage() {
+  const { user, profile, loading } = useAuth()
+  const router = useRouter()
+  const [courts, setCourts] = useState<any[]>([])
+  const [loadingCourts, setLoadingCourts] = useState(true)
+  const [searchTerm, setSearchTerm] = useState('')
+  const [filterType, setFilterType] = useState('all')
+  const [filterStatus, setFilterStatus] = useState('all')
+  const [deleteConfirmation, setDeleteConfirmation] = useState<{
+    isOpen: boolean
+    courtId: string | null
+    courtName: string
+  }>({
+    isOpen: false,
+    courtId: null,
+    courtName: ''
+  })
+
+  useEffect(() => {
+    if (!loading && (!user || profile?.role !== 'admin')) {
+      router.push('/')
+      return
+    }
+    
+    if (user && profile?.role === 'admin') {
+      loadCourts()
+    }
+  }, [user, profile, loading, router])
+
+  const loadCourts = async () => {
+    try {
+      setLoadingCourts(true)
+      console.log('Loading courts from database...')
+
+      const { data, error } = await supabase
+        .from('courts')
+        .select('*')
+        .order('created_at', { ascending: false })
+
+      if (error) {
+        console.error('Error loading courts:', error)
+        toast.error('Failed to load courts')
+        return
+      }
+
+      // Transform data to match component expectations
+      const transformedCourts = (data || []).map(court => ({
+        id: court.id,
+        name: court.name,
+        type: court.type,
+        location: 'Sports Complex', // Default location
+        status: court.is_active ? 'active' : 'inactive',
+        bookings: 0, // Could be calculated from bookings table
+        revenue: 0, // Could be calculated from bookings table
+        rating: 4.5, // Default rating
+        lastMaintenance: court.updated_at?.split('T')[0] || court.created_at?.split('T')[0],
+        isActive: court.is_active,
+        maintenanceMode: court.maintenance_mode || false,
+        description: court.description,
+        image_url: court.image_url,
+        amenities: court.amenities
+      }))
+
+      console.log('Loaded courts:', transformedCourts)
+      setCourts(transformedCourts)
+    } catch (error) {
+      console.error('Exception loading courts:', error)
+      toast.error('An error occurred while loading courts')
+    } finally {
+      setLoadingCourts(false)
+    }
+  }
+
+  const handleToggleStatus = async (courtId: string) => {
+    try {
+      const court = courts.find(c => c.id === courtId)
+      if (!court) return
+
+      const { error } = await supabase
+        .from('courts')
+        .update({ is_active: !court.isActive })
+        .eq('id', courtId)
+
+      if (error) {
+        console.error('Error updating court status:', error)
+        toast.error('Failed to update court status')
+        return
+      }
+
+      setCourts(courts.map(court => 
+        court.id === courtId 
+          ? { ...court, isActive: !court.isActive, status: !court.isActive ? 'active' : 'inactive' }
+          : court
+      ))
+      toast.success('Court status updated successfully')
+    } catch (error) {
+      console.error('Exception updating court status:', error)
+      toast.error('An error occurred')
+    }
+  }
+
+  const handleToggleMaintenance = async (courtId: string) => {
+    try {
+      const court = courts.find(c => c.id === courtId)
+      if (!court) return
+
+      const { error } = await supabase
+        .from('courts')
+        .update({ maintenance_mode: !court.maintenanceMode })
+        .eq('id', courtId)
+
+      if (error) {
+        console.error('Error updating maintenance mode:', error)
+        toast.error('Failed to update maintenance mode')
+        return
+      }
+
+      setCourts(courts.map(court => 
+        court.id === courtId 
+          ? { ...court, maintenanceMode: !court.maintenanceMode }
+          : court
+      ))
+      toast.success('Maintenance mode updated successfully')
+    } catch (error) {
+      console.error('Exception updating maintenance mode:', error)
+      toast.error('An error occurred')
+    }
+  }
+
+  const handleDeleteCourt = (courtId: string) => {
+    const court = courts.find(c => c.id === courtId)
+    if (!court) return
+
+    setDeleteConfirmation({
+      isOpen: true,
+      courtId: courtId,
+      courtName: court.name
+    })
+  }
+
+  const confirmDeleteCourt = async () => {
+    const { courtId } = deleteConfirmation
+    if (!courtId) return
+
+    try {
+      const { error } = await supabase
+        .from('courts')
+        .delete()
+        .eq('id', courtId)
+
+      if (error) {
+        console.error('Error deleting court:', error)
+        toast.error('Failed to delete court')
+        return
+      }
+
+      setCourts(courts.filter(court => court.id !== courtId))
+      toast.success('Court deleted successfully')
+      setDeleteConfirmation({ isOpen: false, courtId: null, courtName: '' })
+    } catch (error) {
+      console.error('Exception deleting court:', error)
+      toast.error('An error occurred')
+    }
+  }
+
+  const cancelDeleteCourt = () => {
+    setDeleteConfirmation({ isOpen: false, courtId: null, courtName: '' })
+  }
+
+  const handleEditCourt = (courtId: string) => {
+    router.push(`/admin/courts/${courtId}/edit`)
+  }
+
+  const filteredCourts = courts.filter(court => {
+    const matchesSearch = court.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         court.location.toLowerCase().includes(searchTerm.toLowerCase())
+    const matchesType = filterType === 'all' || court.type === filterType
+    const matchesStatus = filterStatus === 'all' || 
+                         (filterStatus === 'active' && court.isActive && !court.maintenanceMode) ||
+                         (filterStatus === 'inactive' && !court.isActive) ||
+                         (filterStatus === 'maintenance' && court.maintenanceMode)
+    
+    return matchesSearch && matchesType && matchesStatus
+  })
+
+  if (loading || loadingCourts) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading courts...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (!user || profile?.role !== 'admin') {
+    return null
+  }
+
+  return (
+    <AdminLayout>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50">
+        <Header />
+      
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Page Header */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8"
+        >
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              Court Management
+            </h1>
+            <p className="text-gray-600">
+              Manage your sports venues and track their performance
+            </p>
+          </div>
+          
+          <div className="mt-4 sm:mt-0 flex space-x-3">
+            <Button
+              variant="outline"
+              onClick={() => router.push('/admin')}
+              className="flex items-center space-x-2"
+            >
+              <Settings className="w-4 h-4" />
+              <span>Dashboard</span>
+            </Button>
+            
+            <Button
+              onClick={() => router.push('/admin/courts/new')}
+              className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Add Court</span>
+            </Button>
+          </div>
+        </motion.div>
+
+        {/* Filters and Search */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.1 }}
+          className="bg-white rounded-xl shadow-lg p-6 mb-8"
+        >
+          <div className="flex flex-col lg:flex-row gap-4">
+            {/* Search */}
+            <div className="flex-1 relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <input
+                type="text"
+                placeholder="Search courts by name or location..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+
+            {/* Type Filter */}
+            <select
+              value={filterType}
+              onChange={(e) => setFilterType(e.target.value)}
+              className="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              <option value="all">All Types</option>
+              <option value="tennis">Tennis</option>
+              <option value="basketball">Basketball</option>
+              <option value="cricket">Cricket</option>
+              <option value="badminton">Badminton</option>
+              <option value="football">Football</option>
+            </select>
+
+            {/* Status Filter */}
+            <select
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value)}
+              className="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              <option value="all">All Status</option>
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+              <option value="maintenance">Maintenance</option>
+            </select>
+          </div>
+        </motion.div>
+
+        {/* Courts Table */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="bg-white rounded-xl shadow-lg overflow-hidden"
+        >
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="text-left py-4 px-6 font-medium text-gray-600">Court</th>
+                  <th className="text-left py-4 px-6 font-medium text-gray-600">Type</th>
+                  <th className="text-left py-4 px-6 font-medium text-gray-600">Location</th>
+                  <th className="text-left py-4 px-6 font-medium text-gray-600">Status</th>
+                  <th className="text-left py-4 px-6 font-medium text-gray-600">Performance</th>
+                  <th className="text-left py-4 px-6 font-medium text-gray-600">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredCourts.map((court, index) => (
+                  <motion.tr
+                    key={court.id}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.4, delay: index * 0.1 }}
+                    className="border-b border-gray-100 hover:bg-gray-50"
+                  >
+                    <td className="py-4 px-6">
+                      <div className="flex items-center space-x-3">
+                        <span className="text-2xl">{getCourtTypeIcon(court.type)}</span>
+                        <div>
+                          <div className="font-medium text-gray-900">{court.name}</div>
+                          <div className="flex items-center space-x-1 mt-1">
+                            <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                            <span className="text-sm text-gray-600">{court.rating}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                    
+                    <td className="py-4 px-6">
+                      <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-sm font-medium capitalize">
+                        {court.type}
+                      </span>
+                    </td>
+                    
+                    <td className="py-4 px-6">
+                      <div className="flex items-center space-x-1 text-gray-600">
+                        <MapPin className="w-4 h-4" />
+                        <span className="text-sm">{court.location}</span>
+                      </div>
+                    </td>
+                    
+                    <td className="py-4 px-6">
+                      <div className="flex flex-col space-y-1">
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                          court.maintenanceMode 
+                            ? 'bg-orange-100 text-orange-800'
+                            : court.isActive
+                            ? 'bg-green-100 text-green-800'
+                            : 'bg-red-100 text-red-800'
+                        }`}>
+                          {court.maintenanceMode ? 'Maintenance' : court.isActive ? 'Active' : 'Inactive'}
+                        </span>
+                      </div>
+                    </td>
+                    
+                    <td className="py-4 px-6">
+                      <div className="text-sm">
+                        <div className="text-gray-900 font-medium">{court.bookings} bookings</div>
+                        <div className="text-gray-600">${court.revenue} revenue</div>
+                      </div>
+                    </td>
+                    
+                    <td className="py-4 px-6">
+                      <div className="flex items-center space-x-2">
+                        <button
+                          onClick={() => router.push(`/courts/${court.id}`)}
+                          className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                          title="View Court"
+                        >
+                          <Eye className="w-4 h-4 text-gray-600" />
+                        </button>
+                        
+                        <button
+                          onClick={() => router.push(`/admin/courts/${court.id}/edit`)}
+                          className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                          title="Edit Court"
+                        >
+                          <Edit className="w-4 h-4 text-gray-600" />
+                        </button>
+                        
+                        <button
+                          onClick={() => handleToggleStatus(court.id)}
+                          className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                          title={court.isActive ? 'Deactivate' : 'Activate'}
+                        >
+                          {court.isActive ? (
+                            <PowerOff className="w-4 h-4 text-red-600" />
+                          ) : (
+                            <Power className="w-4 h-4 text-green-600" />
+                          )}
+                        </button>
+                        
+{/* Maintenance button temporarily hidden */}
+                        {/* <button
+                          onClick={() => handleToggleMaintenance(court.id)}
+                          className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                          title={court.maintenanceMode ? 'Exit Maintenance' : 'Enter Maintenance'}
+                        >
+                          <Settings className={`w-4 h-4 ${court.maintenanceMode ? 'text-orange-600' : 'text-gray-600'}`} />
+                        </button> */}
+                        
+                        <button
+                          onClick={() => handleDeleteCourt(court.id)}
+                          className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                          title="Delete Court"
+                        >
+                          <Trash2 className="w-4 h-4 text-red-600" />
+                        </button>
+                      </div>
+                    </td>
+                  </motion.tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {filteredCourts.length === 0 && (
+            <div className="text-center py-12">
+              <div className="text-6xl mb-4">🏟️</div>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">No courts found</h3>
+              <p className="text-gray-600 mb-6">
+                {searchTerm || filterType !== 'all' || filterStatus !== 'all'
+                  ? 'Try adjusting your search criteria'
+                  : 'Get started by adding your first court'
+                }
+              </p>
+              {!searchTerm && filterType === 'all' && filterStatus === 'all' && (
+                <Button onClick={() => router.push('/admin/courts/new')}>
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add Your First Court
+                </Button>
+              )}
+            </div>
+          )}
+        </motion.div>
+      </main>
+
+        <Footer />
+      </div>
+
+      {/* Delete Confirmation Modal */}
+      {deleteConfirmation.isOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-white rounded-xl shadow-xl p-6 max-w-md w-full mx-4"
+          >
+            <div className="flex items-center space-x-3 mb-4">
+              <div className="flex-shrink-0">
+                <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+                  <Trash2 className="w-5 h-5 text-red-600" />
+                </div>
+              </div>
+              <div>
+                <h3 className="text-lg font-medium text-gray-900">Delete Court</h3>
+                <p className="text-sm text-gray-500">This action cannot be undone</p>
+              </div>
+            </div>
+
+            <div className="mb-6">
+              <p className="text-gray-700">
+                Are you sure you want to delete <span className="font-semibold">"{deleteConfirmation.courtName}"</span>?
+                This will permanently remove the court and all associated data.
+              </p>
+            </div>
+
+            <div className="flex space-x-3 justify-end">
+              <Button
+                variant="outline"
+                onClick={cancelDeleteCourt}
+                className="px-4 py-2"
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={confirmDeleteCourt}
+                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white"
+              >
+                Delete Court
+              </Button>
+            </div>
+          </motion.div>
+        </div>
+      )}
+    </AdminLayout>
+  )
+}

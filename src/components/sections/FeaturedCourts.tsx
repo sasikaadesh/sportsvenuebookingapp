@@ -195,7 +195,7 @@ export function FeaturedCourts() {
                 {/* Amenities */}
                 <div className="mb-4">
                   <div className="flex flex-wrap gap-2">
-                    {court.amenities.slice(0, 3).map((amenity, idx) => (
+                    {court.amenities.slice(0, 3).map((amenity: any, idx: number) => (
                       <span
                         key={idx}
                         className="bg-gray-100 dark:bg-gray-600 text-gray-700 dark:text-gray-300 px-2 py-1 rounded text-xs"

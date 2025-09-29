@@ -22,6 +22,7 @@ import { HeaderApp } from '@/components/layout/HeaderApp'
 import { FooterSimple } from '@/components/layout/FooterSimple'
 import { Button } from '@/components/ui/Button'
 import { getCourtTypeIcon, formatCurrency } from '@/lib/utils'
+import Image from 'next/image'
 
 // Mock data - will be replaced with real data from Supabase
 const mockCourtDetails = {
@@ -126,7 +127,7 @@ export default function CourtDetailPage() {
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center py-12">
             <h1 className="text-2xl font-bold text-gray-900 mb-4">Court Not Found</h1>
-            <p className="text-gray-600 mb-6">The court you're looking for doesn't exist.</p>
+            <p className="text-gray-600 mb-6">The court you&apos;re looking for doesn&apos;t exist.</p>
             <Button onClick={() => router.push('/courts')}>
               Back to Courts
             </Button>
@@ -163,9 +164,11 @@ export default function CourtDetailPage() {
               className="bg-white rounded-xl shadow-lg overflow-hidden"
             >
               <div className="relative h-96">
-                <img
+                <Image
                   src={court.images[currentImageIndex]}
                   alt={court.name}
+                  width={800}
+                  height={384}
                   className="w-full h-full object-cover"
                 />
                 

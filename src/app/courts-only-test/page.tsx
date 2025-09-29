@@ -175,7 +175,7 @@ export default function CourtsOnlyTestPage() {
             <li>1. Go to your Supabase Dashboard SQL Editor</li>
             <li>2. Copy and paste the emergency-disable-rls.sql script</li>
             <li>3. Run the script to disable all RLS policies</li>
-            <li>4. Come back and click "Test Courts Table"</li>
+            <li>4. Come back and click &quot;Test Courts Table&quot;</li>
             <li>5. If successful, the main app should work</li>
           </ol>
         </div>

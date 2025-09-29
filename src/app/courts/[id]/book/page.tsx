@@ -12,6 +12,7 @@ import { useAuth } from '@/components/providers/AuthProvider'
 import { getCourtTypeIcon, formatCurrency } from '@/lib/utils'
 import { supabase } from '@/lib/supabase'
 import { sendContactEmails, isEmailJSConfigured } from '@/lib/emailjs'
+import Image from 'next/image'
 import toast from 'react-hot-toast'
 
 // Mock court data - same as court detail page
@@ -99,13 +100,14 @@ export default function BookCourtPage() {
           setCourt(null)
         }
       } else if (data) {
-        console.log('Found court in database:', data.name)
+        const courtData = data as any
+        console.log('Found court in database:', courtData.name)
         // Transform database data
         const transformedCourt = {
-          id: data.id,
-          name: data.name,
-          type: data.type,
-          image: data.image_url || 'https://images.unsplash.com/photo-1554068865-24cecd4e34b8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+          id: courtData.id,
+          name: courtData.name,
+          type: courtData.type,
+          image: courtData.image_url || 'https://images.unsplash.com/photo-1554068865-24cecd4e34b8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
           location: 'Sports Complex',
           rating: 4.8,
           reviews: 124,
@@ -177,7 +179,7 @@ export default function BookCourtPage() {
       }
 
       // Create booking in database
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('bookings')
         .insert({
           user_id: user.id,
@@ -291,7 +293,7 @@ The Sports Venue Team`
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center py-12 max-w-md mx-auto">
             <h1 className="text-2xl font-bold text-gray-900 mb-4">Court Not Found</h1>
-            <p className="text-gray-600 mb-4">The court you're trying to book doesn't exist.</p>
+            <p className="text-gray-600 mb-4">The court you&apos;re trying to book doesn&apos;t exist.</p>
             <p className="text-sm text-gray-500 mb-6">Court ID: {params.id}</p>
             <div className="space-x-4">
               <Button onClick={() => router.push('/courts')}>
@@ -456,9 +458,11 @@ The Sports Venue Team`
               className="bg-white rounded-xl shadow-lg p-6 sticky top-8"
             >
               <div className="flex items-center space-x-3 mb-4">
-                <img
+                <Image
                   src={court.image}
                   alt={court.name}
+                  width={64}
+                  height={64}
                   className="w-16 h-16 rounded-lg object-cover"
                 />
                 <div>

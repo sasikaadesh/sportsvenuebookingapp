@@ -124,11 +124,11 @@ export default function TestAllPage() {
       }
 
       // Create test booking
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('bookings')
         .insert([{
           user_id: user.id,
-          court_id: courts[0].id,
+          court_id: (courts as any[])[0].id,
           booking_date: new Date().toISOString().split('T')[0],
           start_time: '14:00',
           duration_hours: 1,

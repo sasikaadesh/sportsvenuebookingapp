@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { supabase } from '@/lib/supabase'
+import Link from 'next/link'
 
 export default function SimpleDebugPage() {
   const [results, setResults] = useState<any>(null)
@@ -140,9 +141,9 @@ export default function SimpleDebugPage() {
       }}>
         <h3 style={{ margin: '0 0 1rem 0' }}>Quick Links:</h3>
         <ul style={{ margin: 0, paddingLeft: '1.5rem' }}>
-          <li><a href="/courts" style={{ color: '#3b82f6' }}>Courts Page</a></li>
-          <li><a href="/" style={{ color: '#3b82f6' }}>Home Page</a></li>
-          <li><a href="/dashboard" style={{ color: '#3b82f6' }}>Dashboard</a></li>
+          <li><Link href="/courts" style={{ color: '#3b82f6' }}>Courts Page</Link></li>
+          <li><Link href="/" style={{ color: '#3b82f6' }}>Home Page</Link></li>
+          <li><Link href="/dashboard" style={{ color: '#3b82f6' }}>Dashboard</Link></li>
         </ul>
       </div>
     </div>

@@ -1,7 +1,8 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { Header } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
 import { Button } from '@/components/ui/Button'
@@ -12,11 +13,7 @@ export default function SimpleCourtsPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  useEffect(() => {
-    loadCourts()
-  }, [])
-
-  const loadCourts = async () => {
+  const loadCourts = useCallback(async () => {
     try {
       console.log('Loading courts...')
       setLoading(true)
@@ -46,7 +43,11 @@ export default function SimpleCourtsPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [])
+
+  useEffect(() => {
+    loadCourts()
+  }, [loadCourts])
 
   const getMockCourts = () => [
     {
@@ -88,8 +89,8 @@ export default function SimpleCourtsPage() {
             Simple Courts Page
           </h1>
           <p className="text-gray-600 max-w-2xl mx-auto">
-            This is a simplified courts page for testing. If this loads but the main courts page doesn't, 
-            there's an issue with the complex components.
+            This is a simplified courts page for testing. If this loads but the main courts page doesn&apos;t,
+            there&apos;s an issue with the complex components.
           </p>
         </div>
 
@@ -114,9 +115,11 @@ export default function SimpleCourtsPage() {
             {courts.map((court, index) => (
               <div key={court.id} className="bg-white rounded-lg shadow-md overflow-hidden">
                 <div className="aspect-w-16 aspect-h-9">
-                  <img
+                  <Image
                     src={court.images?.[0] || 'https://images.unsplash.com/photo-1554068865-24cecd4e34b8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'}
                     alt={court.name}
+                    width={400}
+                    height={192}
                     className="w-full h-48 object-cover"
                   />
                 </div>
@@ -182,8 +185,8 @@ export default function SimpleCourtsPage() {
             <li>• Courts loaded: {courts.length}</li>
             <li>• Loading state: {loading ? 'Yes' : 'No'}</li>
             <li>• Error: {error || 'None'}</li>
-            <li>• <a href="/courts" className="underline">Try main courts page</a></li>
-            <li>• <a href="/courts-test" className="underline">Try courts test page</a></li>
+            <li>• <Link href="/courts" className="underline">Try main courts page</Link></li>
+            <li>• <Link href="/courts-test" className="underline">Try courts test page</Link></li>
           </ul>
         </div>
       </main>

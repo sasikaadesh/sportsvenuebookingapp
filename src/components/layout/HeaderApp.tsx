@@ -111,7 +111,7 @@ export function HeaderApp({ hideThemeToggle = false }: HeaderAppProps) {
                     onClick={() => setIsProfileOpen(!isProfileOpen)}
                   >
                     <User className="w-4 h-4" />
-                    <span>{profile?.name || user.email?.split('@')[0] || 'User'}</span>
+                    <span>{profile?.full_name || user.email?.split('@')[0] || 'User'}</span>
                   </Button>
 
                   {isProfileOpen && (

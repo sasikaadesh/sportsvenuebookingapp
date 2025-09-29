@@ -228,10 +228,10 @@ export default function TestPerformancePage() {
       }}>
         <h3 style={{ margin: '0 0 1rem 0', color: '#92400e' }}>Test Instructions:</h3>
         <ol style={{ margin: 0, paddingLeft: '1.5rem', color: '#92400e' }}>
-          <li><strong>Session Persistence:</strong> Sign in, then click "Test Session Persistence" multiple times. You should stay signed in after each refresh.</li>
-          <li><strong>Performance:</strong> Click "Run Performance Test" to measure loading times. Auth should complete quickly.</li>
-          <li><strong>Page Load Times:</strong> Click "Test Page Load Times" to open courts, dashboard, and home pages in new tabs. They should load quickly.</li>
-          <li><strong>Storage Test:</strong> Click "Clear Storage & Test" to verify sign-out behavior works correctly.</li>
+          <li><strong>Session Persistence:</strong> Sign in, then click &quot;Test Session Persistence&quot; multiple times. You should stay signed in after each refresh.</li>
+          <li><strong>Performance:</strong> Click &quot;Run Performance Test&quot; to measure loading times. Auth should complete quickly.</li>
+          <li><strong>Page Load Times:</strong> Click &quot;Test Page Load Times&quot; to open courts, dashboard, and home pages in new tabs. They should load quickly.</li>
+          <li><strong>Storage Test:</strong> Click &quot;Clear Storage &amp; Test&quot; to verify sign-out behavior works correctly.</li>
         </ol>
         
         <div style={{ marginTop: '1rem', padding: '1rem', backgroundColor: '#fbbf24', borderRadius: '4px' }}>

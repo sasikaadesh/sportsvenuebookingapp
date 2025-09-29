@@ -119,8 +119,8 @@ export default function SimpleTestPage() {
           <h3 className="font-semibold text-blue-800 mb-2">Instructions:</h3>
           <ol className="text-blue-700 text-sm space-y-1">
             <li>1. First run the RLS fix script in Supabase SQL Editor</li>
-            <li>2. Try "Test Supabase Client" button</li>
-            <li>3. If that fails, try "Test Direct API" button</li>
+            <li>2. Try &quot;Test Supabase Client&quot; button</li>
+            <li>3. If that fails, try &quot;Test Direct API&quot; button</li>
             <li>4. Check browser console for detailed error messages</li>
           </ol>
         </div>

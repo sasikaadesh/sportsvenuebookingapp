@@ -72,7 +72,7 @@ export default function TestSessionPage() {
       // Create test booking with proper format
       const bookingData = {
         user_id: user.id,
-        court_id: courts[0].id,
+        court_id: (courts as any[])[0].id,
         booking_date: new Date().toISOString().split('T')[0],
         start_time: '14:00:00', // Proper HH:MM:SS format
         duration_hours: 1,
@@ -83,7 +83,7 @@ export default function TestSessionPage() {
 
       console.log('Creating booking with data:', bookingData)
 
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('bookings')
         .insert([bookingData])
         .select()
@@ -241,10 +241,10 @@ export default function TestSessionPage() {
         <ol style={{ margin: 0, paddingLeft: '1.5rem', color: '#92400e' }}>
           <li>Sign in to your account</li>
           <li>Check that both status boxes show green ✅</li>
-          <li>Click "Force Refresh" multiple times</li>
+          <li>Click &quot;Force Refresh&quot; multiple times</li>
           <li>You should stay signed in after each refresh</li>
           <li>Test booking creation to verify database access</li>
-          <li>If you get signed out, there's a session persistence issue</li>
+          <li>If you get signed out, there&apos;s a session persistence issue</li>
         </ol>
       </div>
     </div>

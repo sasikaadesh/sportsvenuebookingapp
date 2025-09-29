@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Star, ChevronLeft, ChevronRight, Quote } from 'lucide-react'
+import Image from 'next/image'
 
 const testimonials = [
   {
@@ -123,9 +124,11 @@ export function Testimonials() {
               >
                 {/* Customer Image */}
                 <div className="mb-6">
-                  <img
+                  <Image
                     src={testimonials[currentIndex].image}
                     alt={testimonials[currentIndex].name}
+                    width={80}
+                    height={80}
                     className="w-20 h-20 rounded-full mx-auto object-cover border-4 border-blue-100"
                   />
                 </div>
@@ -139,7 +142,7 @@ export function Testimonials() {
 
                 {/* Testimonial Text */}
                 <blockquote className="text-lg md:text-xl text-gray-700 leading-relaxed mb-6 italic">
-                  "{testimonials[currentIndex].text}"
+                  &quot;{testimonials[currentIndex].text}&quot;
                 </blockquote>
 
                 {/* Customer Info */}

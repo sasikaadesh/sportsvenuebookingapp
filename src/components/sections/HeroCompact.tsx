@@ -98,7 +98,7 @@ export function HeroCompact() {
           
           <div className="flex flex-col sm:flex-row items-center justify-center space-y-3 sm:space-y-0 sm:space-x-3 pt-6">
             <Link href="/courts">
-              <Button size="md" className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3">
+              <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3">
                 <Search className="w-4 h-4 mr-2" />
                 Browse Courts
               </Button>

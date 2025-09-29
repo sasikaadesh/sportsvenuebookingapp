@@ -74,7 +74,7 @@ export default function AdminUsersPage() {
     try {
       const newRole = currentRole === 'admin' ? 'user' : 'admin'
       
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('users')
         .update({ role: newRole })
         .eq('id', userId)

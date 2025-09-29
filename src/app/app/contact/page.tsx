@@ -46,7 +46,7 @@ export default function AppContactPage() {
 
     try {
       // Save message to database
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('contact_messages')
         .insert([
           {
@@ -158,7 +158,7 @@ export default function AppContactPage() {
             Contact Support
           </h1>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Need help with booking or have questions? We're here to assist you!
+            Need help with booking or have questions? We&apos;re here to assist you!
           </p>
         </motion.div>
 

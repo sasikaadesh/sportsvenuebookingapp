@@ -3,9 +3,9 @@
 import { useState, useEffect } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { motion } from 'framer-motion'
-import { 
-  ArrowLeft, 
-  Save, 
+import {
+  ArrowLeft,
+  Save,
   Plus,
   X
 } from 'lucide-react'
@@ -14,6 +14,7 @@ import { Footer } from '@/components/layout/Footer'
 import { Button } from '@/components/ui/Button'
 import { useAuth } from '@/components/providers/AuthProvider'
 import { supabase } from '@/lib/supabase'
+import Image from 'next/image'
 import toast from 'react-hot-toast'
 
 const courtTypes = [
@@ -72,7 +73,7 @@ export default function EditCourtPage() {
       const { data, error } = await supabase
         .from('courts')
         .select('*')
-        .eq('id', params.id)
+        .eq('id', params.id as string)
         .single()
 
       if (error) {
@@ -86,36 +87,37 @@ export default function EditCourtPage() {
       const { data: pricingData, error: pricingError } = await supabase
         .from('pricing_rules')
         .select('*')
-        .eq('court_id', params.id)
+        .eq('court_id', params.id as string)
         .in('duration_hours', [1, 2])
 
       let price1hr = 45
       let price2hr = 80
 
       if (!pricingError && pricingData) {
-        const oneHourRule = pricingData.find(rule => rule.duration_hours === 1)
-        const twoHourRule = pricingData.find(rule => rule.duration_hours === 2)
-        
+        const oneHourRule = (pricingData as any[]).find((rule: any) => rule.duration_hours === 1)
+        const twoHourRule = (pricingData as any[]).find((rule: any) => rule.duration_hours === 2)
+
         if (oneHourRule) price1hr = oneHourRule.off_peak_price || 45
         if (twoHourRule) price2hr = twoHourRule.off_peak_price || 80
       }
 
+      const courtData = data as any
       setFormData({
-        name: data.name || '',
-        type: data.type || 'tennis',
-        description: data.description || '',
-        image_url: data.image_url || defaultImages[data.type as keyof typeof defaultImages] || '',
-        amenities: data.amenities || '',
+        name: courtData.name || '',
+        type: courtData.type || 'tennis',
+        description: courtData.description || '',
+        image_url: courtData.image_url || defaultImages[courtData.type as keyof typeof defaultImages] || '',
+        amenities: courtData.amenities || '',
         price_1hr: price1hr,
         price_2hr: price2hr,
-        is_active: data.is_active !== false,
-        maintenance_mode: data.maintenance_mode || false
+        is_active: courtData.is_active !== false,
+        maintenance_mode: courtData.maintenance_mode || false
       })
 
       // Parse amenities if it's a string
-      if (data.amenities) {
-        const amenities = typeof data.amenities === 'string' 
-          ? data.amenities.split(', ').filter(a => a.trim())
+      if (courtData.amenities) {
+        const amenities = typeof courtData.amenities === 'string'
+          ? courtData.amenities.split(', ').filter((a: string) => a.trim())
           : []
         setAmenityList(amenities)
       }
@@ -204,10 +206,10 @@ export default function EditCourtPage() {
 
       console.log('Updating court with data:', courtData)
 
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('courts')
         .update(courtData)
-        .eq('id', params.id)
+        .eq('id', params.id as string)
 
       if (error) {
         console.error('Error updating court:', error)
@@ -237,11 +239,11 @@ export default function EditCourtPage() {
       await supabase
         .from('pricing_rules')
         .delete()
-        .eq('court_id', params.id)
+        .eq('court_id', params.id as string)
         .in('duration_hours', [1, 2])
 
       // Insert new pricing rules
-      const { error: pricingError } = await supabase
+      const { error: pricingError } = await (supabase as any)
         .from('pricing_rules')
         .insert(pricingRules)
 
@@ -419,9 +421,11 @@ export default function EditCourtPage() {
               />
               {formData.image_url && (
                 <div className="mt-3">
-                  <img
+                  <Image
                     src={formData.image_url}
                     alt="Preview"
+                    width={128}
+                    height={96}
                     className="w-32 h-24 object-cover rounded-lg border border-gray-300"
                     onError={(e) => {
                       (e.target as HTMLImageElement).src = defaultImages[formData.type as keyof typeof defaultImages]

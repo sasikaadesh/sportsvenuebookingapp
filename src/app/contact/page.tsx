@@ -51,7 +51,7 @@ export default function ContactPage() {
       })
 
       // Save message to database
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('contact_messages')
         .insert([
           {

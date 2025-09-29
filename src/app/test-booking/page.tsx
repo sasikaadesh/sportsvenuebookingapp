@@ -5,6 +5,7 @@ import { useAuth } from '@/components/providers/AuthProvider'
 import { supabase } from '@/lib/supabase'
 import { Button } from '@/components/ui/Button'
 import toast from 'react-hot-toast'
+import Link from 'next/link'
 
 export default function TestBookingPage() {
   const { user } = useAuth()
@@ -34,7 +35,7 @@ export default function TestBookingPage() {
       // Create a test booking
       const bookingData = {
         user_id: user.id,
-        court_id: courts.id,
+        court_id: (courts as any).id,
         booking_date: new Date().toISOString().split('T')[0], // Today
         start_time: '14:00',
         duration_hours: 2,
@@ -46,7 +47,7 @@ export default function TestBookingPage() {
 
       console.log('Creating test booking:', bookingData)
 
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('bookings')
         .insert(bookingData)
         .select()
@@ -190,10 +191,10 @@ export default function TestBookingPage() {
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-6">
           <h3 className="font-semibold text-blue-800 mb-2">Testing Instructions:</h3>
           <ol className="text-blue-700 text-sm space-y-1">
-            <li>1. Click "Create Test Booking" to create a sample booking</li>
-            <li>2. Click "Load My Bookings" to see your bookings</li>
-            <li>3. Go to <a href="/dashboard" className="underline">Dashboard</a> to see if bookings appear there</li>
-            <li>4. Try booking a real court from <a href="/courts" className="underline">Courts Page</a></li>
+            <li>1. Click &quot;Create Test Booking&quot; to create a sample booking</li>
+            <li>2. Click &quot;Load My Bookings&quot; to see your bookings</li>
+            <li>3. Go to <Link href="/dashboard" className="underline">Dashboard</Link> to see if bookings appear there</li>
+            <li>4. Try booking a real court from <Link href="/courts" className="underline">Courts Page</Link></li>
           </ol>
         </div>
       </div>

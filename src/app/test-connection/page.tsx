@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
+import Link from 'next/link'
 import { Button } from '@/components/ui/Button'
 
 export default function TestConnectionPage() {
@@ -110,7 +111,7 @@ export default function TestConnectionPage() {
 
     try {
       // Create a test court
-      const { data: courtData, error: courtError } = await supabase
+      const { data: courtData, error: courtError } = await (supabase as any)
         .from('courts')
         .insert({
           name: 'Test Tennis Court',
@@ -129,7 +130,7 @@ export default function TestConnectionPage() {
       }
 
       // Create pricing for the court
-      const { error: pricingError } = await supabase
+      const { error: pricingError } = await (supabase as any)
         .from('pricing_rules')
         .insert([
           {
@@ -191,9 +192,9 @@ export default function TestConnectionPage() {
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-6">
           <h3 className="font-semibold text-blue-800 mb-2">Quick Links:</h3>
           <div className="space-x-4">
-            <a href="/dashboard" className="text-blue-600 hover:underline">Dashboard</a>
-            <a href="/debug-courts" className="text-blue-600 hover:underline">Debug Courts</a>
-            <a href="/courts" className="text-blue-600 hover:underline">Courts Page</a>
+            <Link href="/dashboard" className="text-blue-600 hover:underline">Dashboard</Link>
+            <Link href="/debug-courts" className="text-blue-600 hover:underline">Debug Courts</Link>
+            <Link href="/courts" className="text-blue-600 hover:underline">Courts Page</Link>
           </div>
         </div>
       </div>

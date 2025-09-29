@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
+import Link from 'next/link'
 import { Button } from '@/components/ui/Button'
 
 export default function DebugCourtsIdsPage() {
@@ -123,18 +124,18 @@ export default function DebugCourtsIdsPage() {
           <h3 className="font-semibold text-yellow-800 mb-2">Debug Info:</h3>
           <ul className="text-yellow-700 text-sm space-y-1">
             <li>• This page shows the actual court IDs in your database</li>
-            <li>• Click "Test Booking Link" to test if the booking page works</li>
-            <li>• If booking page shows "Court Not Found", there's an ID mismatch</li>
-            <li>• The court IDs should match what's used in the courts page links</li>
+            <li>• Click &quot;Test Booking Link&quot; to test if the booking page works</li>
+            <li>• If booking page shows &quot;Court Not Found&quot;, there&apos;s an ID mismatch</li>
+            <li>• The court IDs should match what&apos;s used in the courts page links</li>
           </ul>
         </div>
 
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-4">
           <h3 className="font-semibold text-blue-800 mb-2">Quick Links:</h3>
           <ul className="text-blue-700 text-sm space-y-1">
-            <li>• <a href="/courts" className="underline">Main Courts Page</a></li>
-            <li>• <a href="/courts-diagnostic" className="underline">Courts Diagnostic</a></li>
-            <li>• <a href="/" className="underline">Home Page</a></li>
+            <li>• <Link href="/courts" className="underline">Main Courts Page</Link></li>
+            <li>• <Link href="/courts-diagnostic" className="underline">Courts Diagnostic</Link></li>
+            <li>• <Link href="/" className="underline">Home Page</Link></li>
           </ul>
         </div>
       </div>

@@ -45,7 +45,7 @@ export async function ensureAdminRole(userId: string, userEmail: string): Promis
     console.log(`Promoting ${userEmail} to admin role...`)
 
     // Update user role to admin
-    const { data, error } = await supabase
+    const { data, error } = await (supabase as any)
       .from('users')
       .update({ role: 'admin' })
       .eq('id', userId)
@@ -80,7 +80,7 @@ export async function checkAdminRole(userId: string): Promise<boolean> {
       return false
     }
 
-    return data.role === 'admin'
+    return (data as any).role === 'admin'
   } catch (error) {
     console.error('Error checking admin role:', error)
     return false
@@ -99,7 +99,7 @@ export async function makeCurrentUserAdmin(): Promise<{ success: boolean; messag
     }
 
     // Update user to admin
-    const { error } = await supabase
+    const { error } = await (supabase as any)
       .from('users')
       .update({ role: 'admin' })
       .eq('id', user.id)

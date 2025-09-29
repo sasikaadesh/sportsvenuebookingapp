@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 
 export default function BasicTestPage() {
   const [message, setMessage] = useState('Page loaded successfully!')
@@ -114,19 +115,19 @@ export default function BasicTestPage() {
           <h3 style={{ margin: '0 0 1rem 0', color: '#92400e' }}>Debug Steps:</h3>
           <ol style={{ margin: 0, color: '#92400e' }}>
             <li>If this page loads → React is working</li>
-            <li>If "Test Basic Function" works → JavaScript is working</li>
-            <li>If "Test Supabase" works → Supabase connection is working</li>
-            <li>If this page doesn't load → There's a fundamental build issue</li>
+            <li>If &quot;Test Basic Function&quot; works → JavaScript is working</li>
+            <li>If &quot;Test Supabase&quot; works → Supabase connection is working</li>
+            <li>If this page doesn&apos;t load → There&apos;s a fundamental build issue</li>
           </ol>
         </div>
 
         <div style={{ marginTop: '2rem' }}>
           <h3>Quick Links:</h3>
           <ul>
-            <li><a href="/courts" style={{ color: '#3b82f6' }}>Main Courts Page</a></li>
-            <li><a href="/simple-courts" style={{ color: '#3b82f6' }}>Simple Courts Page</a></li>
-            <li><a href="/courts-test" style={{ color: '#3b82f6' }}>Courts Test Page</a></li>
-            <li><a href="/dashboard" style={{ color: '#3b82f6' }}>Dashboard</a></li>
+            <li><Link href="/courts" style={{ color: '#3b82f6' }}>Main Courts Page</Link></li>
+            <li><Link href="/simple-courts" style={{ color: '#3b82f6' }}>Simple Courts Page</Link></li>
+            <li><Link href="/courts-test" style={{ color: '#3b82f6' }}>Courts Test Page</Link></li>
+            <li><Link href="/dashboard" style={{ color: '#3b82f6' }}>Dashboard</Link></li>
           </ul>
         </div>
       </div>

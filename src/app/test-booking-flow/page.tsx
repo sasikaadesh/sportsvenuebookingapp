@@ -45,7 +45,7 @@ export default function TestBookingFlowPage() {
       console.log('Mock booking data from calendar:', mockBookingData)
 
       // Step 3: Process the booking data (same logic as in booking page)
-      const startTime = mockBookingData.startTime || mockBookingData.time
+      const startTime = mockBookingData.startTime || (mockBookingData as any).time
       
       if (!startTime) {
         setResult({ 
@@ -57,7 +57,7 @@ export default function TestBookingFlowPage() {
 
       const bookingData = {
         user_id: user.id,
-        court_id: courts[0].id,
+        court_id: (courts as any[])[0].id,
         booking_date: mockBookingData.date,
         start_time: startTime + ':00', // Convert HH:MM to HH:MM:SS
         duration_hours: mockBookingData.duration,
@@ -69,7 +69,7 @@ export default function TestBookingFlowPage() {
       console.log('Final booking data for database:', bookingData)
 
       // Step 4: Create booking
-      const { data: booking, error: bookingError } = await supabase
+      const { data: booking, error: bookingError } = await (supabase as any)
         .from('bookings')
         .insert([bookingData])
         .select()

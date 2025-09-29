@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useAuth } from '@/components/providers/AuthProvider'
 import { supabase } from '@/lib/supabase'
 import { Button } from '@/components/ui/Button'
+import Link from 'next/link'
 
 export default function CourtsTestPage() {
   const { user, loading: authLoading } = useAuth()
@@ -57,7 +58,7 @@ export default function CourtsTestPage() {
       }
 
       // Transform data
-      const transformedCourts = data.map(court => ({
+      const transformedCourts = data.map((court: any) => ({
         id: court.id,
         name: court.name,
         type: court.type,
@@ -166,11 +167,11 @@ export default function CourtsTestPage() {
         <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
           <h3 className="font-semibold text-yellow-800 mb-2">Debug Steps:</h3>
           <ol className="text-yellow-700 text-sm space-y-1">
-            <li>1. Click "Test Courts Loading" to see if courts load properly</li>
+            <li>1. Click &quot;Test Courts Loading&quot; to see if courts load properly</li>
             <li>2. Check browser console for detailed error messages</li>
-            <li>3. If courts load here but not on main page, there's a component issue</li>
-            <li>4. Try "Load Mock Data" to test with simple data</li>
-            <li>5. Go to <a href="/courts" className="underline">main courts page</a> to compare</li>
+            <li>3. If courts load here but not on main page, there&apos;s a component issue</li>
+            <li>4. Try &quot;Load Mock Data&quot; to test with simple data</li>
+            <li>5. Go to <Link href="/courts" className="underline">main courts page</Link> to compare</li>
           </ol>
         </div>
       </div>

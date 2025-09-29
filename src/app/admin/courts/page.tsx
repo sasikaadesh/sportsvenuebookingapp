@@ -72,7 +72,7 @@ export default function AdminCourtsPage() {
       }
 
       // Transform data to match component expectations
-      const transformedCourts = (data || []).map(court => ({
+      const transformedCourts = (data || []).map((court: any) => ({
         id: court.id,
         name: court.name,
         type: court.type,
@@ -104,7 +104,7 @@ export default function AdminCourtsPage() {
       const court = courts.find(c => c.id === courtId)
       if (!court) return
 
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('courts')
         .update({ is_active: !court.isActive })
         .eq('id', courtId)
@@ -132,7 +132,7 @@ export default function AdminCourtsPage() {
       const court = courts.find(c => c.id === courtId)
       if (!court) return
 
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('courts')
         .update({ maintenance_mode: !court.maintenanceMode })
         .eq('id', courtId)
@@ -491,7 +491,7 @@ export default function AdminCourtsPage() {
 
             <div className="mb-6">
               <p className="text-gray-700">
-                Are you sure you want to delete <span className="font-semibold">"{deleteConfirmation.courtName}"</span>?
+                Are you sure you want to delete <span className="font-semibold">&quot;{deleteConfirmation.courtName}&quot;</span>?
                 This will permanently remove the court and all associated data.
               </p>
             </div>

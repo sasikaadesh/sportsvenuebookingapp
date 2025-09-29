@@ -60,11 +60,11 @@ export default function AdminSetupPage() {
           })
         }
       } else {
-        setResult({ 
-          success: true, 
+        setResult({
+          success: true,
           message: 'User profile found!',
           user: data,
-          isAdmin: data.role === 'admin'
+          isAdmin: (data as any)?.role === 'admin'
         })
       }
     } catch (error) {
@@ -254,9 +254,9 @@ export default function AdminSetupPage() {
         <h3 style={{ margin: '0 0 1rem 0', color: '#92400e' }}>Instructions:</h3>
         <ol style={{ margin: 0, paddingLeft: '1.5rem', color: '#92400e' }}>
           <li>Sign in to your account first</li>
-          <li>Click "Check Admin Status" to see your current role</li>
-          <li>Click "Make Me Admin" to grant yourself admin privileges</li>
-          <li>Click "Test Admin Access" to open the admin panel</li>
+          <li>Click &quot;Check Admin Status&quot; to see your current role</li>
+          <li>Click &quot;Make Me Admin&quot; to grant yourself admin privileges</li>
+          <li>Click &quot;Test Admin Access&quot; to open the admin panel</li>
           <li>Admin panel URL: <code>/admin</code></li>
           <li>All bookings URL: <code>/admin/bookings</code></li>
         </ol>

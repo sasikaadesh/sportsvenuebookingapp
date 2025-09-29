@@ -113,7 +113,7 @@ export default function AppAboutPage() {
             About SportVenue
           </h1>
           <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-            We're revolutionizing how athletes find and book sports venues.
+            We&apos;re revolutionizing how athletes find and book sports venues.
             Simple, fast, and reliable - the way booking should be.
           </p>
         </motion.div>

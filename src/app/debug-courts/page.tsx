@@ -147,7 +147,7 @@ export default function DebugCourtsPage() {
         }
       ]
 
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('courts')
         .insert(sampleCourts)
         .select()
@@ -161,7 +161,7 @@ export default function DebugCourtsPage() {
 
         // Create pricing rules for each court
         if (data && data.length > 0) {
-          const pricingRules = data.flatMap(court => [
+          const pricingRules = data.flatMap((court: any) => [
             {
               court_id: court.id,
               duration_hours: 1,
@@ -298,8 +298,8 @@ export default function DebugCourtsPage() {
           <h3 className="font-semibold text-yellow-800 mb-2">Debug Info:</h3>
           <ul className="text-yellow-700 text-sm space-y-1">
             <li>• This page shows all courts in your Supabase database</li>
-            <li>• Use "Create Sample Courts" if no courts exist</li>
-            <li>• Click "Test Booking" to test the booking page for each court</li>
+            <li>• Use &quot;Create Sample Courts&quot; if no courts exist</li>
+            <li>• Click &quot;Test Booking&quot; to test the booking page for each court</li>
             <li>• Check browser console for detailed logs</li>
           </ul>
         </div>
@@ -307,11 +307,11 @@ export default function DebugCourtsPage() {
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
           <h3 className="font-semibold text-blue-800 mb-2">Quick Actions:</h3>
           <div className="space-y-2">
-            <p className="text-blue-700 text-sm">If courts aren't loading, try these steps:</p>
+            <p className="text-blue-700 text-sm">If courts aren&apos;t loading, try these steps:</p>
             <ol className="text-blue-700 text-sm space-y-1 ml-4">
-              <li>1. Click "Test Connection" to check Supabase connectivity</li>
+              <li>1. Click &quot;Test Connection&quot; to check Supabase connectivity</li>
               <li>2. If connection fails, check your .env.local file</li>
-              <li>3. If connection works but no courts, click "Create Sample Courts"</li>
+              <li>3. If connection works but no courts, click &quot;Create Sample Courts&quot;</li>
               <li>4. Go to <a href="/test-connection" className="underline">Test Connection Page</a> for detailed diagnostics</li>
             </ol>
           </div>

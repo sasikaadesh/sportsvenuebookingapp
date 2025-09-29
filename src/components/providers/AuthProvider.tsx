@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useContext, useEffect, useState, useCallback } from 'react'
 import { User, Session } from '@supabase/supabase-js'
 import { supabase, isSupabaseConfigured } from '@/lib/supabase'
 import { Database } from '@/types/database'
@@ -25,7 +25,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null)
   const [loading, setLoading] = useState(true)
 
-  const fetchProfile = async (userId: string) => {
+  const fetchProfile = useCallback(async (userId: string) => {
     try {
       console.log('Fetching profile for user:', userId)
       const { data, error } = await supabase
@@ -51,7 +51,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       console.error('Error fetching profile:', error)
       return null
     }
-  }
+  }, [])
 
   const createProfile = async (userId: string) => {
     try {
@@ -215,7 +215,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 setProfile(profileData)
                 
                 // Auto-promote admin emails
-                if (session.user.email && isAdminEmail(session.user.email) && profileData?.role !== 'admin') {
+                if (session.user.email && isAdminEmail(session.user.email) && (profileData as any)?.role !== 'admin') {
                   console.log('Auto-promoting admin email:', session.user.email)
                   await ensureAdminRole(session.user.id, session.user.email)
                   // Refresh profile to get updated role
@@ -269,7 +269,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                   setProfile(profileData)
                   
                   // Auto-promote admin emails
-                  if (session.user.email && isAdminEmail(session.user.email) && profileData?.role !== 'admin') {
+                  if (session.user.email && isAdminEmail(session.user.email) && (profileData as any)?.role !== 'admin') {
                     console.log('Auto-promoting admin email:', session.user.email)
                     await ensureAdminRole(session.user.id, session.user.email)
                     // Refresh profile to get updated role
@@ -299,7 +299,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       mounted = false
       subscription.unsubscribe()
     }
-  }, [])
+  }, [fetchProfile])
 
   const value = {
     user,

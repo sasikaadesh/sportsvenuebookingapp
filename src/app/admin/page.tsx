@@ -36,8 +36,8 @@ export default function AdminDashboard() {
       activeUsers: 0,
       courtsAvailable: 0
     },
-    recentBookings: [],
-    revenueData: []
+    recentBookings: [] as any[],
+    revenueData: [] as any[]
   })
 
   useEffect(() => {
@@ -163,12 +163,12 @@ export default function AdminDashboard() {
       if (!bookingsError && recentBookingsData) {
         // Calculate stats from real data
         const totalBookings = bookingsResult.data?.length || 0
-        const totalRevenue = bookingsResult.data?.reduce((sum, booking) => sum + (booking.total_price || 0), 0) || 0
+        const totalRevenue = bookingsResult.data?.reduce((sum: number, booking: any) => sum + (booking.total_price || 0), 0) || 0
         const activeUsers = usersResult.count || 0
         const courtsAvailable = courtsResult.count || 0
 
         // Transform recent bookings
-        const transformedBookings = recentBookingsData.map(booking => ({
+        const transformedBookings = recentBookingsData.map((booking: any) => ({
           id: booking.id,
           user: booking.users?.full_name || booking.users?.email || 'Unknown User',
           court: booking.courts?.name || 'Unknown Court',
@@ -263,7 +263,7 @@ export default function AdminDashboard() {
               Admin Dashboard
             </h1>
             <p className="text-gray-600">
-              Welcome back, {profile?.full_name || 'Admin'}! Here's what's happening with your venues.
+              Welcome back, {profile?.full_name || 'Admin'}! Here&apos;s what&apos;s happening with your venues.
             </p>
           </div>
           

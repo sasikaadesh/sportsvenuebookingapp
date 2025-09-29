@@ -146,7 +146,7 @@ export default function AdminBookingsPage() {
 
   const updateBookingStatus = async (bookingId: string, newStatus: string) => {
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('bookings')
         .update({ status: newStatus })
         .eq('id', bookingId)

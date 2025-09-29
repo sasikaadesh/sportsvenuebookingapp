@@ -3,9 +3,9 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
-import { 
-  ArrowLeft, 
-  Save, 
+import {
+  ArrowLeft,
+  Save,
   Upload,
   Plus,
   X
@@ -15,6 +15,7 @@ import { Footer } from '@/components/layout/Footer'
 import { Button } from '@/components/ui/Button'
 import { useAuth } from '@/components/providers/AuthProvider'
 import { supabase } from '@/lib/supabase'
+import Image from 'next/image'
 import toast from 'react-hot-toast'
 
 const courtTypes = [
@@ -136,7 +137,7 @@ export default function AddCourtPage() {
 
       console.log('Creating court with data:', courtData)
 
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('courts')
         .insert([courtData])
         .select()
@@ -166,7 +167,7 @@ export default function AddCourtPage() {
         }
       ]
 
-      const { error: pricingError } = await supabase
+      const { error: pricingError } = await (supabase as any)
         .from('pricing_rules')
         .insert(pricingRules)
 
@@ -344,9 +345,11 @@ export default function AddCourtPage() {
               />
               {formData.image_url && (
                 <div className="mt-3">
-                  <img
+                  <Image
                     src={formData.image_url}
                     alt="Preview"
+                    width={128}
+                    height={96}
                     className="w-32 h-24 object-cover rounded-lg border border-gray-300"
                     onError={(e) => {
                       (e.target as HTMLImageElement).src = defaultImages[formData.type as keyof typeof defaultImages]

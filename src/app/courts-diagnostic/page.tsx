@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { Button } from '@/components/ui/Button'
+import Link from 'next/link'
 
 export default function CourtsDiagnosticPage() {
   const [results, setResults] = useState<any>({})
@@ -145,7 +146,7 @@ export default function CourtsDiagnosticPage() {
         is_active: true
       }
 
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('courts')
         .insert([testCourt])
         .select()
@@ -258,8 +259,8 @@ export default function CourtsDiagnosticPage() {
             <li>• If count is 0 - No courts in database, using mock data</li>
             <li>• If fetch fails - RLS policies blocking access</li>
             <li>• If active courts = 0 but total {'>'}= 0 - All courts are inactive</li>
-            <li>• <a href="/courts" className="underline">Test main courts page</a></li>
-            <li>• <a href="/simple-courts" className="underline">Test simple courts page</a></li>
+            <li>• <Link href="/courts" className="underline">Test main courts page</Link></li>
+            <li>• <Link href="/simple-courts" className="underline">Test simple courts page</Link></li>
           </ul>
         </div>
       </div>

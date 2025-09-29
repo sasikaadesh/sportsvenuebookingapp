@@ -33,7 +33,7 @@ export default function FixProfilesPage() {
         return
       }
 
-      const existingProfileIds = new Set(existingProfiles?.map(p => p.id) || [])
+      const existingProfileIds = new Set(existingProfiles?.map((p: any) => p.id) || [])
       const usersNeedingProfiles = authUsers.users.filter(user => !existingProfileIds.has(user.id))
 
       setStatus(`${usersNeedingProfiles.length} users need profiles`)
@@ -156,7 +156,7 @@ export default function FixProfilesPage() {
       }
 
       // Create pricing rules for each court
-      const pricingRules = courtsData.flatMap(court => [
+      const pricingRules = courtsData.flatMap((court: any) => [
         {
           court_id: court.id,
           duration_hours: 1,
@@ -238,8 +238,8 @@ export default function FixProfilesPage() {
           <h3 className="font-semibold text-yellow-800 mb-2">⚠️ Important Notes:</h3>
           <ul className="text-yellow-700 text-sm space-y-1">
             <li>• This page requires service role access</li>
-            <li>• Run "Fix Missing Profiles" to create profiles for existing auth users</li>
-            <li>• Use "Create Admin User" to create a test admin account</li>
+            <li>• Run &quot;Fix Missing Profiles&quot; to create profiles for existing auth users</li>
+            <li>• Use &quot;Create Admin User&quot; to create a test admin account</li>
             <li>• Check browser console for detailed logs</li>
           </ul>
         </div>

@@ -22,15 +22,15 @@ export function HeaderMarketing() {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            <a href="/#features" className="text-gray-700 hover:text-blue-600 transition-colors">
+            <Link href="/#features" className="text-gray-700 hover:text-blue-600 transition-colors">
               Features
-            </a>
-            <a href="/#how-it-works" className="text-gray-700 hover:text-blue-600 transition-colors">
+            </Link>
+            <Link href="/#how-it-works" className="text-gray-700 hover:text-blue-600 transition-colors">
               How It Works
-            </a>
-            <a href="/#testimonials" className="text-gray-700 hover:text-blue-600 transition-colors">
+            </Link>
+            <Link href="/#testimonials" className="text-gray-700 hover:text-blue-600 transition-colors">
               Reviews
-            </a>
+            </Link>
             <Link href="/about" className="text-gray-700 hover:text-blue-600 transition-colors">
               About Us
             </Link>
@@ -62,36 +62,36 @@ export function HeaderMarketing() {
         {isMenuOpen && (
           <div className="md:hidden py-4 border-t border-gray-200">
             <div className="flex flex-col space-y-4">
-              <a
+              <Link
                 href="/#features"
                 className="text-gray-700 hover:text-blue-600 transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Features
-              </a>
-              <a
+              </Link>
+              <Link
                 href="/#how-it-works"
                 className="text-gray-700 hover:text-blue-600 transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 How It Works
-              </a>
-              <a
+              </Link>
+              <Link
                 href="/#testimonials"
                 className="text-gray-700 hover:text-blue-600 transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Reviews
-              </a>
-              <Link 
-                href="/about" 
+              </Link>
+              <Link
+                href="/about"
                 className="text-gray-700 hover:text-blue-600 transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 About Us
               </Link>
-              <Link 
-                href="/contact" 
+              <Link
+                href="/contact"
                 className="text-gray-700 hover:text-blue-600 transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >

@@ -43,12 +43,12 @@ export function QuickActions() {
 
       // Calculate statistics
       const totalBookings = bookingsResult.data?.length || 0
-      const totalRevenue = bookingsResult.data?.reduce((sum, booking) => sum + (booking.total_price || 0), 0) || 0
+      const totalRevenue = bookingsResult.data?.reduce((sum, booking: any) => sum + (booking.total_price || 0), 0) || 0
       const activeUsers = usersResult.data?.length || 0
-      const availableCourts = courtsResult.data?.filter(court => court.is_active).length || 0
+      const availableCourts = courtsResult.data?.filter((court: any) => court.is_active).length || 0
 
       // Prepare bookings data for table
-      const bookingsData = (bookingsResult.data || []).map(booking => [
+      const bookingsData = (bookingsResult.data || []).map((booking: any) => [
         booking.users?.full_name || 'Unknown',
         booking.courts?.name || 'Unknown',
         booking.courts?.type || 'Unknown',
@@ -282,7 +282,7 @@ export function QuickActions() {
 
       {/* Recent Activity Summary */}
       <div className="mt-6 pt-6 border-t border-gray-200">
-        <h3 className="font-medium text-gray-900 mb-3">Today's Summary</h3>
+        <h3 className="font-medium text-gray-900 mb-3">Today&apos;s Summary</h3>
         <div className="space-y-2 text-sm">
           <div className="flex justify-between">
             <span className="text-gray-600">New Bookings</span>

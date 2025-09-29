@@ -44,7 +44,7 @@ export default function TestBookingSimplePage() {
       
       const bookingData = {
         user_id: user.id,
-        court_id: courts[0].id,
+        court_id: (courts as any[])[0].id,
         booking_date: bookingDate,
         start_time: startTime,
         duration_hours: 1,
@@ -56,7 +56,7 @@ export default function TestBookingSimplePage() {
       console.log('Step 2: Creating booking with data:', bookingData)
 
       // Step 3: Create booking
-      const { data: booking, error: bookingError } = await supabase
+      const { data: booking, error: bookingError } = await (supabase as any)
         .from('bookings')
         .insert([bookingData])
         .select()
@@ -107,7 +107,7 @@ export default function TestBookingSimplePage() {
       if (userError && userError.code === 'PGRST116') {
         // User doesn't exist, create profile
         console.log('Creating user profile...')
-        const { data: newProfile, error: createError } = await supabase
+        const { data: newProfile, error: createError } = await (supabase as any)
           .from('users')
           .insert([{
             id: user.id,
@@ -286,10 +286,10 @@ export default function TestBookingSimplePage() {
       }}>
         <h3 style={{ margin: '0 0 1rem 0', color: '#92400e' }}>Instructions:</h3>
         <ol style={{ margin: 0, paddingLeft: '1.5rem', color: '#92400e' }}>
-          <li>Make sure you've run the emergency database setup</li>
+          <li>Make sure you&apos;ve run the emergency database setup</li>
           <li>Sign in to your account first</li>
-          <li>Click "Check/Create User Profile" first</li>
-          <li>Then click "Create Test Booking"</li>
+          <li>Click &quot;Check/Create User Profile&quot; first</li>
+          <li>Then click &quot;Create Test Booking&quot;</li>
           <li>Check for any error messages</li>
         </ol>
       </div>

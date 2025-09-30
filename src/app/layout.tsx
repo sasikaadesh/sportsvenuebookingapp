@@ -1,10 +1,8 @@
 import type { Metadata } from 'next'
-import { Inter, Poppins } from 'next/font/google'
+import { Poppins } from 'next/font/google'
 import './globals.css'
 import { Toaster } from 'react-hot-toast'
 import { AuthProvider } from '@/components/providers/AuthProvider'
-
-const inter = Inter({ subsets: ['latin'] })
 
 const poppins = Poppins({
   subsets: ['latin'],
@@ -33,7 +31,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${inter.className} ${poppins.variable}`}>
+      <body className={`${poppins.variable} font-poppins`}>
         <AuthProvider>
           {children}
           <Toaster 

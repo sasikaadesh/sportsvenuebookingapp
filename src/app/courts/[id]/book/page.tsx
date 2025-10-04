@@ -66,7 +66,14 @@ export default function BookCourtPage() {
       console.log('Querying court with ID:', courtId)
       let { data, error } = await supabase
         .from('courts')
-        .select('*')
+        .select(`
+          *,
+          pricing_rules (
+            duration_hours,
+            off_peak_price,
+            peak_price
+          )
+        `)
         .eq('id', courtId)
         .eq('is_active', true)
         .single()
@@ -78,7 +85,14 @@ export default function BookCourtPage() {
         console.log('Court not found by ID, trying by name...')
         const { data: nameData, error: nameError } = await supabase
           .from('courts')
-          .select('*')
+          .select(`
+            *,
+            pricing_rules (
+              duration_hours,
+              off_peak_price,
+              peak_price
+            )
+          `)
           .ilike('name', `%${courtId.replace('-', ' ')}%`)
           .eq('is_active', true)
           .limit(1)
@@ -111,10 +125,16 @@ export default function BookCourtPage() {
           location: 'Sports Complex',
           rating: 4.8,
           reviews: 124,
-          pricing: [
-            { duration: 1, offPeak: 45, peak: 65 },
-            { duration: 2, offPeak: 85, peak: 120 }
-          ]
+          pricing: courtData.pricing_rules && courtData.pricing_rules.length > 0
+            ? courtData.pricing_rules.map((rule: any) => ({
+                duration: rule.duration_hours,
+                offPeak: rule.off_peak_price,
+                peak: rule.peak_price
+              }))
+            : [
+                { duration: 1, offPeak: 45, peak: 65 },
+                { duration: 2, offPeak: 85, peak: 120 }
+              ]
         }
         setCourt(transformedCourt)
       } else {
@@ -232,10 +252,10 @@ IMPORTANT REMINDERS:
 ✅ Free cancellation up to 24 hours before your booking
 ✅ Contact us at (555) 123-4567 for any changes
 
-Thank you for choosing Sports Venue!
+Thank you for choosing SportsVenueBookings!
 
 Best regards,
-The Sports Venue Team`
+The SportsVenueBookings Team`
 
           await sendContactEmails({
             name: user.user_metadata?.full_name || user.email || 'Customer',

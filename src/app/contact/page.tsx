@@ -134,7 +134,7 @@ export default function ContactPage() {
     {
       icon: Mail,
       title: 'Email',
-      details: ['info@sportvenue.com', 'support@sportvenue.com'],
+      details: ['info@sportsvenuebookings.com', 'support@sportsvenuebookings.com'],
       description: 'We respond within 24 hours'
     },
     {
@@ -171,7 +171,7 @@ export default function ContactPage() {
           className="text-center mb-12"
         >
           <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-            Contact SportVenue
+            Contact SportsVenueBookings
           </h1>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
             Questions about our platform? Need help getting started? Our team is here to help you find the perfect sports venue!

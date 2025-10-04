@@ -11,6 +11,40 @@ import { CourtCard } from '@/components/courts/CourtCard'
 import { CourtFilters } from '@/components/courts/CourtFilters'
 import { supabase } from '@/lib/supabase'
 
+// Helper functions for court data
+const getDefaultImageForType = (type: string) => {
+  const imageMap: { [key: string]: string } = {
+    'tennis': 'https://images.unsplash.com/photo-1554068865-24cecd4e34b8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+    'basketball': 'https://images.unsplash.com/photo-1546519638-68e109498ffc?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+    'cricket': 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+    'badminton': 'https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+    'football': 'https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
+  }
+  return imageMap[type] || imageMap['tennis']
+}
+
+const getPriceForType = (type: string) => {
+  const priceMap: { [key: string]: number } = {
+    'tennis': 45,
+    'basketball': 35,
+    'cricket': 240,
+    'badminton': 30,
+    'football': 120
+  }
+  return priceMap[type] || 45
+}
+
+const getDefaultAmenitiesForType = (type: string) => {
+  const amenitiesMap: { [key: string]: string[] } = {
+    'tennis': ['Professional Lighting', 'Equipment Rental', 'Parking Available'],
+    'basketball': ['Indoor', 'Air Conditioning', 'Sound System'],
+    'cricket': ['Professional Pitch', 'Pavilion', 'Equipment Rental'],
+    'badminton': ['Indoor', 'Wooden Floor', 'Net Equipment'],
+    'football': ['Natural Grass', 'Professional Goals', 'Changing Rooms']
+  }
+  return amenitiesMap[type] || ['Professional Lighting', 'Parking Available']
+}
+
 // Mock data - will be replaced with real data from Supabase
 const mockCourts = [
   {
@@ -120,18 +154,6 @@ export default function CourtsPage() {
   // Load courts from database
   useEffect(() => {
     loadCourts()
-
-    // Add timeout to prevent infinite loading
-    const timeout = setTimeout(() => {
-      if (loading) {
-        console.log('Courts loading timeout, using mock data')
-        setCourts(mockCourts)
-        setFilteredCourts(mockCourts)
-        setLoading(false)
-      }
-    }, 10000) // 10 second timeout
-
-    return () => clearTimeout(timeout)
   }, [])
 
   const loadCourts = async () => {
@@ -140,10 +162,17 @@ export default function CourtsPage() {
 
     try {
       console.log('Querying courts from database...')
-      // Optimized query - only select needed fields
+      // Load courts with their pricing rules
       const { data, error } = await supabase
         .from('courts')
-        .select('id, name, type, description, image_url, amenities, is_active')
+        .select(`
+          id, name, type, description, image_url, amenities, is_active,
+          pricing_rules (
+            duration_hours,
+            off_peak_price,
+            peak_price
+          )
+        `)
         .eq('is_active', true)
         .order('name')
 
@@ -160,23 +189,33 @@ export default function CourtsPage() {
         setFilteredCourts(mockCourts)
       } else {
         console.log(`Found ${data.length} courts in database`)
-        setDataSource('database')
+
         // Transform database data to match component expectations
-        const transformedCourts = data.map((court: any) => ({
-          id: court.id,
-          name: court.name,
-          type: court.type,
-          image: court.image_url || (court.type === 'badminton' ? 'https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80' : 'https://images.unsplash.com/photo-1554068865-24cecd4e34b8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'),
-          location: 'Sports Complex',
-          rating: 4.5,
-          reviews: 50,
-          priceFrom: 45, // Use fixed price for now
-          amenities: court.amenities ? court.amenities.split(', ') : [],
-          availability: 'Available Today',
-          description: court.description || 'Professional sports court'
-        }))
+        const transformedCourts = data.map((court: any) => {
+          // Get the lowest price from pricing rules for "priceFrom"
+          let priceFrom = getPriceForType(court.type) // fallback
+          if (court.pricing_rules && court.pricing_rules.length > 0) {
+            const prices = court.pricing_rules.map((rule: any) => rule.off_peak_price)
+            priceFrom = Math.min(...prices)
+          }
+
+          return {
+            id: court.id,
+            name: court.name,
+            type: court.type,
+            image: court.image_url || getDefaultImageForType(court.type),
+            location: 'Sports Complex',
+            rating: 4.5,
+            reviews: 50,
+            priceFrom: priceFrom,
+            amenities: court.amenities ? court.amenities.split(', ') : getDefaultAmenitiesForType(court.type),
+            availability: 'Available Today',
+            description: court.description || 'Professional sports court'
+          }
+        })
 
         console.log('Transformed courts:', transformedCourts)
+        setDataSource('database')
         setCourts(transformedCourts)
         setFilteredCourts(transformedCourts)
       }

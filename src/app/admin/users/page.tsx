@@ -34,14 +34,32 @@ export default function AdminUsersPage() {
   const [filterRole, setFilterRole] = useState('all')
 
   useEffect(() => {
-    if (!loading && (!user || profile?.role !== 'admin')) {
+    // Wait for loading to complete
+    if (loading) return
+
+    // If no user, redirect to home
+    if (!user) {
+      console.log('Admin users: No user found, redirecting to home')
       router.push('/')
       return
     }
-    
-    if (user && profile?.role === 'admin') {
-      loadUsers()
+
+    // If profile is still loading (null), wait
+    if (profile === null) {
+      console.log('Admin users: Profile still loading, waiting...')
+      return
     }
+
+    // If profile exists but no admin role, redirect
+    if (profile && profile.role !== 'admin') {
+      console.log('Admin users: User is not admin, role:', profile.role, 'redirecting to home')
+      router.push('/')
+      return
+    }
+
+    // If we get here, user should be admin
+    console.log('Admin users: Loading users for admin user')
+    loadUsers()
   }, [user, profile, loading, router])
 
   const loadUsers = async () => {
@@ -139,18 +157,22 @@ export default function AdminUsersPage() {
     })
   }
 
-  if (loading || loadingUsers) {
+  // Show loading while auth is loading or profile is null
+  if (loading || loadingUsers || !user || profile === null) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading users...</p>
+          <p className="text-gray-600">
+            {loading ? 'Loading...' : loadingUsers ? 'Loading users...' : 'Checking permissions...'}
+          </p>
         </div>
       </div>
     )
   }
 
-  if (!user || profile?.role !== 'admin') {
+  // If profile exists but user is not admin, don't render anything (redirect will happen in useEffect)
+  if (profile && profile.role !== 'admin') {
     return null
   }
 

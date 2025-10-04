@@ -12,13 +12,13 @@ const poppins = Poppins({
 })
 
 export const metadata: Metadata = {
-  title: 'Sports Venue Booking App',
-  description: 'Book your favorite sports venues with ease',
+  title: 'SportsVenueBookings - Book Sports Venues Online',
+  description: 'Book your favorite sports venues with ease using SportsVenueBookings',
   keywords: ['sports', 'venue', 'booking', 'tennis', 'basketball', 'cricket', 'badminton', 'football'],
-  authors: [{ name: 'Sports Venue Booking Team' }],
+  authors: [{ name: 'SportsVenueBookings Team' }],
   openGraph: {
-    title: 'Sports Venue Booking App',
-    description: 'Book your favorite sports venues with ease',
+    title: 'SportsVenueBookings - Book Sports Venues Online',
+    description: 'Book your favorite sports venues with ease using SportsVenueBookings',
     type: 'website',
     locale: 'en_US',
   },

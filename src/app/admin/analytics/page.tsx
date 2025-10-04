@@ -12,18 +12,22 @@ export default function AdminAnalyticsPage() {
   const { user, profile, loading } = useAuth()
   const router = useRouter()
 
-  if (loading) {
+  // Show loading while auth is loading or profile is null
+  if (loading || !user || profile === null) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading...</p>
+          <p className="text-gray-600">
+            {loading ? 'Loading...' : 'Checking permissions...'}
+          </p>
         </div>
       </div>
     )
   }
 
-  if (!user || profile?.role !== 'admin') {
+  // If profile exists but user is not admin, redirect and don't render
+  if (profile && profile.role !== 'admin') {
     router.push('/')
     return null
   }

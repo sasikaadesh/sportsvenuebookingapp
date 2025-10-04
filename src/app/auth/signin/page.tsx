@@ -95,7 +95,20 @@ export default function SignInPage() {
       })
 
       if (error) {
-        toast.error(error.message)
+        console.error('Sign in error:', error)
+
+        // Handle specific error cases
+        if (error.message.includes('Email not confirmed')) {
+          toast.error('Please check your email and click the confirmation link before signing in.')
+          toast('If you didn\'t receive the email, try signing up again.', {
+            icon: '📧',
+            duration: 6000,
+          })
+        } else if (error.message.includes('Invalid login credentials')) {
+          toast.error('Invalid email or password. Please check your credentials and try again.')
+        } else {
+          toast.error(error.message || 'Failed to sign in')
+        }
         return
       }
 

@@ -12,7 +12,7 @@ const ADMIN_EMAILS = [
 
 // Fallback admin emails (for development/testing)
 const FALLBACK_ADMIN_EMAILS = [
-  'admin@sportsvenueapp.com',
+  'admin@sportsvenuebookings.com',
   'admin@example.com'
 ]
 

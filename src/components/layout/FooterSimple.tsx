@@ -8,9 +8,9 @@ export function FooterSimple() {
           {/* Logo */}
           <div className="flex items-center space-x-2">
             <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-green-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">SV</span>
+              <span className="text-white font-bold text-xs">SVB</span>
             </div>
-            <span className="text-xl font-bold">SportVenue</span>
+            <span className="text-xl font-bold">SportsVenueBookings</span>
           </div>
 
           {/* Quick Links */}
@@ -37,7 +37,7 @@ export function FooterSimple() {
 
           {/* Copyright */}
           <div className="text-gray-400 dark:text-gray-500 text-sm">
-            © {new Date().getFullYear()} SportVenue. All rights reserved.
+            © {new Date().getFullYear()} SportsVenueBookings. All rights reserved.
           </div>
         </div>
       </div>

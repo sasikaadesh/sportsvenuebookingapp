@@ -1,4 +1,4 @@
--- Sample data for Sports Venue Booking App
+-- Sample data for SportsVenueBookings App
 -- Run this after setting up the main schema
 
 -- Insert sample courts

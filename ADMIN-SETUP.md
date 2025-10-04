@@ -1,6 +1,6 @@
 # Admin Setup Guide
 
-This guide explains how to set up admin access for your Sports Venue Booking App.
+This guide explains how to set up admin access for your SportsVenueBookings App.
 
 ## 1. Database Setup
 

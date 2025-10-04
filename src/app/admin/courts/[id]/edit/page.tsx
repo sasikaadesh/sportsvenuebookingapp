@@ -39,6 +39,7 @@ export default function EditCourtPage() {
   const params = useParams()
   const [saving, setSaving] = useState(false)
   const [loadingCourt, setLoadingCourt] = useState(true)
+  const [hasMaintenanceMode, setHasMaintenanceMode] = useState(true)
   const [formData, setFormData] = useState({
     name: '',
     type: 'tennis',
@@ -55,12 +56,32 @@ export default function EditCourtPage() {
 
   // Redirect if not admin
   useEffect(() => {
-    if (!loading && (!user || profile?.role !== 'admin')) {
+    // Wait for loading to complete
+    if (loading) return
+
+    // If no user, redirect to home
+    if (!user) {
+      console.log('Admin edit court: No user found, redirecting to home')
       router.push('/')
       return
     }
 
-    if (user && profile?.role === 'admin' && params.id) {
+    // If profile is still loading (null), wait
+    if (profile === null) {
+      console.log('Admin edit court: Profile still loading, waiting...')
+      return
+    }
+
+    // If profile exists but no admin role, redirect
+    if (profile && profile.role !== 'admin') {
+      console.log('Admin edit court: User is not admin, role:', profile.role, 'redirecting to home')
+      router.push('/')
+      return
+    }
+
+    // If we get here, user should be admin
+    if (params.id) {
+      console.log('Admin edit court: Loading court for admin user')
       loadCourt()
     }
   }, [user, profile, loading, router, params.id])
@@ -68,7 +89,15 @@ export default function EditCourtPage() {
   const loadCourt = async () => {
     try {
       setLoadingCourt(true)
-      
+
+      // First check if maintenance_mode column exists
+      const { error: testError } = await supabase
+        .from('courts')
+        .select('maintenance_mode')
+        .limit(1)
+
+      setHasMaintenanceMode(!testError)
+
       // Load court data
       const { data, error } = await supabase
         .from('courts')
@@ -83,22 +112,42 @@ export default function EditCourtPage() {
         return
       }
 
-      // Load pricing rules
-      const { data: pricingData, error: pricingError } = await supabase
-        .from('pricing_rules')
-        .select('*')
-        .eq('court_id', params.id as string)
-        .in('duration_hours', [1, 2])
-
+      // Load pricing rules (with fallback for missing table or wrong schema)
       let price1hr = 45
       let price2hr = 80
 
-      if (!pricingError && pricingData) {
-        const oneHourRule = (pricingData as any[]).find((rule: any) => rule.duration_hours === 1)
-        const twoHourRule = (pricingData as any[]).find((rule: any) => rule.duration_hours === 2)
+      try {
+        // First check if table has correct schema
+        const { data: schemaTest, error: schemaError } = await supabase
+          .from('pricing_rules')
+          .select('off_peak_price')
+          .limit(1)
 
-        if (oneHourRule) price1hr = oneHourRule.off_peak_price || 45
-        if (twoHourRule) price2hr = twoHourRule.off_peak_price || 80
+        if (schemaError) {
+          console.log('Pricing rules table schema issue:', schemaError.message)
+          // Use defaults
+        } else {
+          // Schema is correct, load pricing data
+          const { data: pricingData, error: pricingError } = await supabase
+            .from('pricing_rules')
+            .select('duration_hours, off_peak_price, peak_price')
+            .eq('court_id', params.id as string)
+            .in('duration_hours', [1, 2])
+
+          if (!pricingError && pricingData && pricingData.length > 0) {
+            const oneHourRule = (pricingData as any[]).find((rule: any) => rule.duration_hours === 1)
+            const twoHourRule = (pricingData as any[]).find((rule: any) => rule.duration_hours === 2)
+
+            if (oneHourRule) price1hr = oneHourRule.off_peak_price || 45
+            if (twoHourRule) price2hr = twoHourRule.off_peak_price || 80
+
+            console.log('Loaded pricing from database:', { price1hr, price2hr })
+          } else {
+            console.log('No pricing rules found, using defaults:', { price1hr, price2hr })
+          }
+        }
+      } catch (pricingException) {
+        console.log('Pricing rules table not available, using defaults:', { price1hr, price2hr })
       }
 
       const courtData = data as any
@@ -111,7 +160,7 @@ export default function EditCourtPage() {
         price_1hr: price1hr,
         price_2hr: price2hr,
         is_active: courtData.is_active !== false,
-        maintenance_mode: courtData.maintenance_mode || false
+        maintenance_mode: courtData.maintenance_mode !== undefined ? courtData.maintenance_mode : false
       })
 
       // Parse amenities if it's a string
@@ -201,7 +250,24 @@ export default function EditCourtPage() {
         image_url: formData.image_url,
         amenities: formData.amenities,
         is_active: formData.is_active,
-        maintenance_mode: formData.maintenance_mode
+        updated_at: new Date().toISOString()
+      }
+
+      // Only include maintenance_mode if the column exists in the database
+      // This prevents errors when the column is missing
+      try {
+        // Test if maintenance_mode column exists by doing a simple select
+        const { error: testError } = await supabase
+          .from('courts')
+          .select('maintenance_mode')
+          .limit(1)
+
+        if (!testError) {
+          // Column exists, include it in the update
+          (courtData as any).maintenance_mode = formData.maintenance_mode
+        }
+      } catch (e) {
+        console.log('maintenance_mode column not available, skipping...')
       }
 
       console.log('Updating court with data:', courtData)
@@ -220,40 +286,67 @@ export default function EditCourtPage() {
       console.log('Court updated successfully')
 
       // Update or create pricing rules
-      const pricingRules = [
-        {
-          court_id: params.id,
-          duration_hours: 1,
-          off_peak_price: formData.price_1hr,
-          peak_price: formData.price_1hr * 1.3 // Peak price is 30% higher
-        },
-        {
-          court_id: params.id,
-          duration_hours: 2,
-          off_peak_price: formData.price_2hr,
-          peak_price: formData.price_2hr * 1.3 // Peak price is 30% higher
+      try {
+        // First check if pricing_rules table exists and has correct schema
+        const { data: schemaCheck, error: schemaError } = await supabase
+          .from('pricing_rules')
+          .select('off_peak_price, peak_price')
+          .limit(1)
+
+        if (schemaError) {
+          console.log('Pricing rules table not available or wrong schema:', schemaError.message)
+          if (schemaError.message.includes('off_peak_price')) {
+            toast.error('Pricing system needs to be set up. Please run the database setup script.')
+            toast('Court updated successfully, but pricing system requires database migration.', {
+              icon: '⚠️',
+              duration: 8000,
+            })
+          } else {
+            toast.success('Court updated successfully! (Pricing rules table not configured)')
+          }
+        } else {
+          // Table exists with correct schema, proceed with pricing updates
+          const pricingRules = [
+            {
+              court_id: params.id,
+              duration_hours: 1,
+              off_peak_price: formData.price_1hr,
+              peak_price: Math.round(formData.price_1hr * 1.3 * 100) / 100 // Peak price is 30% higher, rounded
+            },
+            {
+              court_id: params.id,
+              duration_hours: 2,
+              off_peak_price: formData.price_2hr,
+              peak_price: Math.round(formData.price_2hr * 1.3 * 100) / 100 // Peak price is 30% higher, rounded
+            }
+          ]
+
+          console.log('Updating pricing rules:', pricingRules)
+
+          // Use upsert to handle both insert and update
+          const { error: pricingError } = await supabase
+            .from('pricing_rules')
+            .upsert(pricingRules, {
+              onConflict: 'court_id,duration_hours'
+            })
+
+          if (pricingError) {
+            console.error('Error updating pricing rules:', pricingError)
+            toast.error(`Court updated but pricing failed: ${pricingError.message}`)
+          } else {
+            console.log('Pricing rules updated successfully')
+            toast.success('Court and pricing updated successfully!')
+          }
         }
-      ]
-
-      // Delete existing pricing rules for this court and durations
-      await supabase
-        .from('pricing_rules')
-        .delete()
-        .eq('court_id', params.id as string)
-        .in('duration_hours', [1, 2])
-
-      // Insert new pricing rules
-      const { error: pricingError } = await (supabase as any)
-        .from('pricing_rules')
-        .insert(pricingRules)
-
-      if (pricingError) {
-        console.error('Error updating pricing rules:', pricingError)
-        // Don't fail the entire operation if pricing rules fail
-        toast.error('Court updated but pricing rules failed. You can update pricing later.')
-      } else {
-        console.log('Pricing rules updated successfully')
+      } catch (pricingException) {
+        console.error('Exception updating pricing rules:', pricingException)
+        toast.success('Court updated successfully! (Pricing system not available)')
       }
+
+      // Refresh the court data to show updated prices
+      setTimeout(() => {
+        loadCourt()
+      }, 1000)
 
       toast.success('Court updated successfully with pricing!')
       
@@ -265,6 +358,25 @@ export default function EditCourtPage() {
     } finally {
       setSaving(false)
     }
+  }
+
+  // Show loading while auth is loading or profile is null
+  if (loading || loadingCourt || !user || profile === null) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">
+            {loading ? 'Loading...' : loadingCourt ? 'Loading court...' : 'Checking permissions...'}
+          </p>
+        </div>
+      </div>
+    )
+  }
+
+  // If profile exists but user is not admin, don't render anything (redirect will happen in useEffect)
+  if (profile && profile.role !== 'admin') {
+    return null
   }
 
   return (
@@ -502,19 +614,21 @@ export default function EditCourtPage() {
                 </label>
               </div>
 
-              <div className="flex items-center">
-                <input
-                  type="checkbox"
-                  id="maintenance_mode"
-                  name="maintenance_mode"
-                  checked={formData.maintenance_mode}
-                  onChange={handleInputChange}
-                  className="h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 rounded"
-                />
-                <label htmlFor="maintenance_mode" className="ml-2 block text-sm text-gray-700">
-                  Court is in maintenance mode
-                </label>
-              </div>
+              {hasMaintenanceMode && (
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="maintenance_mode"
+                    name="maintenance_mode"
+                    checked={formData.maintenance_mode}
+                    onChange={handleInputChange}
+                    className="h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 rounded"
+                  />
+                  <label htmlFor="maintenance_mode" className="ml-2 block text-sm text-gray-700">
+                    Court is in maintenance mode
+                  </label>
+                </div>
+              )}
             </div>
 
             {/* Submit Buttons */}

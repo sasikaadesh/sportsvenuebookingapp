@@ -31,7 +31,7 @@ export default function AboutPage() {
     {
       icon: Users,
       title: 'Trusted by Thousands',
-      description: 'Over 10,000 athletes trust SportVenue for their booking needs, from weekend warriors to professional teams.',
+      description: 'Over 10,000 athletes trust SportsVenueBookings for their booking needs, from weekend warriors to professional teams.',
       color: 'bg-green-500'
     },
     {
@@ -99,7 +99,7 @@ export default function AboutPage() {
       name: 'Alex Thompson',
       role: 'Founder & CEO',
       image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
-      description: 'Former college athlete turned tech entrepreneur. Built SportVenue after struggling to book courts for his team.'
+      description: 'Former college athlete turned tech entrepreneur. Built SportsVenueBookings after struggling to book courts for his team.'
     },
     {
       name: 'Sarah Kim',
@@ -128,7 +128,7 @@ export default function AboutPage() {
               className="text-center"
             >
               <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
-                About <span className="text-blue-600">SportVenue</span>
+                About <span className="text-blue-600">SportsVenueBookings</span>
               </h1>
               <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
                 We&apos;re revolutionizing sports venue booking with technology that makes finding and reserving
@@ -173,7 +173,7 @@ export default function AboutPage() {
               className="text-center mb-16"
             >
               <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-                Why Choose SportVenue?
+                Why Choose SportsVenueBookings?
               </h2>
               <p className="text-xl text-gray-600 max-w-2xl mx-auto">
                 We&apos;re not just another booking platform. We&apos;re the solution to every athlete&apos;s venue booking problems.
@@ -341,7 +341,7 @@ export default function AboutPage() {
                     <Mail className="w-6 h-6" />
                   </div>
                   <p className="font-medium">Email Us</p>
-                  <p className="text-sm opacity-90">info@sportvenue.com<br />support@sportvenue.com</p>
+                  <p className="text-sm opacity-90">info@sportsvenuebookings.com<br />support@sportsvenuebookings.com</p>
                 </div>
               </div>
             </motion.div>

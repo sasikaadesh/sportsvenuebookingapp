@@ -1,4 +1,4 @@
-# Sports Venue Booking App
+# SportsVenueBookings App
 
 A modern, production-ready sports venue booking web application built with Next.js 14, TypeScript, Tailwind CSS, and Supabase.
 
@@ -60,7 +60,7 @@ A modern, production-ready sports venue booking web application built with Next.
 1. **Clone the repository**
    ```bash
    git clone <repository-url>
-   cd sports-venue-booking-app
+   cd sportsvenuebookings-app
    ```
 
 2. **Install dependencies**
@@ -211,7 +211,7 @@ This project is licensed under the MIT License.
 
 For support and questions:
 - Create an issue in the repository
-- Contact: info@sportvenue.com
+- Contact: info@sportsvenuebookings.com
 - Documentation: [Project Wiki](link-to-wiki)
 
 ## 🔄 Roadmap

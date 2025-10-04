@@ -15,9 +15,9 @@ export function HeaderMarketing() {
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2">
             <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-green-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">SV</span>
+              <span className="text-white font-bold text-xs">SVB</span>
             </div>
-            <span className="text-xl font-bold text-gray-900">SportVenue</span>
+            <span className="text-xl font-bold text-gray-900">SportsVenueBookings</span>
           </Link>
 
           {/* Desktop Navigation */}

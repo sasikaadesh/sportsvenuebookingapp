@@ -21,6 +21,14 @@ export default function SignUpPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [passwordValidation, setPasswordValidation] = useState({
+    length: false,
+    uppercase: false,
+    lowercase: false,
+    number: false,
+    special: false,
+    match: false
+  })
   const router = useRouter()
   const { user } = useAuth()
 
@@ -54,6 +62,36 @@ export default function SignUpPage() {
     }
   }, [])
 
+  // Password validation function
+  const validatePassword = (password: string, confirmPassword: string = formData.confirmPassword) => {
+    const validation = {
+      length: password.length >= 8,
+      uppercase: /[A-Z]/.test(password),
+      lowercase: /[a-z]/.test(password),
+      number: /\d/.test(password),
+      special: /[!@#$%^&*(),.?":{}|<>]/.test(password),
+      match: password === confirmPassword && password.length > 0
+    }
+    setPasswordValidation(validation)
+    return validation
+  }
+
+  const getPasswordStrength = () => {
+    const { length, uppercase, lowercase, number, special } = passwordValidation
+    const score = [length, uppercase, lowercase, number, special].filter(Boolean).length
+
+    if (score === 0) return { strength: 'none', color: 'gray', text: '' }
+    if (score <= 2) return { strength: 'weak', color: 'red', text: 'Weak' }
+    if (score <= 3) return { strength: 'fair', color: 'yellow', text: 'Fair' }
+    if (score <= 4) return { strength: 'good', color: 'blue', text: 'Good' }
+    return { strength: 'strong', color: 'green', text: 'Strong' }
+  }
+
+  const isPasswordValid = () => {
+    const { length, uppercase, lowercase, number, special, match } = passwordValidation
+    return length && uppercase && lowercase && number && special && match
+  }
+
   // Redirect if already authenticated
   if (user) {
     router.push('/dashboard')
@@ -61,25 +99,60 @@ export default function SignUpPage() {
   }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({
+    const { name, value } = e.target
+    const newFormData = {
       ...formData,
-      [e.target.name]: e.target.value
-    })
+      [name]: value
+    }
+    setFormData(newFormData)
+
+    // Trigger password validation when password or confirmPassword changes
+    if (name === 'password') {
+      validatePassword(value, newFormData.confirmPassword)
+    } else if (name === 'confirmPassword') {
+      validatePassword(newFormData.password, value)
+    }
   }
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
 
-    // Validation
-    if (formData.password !== formData.confirmPassword) {
-      toast.error('Passwords do not match')
+    // Comprehensive password validation
+    const validation = validatePassword(formData.password, formData.confirmPassword)
+
+    if (!validation.length) {
+      toast.error('Password must be at least 8 characters long')
       setLoading(false)
       return
     }
 
-    if (formData.password.length < 6) {
-      toast.error('Password must be at least 6 characters')
+    if (!validation.uppercase) {
+      toast.error('Password must contain at least one uppercase letter')
+      setLoading(false)
+      return
+    }
+
+    if (!validation.lowercase) {
+      toast.error('Password must contain at least one lowercase letter')
+      setLoading(false)
+      return
+    }
+
+    if (!validation.number) {
+      toast.error('Password must contain at least one number')
+      setLoading(false)
+      return
+    }
+
+    if (!validation.special) {
+      toast.error('Password must contain at least one special character (!@#$%^&*)')
+      setLoading(false)
+      return
+    }
+
+    if (!validation.match) {
+      toast.error('Passwords do not match')
       setLoading(false)
       return
     }
@@ -90,7 +163,8 @@ export default function SignUpPage() {
         password: formData.password,
         options: {
           data: {
-            name: formData.name,
+            full_name: formData.name,
+            name: formData.name, // Keep both for compatibility
             phone: formData.phone,
           },
           // Skip email confirmation for development
@@ -100,48 +174,59 @@ export default function SignUpPage() {
 
       if (error) {
         console.error('Signup error:', error)
-        toast.error(error.message)
+        toast.error(error.message || 'Failed to create account')
+        setLoading(false)
         return
       }
 
       if (data.user) {
-        // Ensure profile is created
-        try {
-          const { error: profileError } = await supabase
-            .from('users')
-            .insert({
-              id: data.user.id,
-              email: data.user.email || '',
-              name: formData.name,
-              phone: formData.phone,
-              role: 'user' as const
-            } as any)
+        console.log('User created successfully:', data.user.email)
+        console.log('User confirmation status:', {
+          email_confirmed_at: data.user.email_confirmed_at,
+          confirmed_at: data.user.confirmed_at
+        })
 
-          if (profileError && profileError.code !== '23505') { // Ignore duplicate key error
-            console.error('Profile creation error:', profileError)
-          }
-        } catch (profileErr) {
-          console.error('Profile creation failed:', profileErr)
-        }
+        // Profile creation is handled by database trigger or AuthProvider
+        // No need to manually create profile here
 
-        // Check if user was created successfully
-        if (data.user.email_confirmed_at) {
+        // Check if email confirmation is required
+        if (data.user.email_confirmed_at || data.user.confirmed_at) {
+          // User is already confirmed (instant confirmation enabled)
           toast.success('Account created and verified successfully!')
 
-          // Check if user came from demo app context
-          const returnTo = localStorage.getItem('auth_return_to') || '/'
-          localStorage.removeItem('auth_return_to')
+          // Small delay to allow AuthProvider to process the new user
+          setTimeout(() => {
+            // Check if user came from demo app context
+            const returnTo = localStorage.getItem('auth_return_to') || '/'
+            localStorage.removeItem('auth_return_to')
 
-          // If return path is app-related, redirect to app, otherwise dashboard
-          if (returnTo.startsWith('/app') || returnTo.includes('/courts') || returnTo.includes('/dashboard') || returnTo.includes('/profile')) {
-            router.push('/app')
-          } else {
-            router.push('/dashboard')
-          }
+            // If return path is app-related, redirect to app, otherwise dashboard
+            if (returnTo.startsWith('/app') || returnTo.includes('/courts') || returnTo.includes('/dashboard') || returnTo.includes('/profile')) {
+              router.push('/app')
+            } else {
+              router.push('/dashboard')
+            }
+          }, 1000)
         } else {
-          // For development, auto-confirm and redirect
-          toast.success('Account created successfully! You can now sign in.')
-          router.push('/auth/signin')
+          // Email confirmation required
+          console.log('Email confirmation required for user')
+          toast.success('Account created successfully!')
+
+          // Always show the email confirmation message for unconfirmed users
+          toast('Please check your email and click the confirmation link to verify your account.', {
+            icon: '📧',
+            duration: 8000,
+          })
+
+          toast('After confirming your email, you can sign in with your credentials.', {
+            icon: 'ℹ️',
+            duration: 6000,
+          })
+
+          // Always redirect to signin page
+          setTimeout(() => {
+            router.push('/auth/signin')
+          }, 2000)
         }
       }
     } catch (error) {
@@ -310,6 +395,69 @@ export default function SignUpPage() {
                   )}
                 </button>
               </div>
+
+              {/* Password Strength Indicator */}
+              {formData.password && (
+                <div className="mt-3">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm text-gray-600">Password Strength:</span>
+                    <span className={`text-sm font-medium ${
+                      getPasswordStrength().color === 'green' ? 'text-green-600' :
+                      getPasswordStrength().color === 'blue' ? 'text-blue-600' :
+                      getPasswordStrength().color === 'yellow' ? 'text-yellow-600' :
+                      getPasswordStrength().color === 'red' ? 'text-red-600' : 'text-gray-400'
+                    }`}>
+                      {getPasswordStrength().text}
+                    </span>
+                  </div>
+
+                  {/* Strength Bar */}
+                  <div className="w-full bg-gray-200 rounded-full h-2 mb-3">
+                    <div
+                      className={`h-2 rounded-full transition-all duration-300 ${
+                        getPasswordStrength().color === 'green' ? 'bg-green-500 w-full' :
+                        getPasswordStrength().color === 'blue' ? 'bg-blue-500 w-4/5' :
+                        getPasswordStrength().color === 'yellow' ? 'bg-yellow-500 w-3/5' :
+                        getPasswordStrength().color === 'red' ? 'bg-red-500 w-2/5' : 'bg-gray-300 w-1/5'
+                      }`}
+                    ></div>
+                  </div>
+
+                  {/* Password Requirements */}
+                  <div className="space-y-1">
+                    <div className={`flex items-center text-xs ${passwordValidation.length ? 'text-green-600' : 'text-gray-500'}`}>
+                      <div className={`w-4 h-4 rounded-full mr-2 flex items-center justify-center ${passwordValidation.length ? 'bg-green-100' : 'bg-gray-100'}`}>
+                        {passwordValidation.length ? '✓' : '○'}
+                      </div>
+                      At least 8 characters
+                    </div>
+                    <div className={`flex items-center text-xs ${passwordValidation.uppercase ? 'text-green-600' : 'text-gray-500'}`}>
+                      <div className={`w-4 h-4 rounded-full mr-2 flex items-center justify-center ${passwordValidation.uppercase ? 'bg-green-100' : 'bg-gray-100'}`}>
+                        {passwordValidation.uppercase ? '✓' : '○'}
+                      </div>
+                      One uppercase letter (A-Z)
+                    </div>
+                    <div className={`flex items-center text-xs ${passwordValidation.lowercase ? 'text-green-600' : 'text-gray-500'}`}>
+                      <div className={`w-4 h-4 rounded-full mr-2 flex items-center justify-center ${passwordValidation.lowercase ? 'bg-green-100' : 'bg-gray-100'}`}>
+                        {passwordValidation.lowercase ? '✓' : '○'}
+                      </div>
+                      One lowercase letter (a-z)
+                    </div>
+                    <div className={`flex items-center text-xs ${passwordValidation.number ? 'text-green-600' : 'text-gray-500'}`}>
+                      <div className={`w-4 h-4 rounded-full mr-2 flex items-center justify-center ${passwordValidation.number ? 'bg-green-100' : 'bg-gray-100'}`}>
+                        {passwordValidation.number ? '✓' : '○'}
+                      </div>
+                      One number (0-9)
+                    </div>
+                    <div className={`flex items-center text-xs ${passwordValidation.special ? 'text-green-600' : 'text-gray-500'}`}>
+                      <div className={`w-4 h-4 rounded-full mr-2 flex items-center justify-center ${passwordValidation.special ? 'bg-green-100' : 'bg-gray-100'}`}>
+                        {passwordValidation.special ? '✓' : '○'}
+                      </div>
+                      One special character (!@#$%^&*)
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Confirm Password Field */}
@@ -344,6 +492,22 @@ export default function SignUpPage() {
                   )}
                 </button>
               </div>
+
+              {/* Password Match Indicator */}
+              {formData.confirmPassword && (
+                <div className="mt-2">
+                  <div className={`flex items-center text-sm ${
+                    passwordValidation.match ? 'text-green-600' : 'text-red-500'
+                  }`}>
+                    <div className={`w-4 h-4 rounded-full mr-2 flex items-center justify-center ${
+                      passwordValidation.match ? 'bg-green-100' : 'bg-red-100'
+                    }`}>
+                      {passwordValidation.match ? '✓' : '✗'}
+                    </div>
+                    {passwordValidation.match ? 'Passwords match' : 'Passwords do not match'}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Terms and Conditions */}
@@ -371,10 +535,24 @@ export default function SignUpPage() {
             <Button
               type="submit"
               loading={loading}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3"
+              disabled={loading || !isPasswordValid() || !formData.name || !formData.email}
+              className={`w-full py-3 text-white transition-all ${
+                loading || !isPasswordValid() || !formData.name || !formData.email
+                  ? 'bg-gray-400 cursor-not-allowed'
+                  : 'bg-blue-600 hover:bg-blue-700'
+              }`}
             >
               Create account
             </Button>
+
+            {/* Validation Summary */}
+            {(formData.password || formData.confirmPassword) && !isPasswordValid() && (
+              <div className="text-center">
+                <p className="text-sm text-gray-600">
+                  Please complete all password requirements to continue
+                </p>
+              </div>
+            )}
 
             {/* Divider */}
             <div className="relative">

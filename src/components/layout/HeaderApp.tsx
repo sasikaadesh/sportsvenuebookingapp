@@ -47,9 +47,9 @@ export function HeaderApp({ hideThemeToggle = false }: HeaderAppProps) {
           {/* Logo */}
           <Link href="/app" className="flex items-center space-x-2">
             <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-green-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">SV</span>
+              <span className="text-white font-bold text-xs">SVB</span>
             </div>
-            <span className="text-xl font-bold text-gray-900 dark:text-white">SportVenue</span>
+            <span className="text-xl font-bold text-gray-900 dark:text-white">SportsVenueBookings</span>
             <span className="text-xs bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 px-2 py-1 rounded-full font-medium">Demo</span>
           </Link>
 

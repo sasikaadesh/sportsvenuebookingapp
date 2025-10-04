@@ -10,9 +10,9 @@ export function Footer() {
           <div className="space-y-4">
             <div className="flex items-center space-x-2">
               <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-green-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">SV</span>
+                <span className="text-white font-bold text-xs">SVB</span>
               </div>
-              <span className="text-xl font-bold">SportVenue</span>
+              <span className="text-xl font-bold">SportsVenueBookings</span>
             </div>
             <p className="text-gray-400 text-sm">
               Your premier destination for booking sports venues. Play your favorite sports with ease and convenience.
@@ -121,7 +121,7 @@ export function Footer() {
         {/* Bottom Bar */}
         <div className="border-t border-gray-800 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
           <p className="text-gray-400 text-sm">
-            © {new Date().getFullYear()} SportVenue. All rights reserved.
+            © {new Date().getFullYear()} SportsVenueBookings. All rights reserved.
           </p>
           <div className="flex space-x-6 mt-4 md:mt-0">
             <Link href="/terms" className="text-gray-400 hover:text-white text-sm transition-colors">

@@ -45,15 +45,117 @@ export default function AdminCourtsPage() {
   })
 
   useEffect(() => {
-    if (!loading && (!user || profile?.role !== 'admin')) {
+    // Wait for loading to complete
+    if (loading) return
+
+    // If no user, redirect to home
+    if (!user) {
+      console.log('Admin courts: No user found, redirecting to home')
       router.push('/')
       return
     }
-    
-    if (user && profile?.role === 'admin') {
-      loadCourts()
+
+    // If profile is still loading (null), wait
+    if (profile === null) {
+      console.log('Admin courts: Profile still loading, waiting...')
+      return
     }
+
+    // If profile exists but no admin role, redirect
+    if (profile && profile.role !== 'admin') {
+      console.log('Admin courts: User is not admin, role:', profile.role, 'redirecting to home')
+      router.push('/')
+      return
+    }
+
+    // If we get here, user should be admin
+    console.log('Admin courts: Loading courts for admin user')
+    loadCourts()
   }, [user, profile, loading, router])
+
+  const createSampleCourts = async () => {
+    try {
+      console.log('Creating sample courts...')
+
+      const sampleCourts = [
+        {
+          name: 'Premium Tennis Court A',
+          type: 'tennis',
+          description: 'Professional-grade tennis court with synthetic grass surface.',
+          image_url: 'https://images.unsplash.com/photo-1554068865-24cecd4e34b8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+          amenities: 'Professional Lighting, Equipment Rental, Parking Available',
+          is_active: true
+        },
+        {
+          name: 'Tennis Court B',
+          type: 'tennis',
+          description: 'Standard tennis court with hard surface.',
+          image_url: 'https://images.unsplash.com/photo-1622279457486-62dcc4a431d6?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+          amenities: 'Lighting, Parking Available',
+          is_active: true
+        },
+        {
+          name: 'Basketball Court Pro',
+          type: 'basketball',
+          description: 'Indoor basketball court with professional-grade flooring.',
+          image_url: 'https://images.unsplash.com/photo-1546519638-68e109498ffc?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+          amenities: 'Indoor, Air Conditioning, Sound System',
+          is_active: true
+        },
+        {
+          name: 'Outdoor Basketball Court',
+          type: 'basketball',
+          description: 'Outdoor basketball court with weather-resistant surface.',
+          image_url: 'https://images.unsplash.com/photo-1519861531473-9200262188bf?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+          amenities: 'Outdoor Lighting, Parking Available',
+          is_active: true
+        },
+        {
+          name: 'Cricket Ground Elite',
+          type: 'cricket',
+          description: 'Full-size cricket ground with professionally maintained pitch.',
+          image_url: 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+          amenities: 'Professional Pitch, Pavilion, Equipment Rental',
+          is_active: true
+        },
+        {
+          name: 'Badminton Court',
+          type: 'badminton',
+          description: 'Indoor badminton court with wooden flooring.',
+          image_url: 'https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+          amenities: 'Indoor, Wooden Floor, Net Equipment',
+          is_active: true
+        },
+        {
+          name: 'Football Field Premium',
+          type: 'football',
+          description: 'Full-size football field with natural grass.',
+          image_url: 'https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+          amenities: 'Natural Grass, Professional Goals, Changing Rooms',
+          is_active: true
+        }
+      ]
+
+      const { data, error } = await (supabase as any)
+        .from('courts')
+        .insert(sampleCourts)
+        .select()
+
+      if (error) {
+        console.error('Error creating sample courts:', error)
+        toast.error('Failed to create sample courts')
+        return false
+      }
+
+      console.log('Sample courts created successfully:', data)
+      toast.success(`Created ${data?.length || 0} sample courts`)
+      return true
+    } catch (error) {
+      console.error('Exception creating sample courts:', error)
+      toast.error('An error occurred while creating sample courts')
+      return false
+    }
+  }
 
   const loadCourts = async () => {
     try {
@@ -69,6 +171,23 @@ export default function AdminCourtsPage() {
         console.error('Error loading courts:', error)
         toast.error('Failed to load courts')
         return
+      }
+
+      // If no courts exist, create sample courts
+      if (!data || data.length === 0) {
+        console.log('No courts found in database, creating sample courts...')
+        const created = await createSampleCourts()
+        if (created) {
+          // Reload courts after creating samples
+          const { data: newData, error: newError } = await supabase
+            .from('courts')
+            .select('*')
+            .order('created_at', { ascending: false })
+
+          if (!newError && newData) {
+            data = newData
+          }
+        }
       }
 
       // Transform data to match component expectations
@@ -211,18 +330,22 @@ export default function AdminCourtsPage() {
     return matchesSearch && matchesType && matchesStatus
   })
 
-  if (loading || loadingCourts) {
+  // Show loading while auth is loading or profile is null
+  if (loading || loadingCourts || !user || profile === null) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading courts...</p>
+          <p className="text-gray-600">
+            {loading ? 'Loading...' : loadingCourts ? 'Loading courts...' : 'Checking permissions...'}
+          </p>
         </div>
       </div>
     )
   }
 
-  if (!user || profile?.role !== 'admin') {
+  // If profile exists but user is not admin, don't render anything (redirect will happen in useEffect)
+  if (profile && profile.role !== 'admin') {
     return null
   }
 

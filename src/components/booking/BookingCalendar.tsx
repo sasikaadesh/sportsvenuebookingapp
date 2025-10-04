@@ -133,6 +133,9 @@ export function BookingCalendar({ courtId, pricing, onBookingSelect }: BookingCa
       {/* Duration Selection */}
       <div>
         <h3 className="text-lg font-semibold text-gray-900 mb-3">Select Duration</h3>
+        <p className="text-sm text-gray-600 mb-4">
+          Choose your booking duration. Time slots will show specific pricing based on peak/off-peak hours.
+        </p>
         <div className="grid grid-cols-3 gap-3">
           {pricing.map((price) => (
             <motion.button
@@ -150,8 +153,11 @@ export function BookingCalendar({ courtId, pricing, onBookingSelect }: BookingCa
                 <Clock className="w-4 h-4" />
                 <span className="font-medium">{price.duration}h</span>
               </div>
-              <div className="text-sm text-gray-600">
-                ${price.offPeak} - ${price.peak}
+              <div className="text-sm font-semibold text-gray-900">
+                ${price.offPeak}
+              </div>
+              <div className="text-xs text-gray-500">
+                per hour
               </div>
             </motion.button>
           ))}
@@ -266,14 +272,16 @@ export function BookingCalendar({ courtId, pricing, onBookingSelect }: BookingCa
                   <div className="text-xs text-gray-600 mt-1">
                     to {formatTime(endTime)}
                   </div>
-                  <div className={`text-xs mt-1 font-medium ${
+                  <div className={`text-sm mt-1 font-semibold ${
                     isPeak ? 'text-orange-600' : 'text-green-600'
                   }`}>
                     ${price}
                   </div>
-                  {isPeak && (
-                    <div className="text-xs text-orange-500">Peak</div>
-                  )}
+                  <div className={`text-xs ${
+                    isPeak ? 'text-orange-500' : 'text-green-500'
+                  }`}>
+                    {isPeak ? 'Peak Rate' : 'Off-Peak'}
+                  </div>
                 </motion.button>
               )
             })}

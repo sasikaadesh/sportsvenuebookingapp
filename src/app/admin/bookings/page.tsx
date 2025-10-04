@@ -35,14 +35,32 @@ export default function AdminBookingsPage() {
   const [dateFilter, setDateFilter] = useState('all')
 
   useEffect(() => {
-    if (!loading && (!user || profile?.role !== 'admin')) {
+    // Wait for loading to complete
+    if (loading) return
+
+    // If no user, redirect to home
+    if (!user) {
+      console.log('Admin bookings: No user found, redirecting to home')
       router.push('/')
       return
     }
 
-    if (user && profile?.role === 'admin') {
-      loadAllBookings()
+    // If profile is still loading (null), wait
+    if (profile === null) {
+      console.log('Admin bookings: Profile still loading, waiting...')
+      return
     }
+
+    // If profile exists but no admin role, redirect
+    if (profile && profile.role !== 'admin') {
+      console.log('Admin bookings: User is not admin, role:', profile.role, 'redirecting to home')
+      router.push('/')
+      return
+    }
+
+    // If we get here, user should be admin
+    console.log('Admin bookings: Loading bookings for admin user')
+    loadAllBookings()
   }, [user, profile, loading, router])
 
   useEffect(() => {
@@ -189,15 +207,23 @@ export default function AdminBookingsPage() {
     window.URL.revokeObjectURL(url)
   }
 
-  if (loading || !user || profile?.role !== 'admin') {
+  // Show loading while auth is loading or profile is null
+  if (loading || loadingBookings || !user || profile === null) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading admin panel...</p>
+          <p className="text-gray-600">
+            {loading ? 'Loading...' : loadingBookings ? 'Loading bookings...' : 'Checking permissions...'}
+          </p>
         </div>
       </div>
     )
+  }
+
+  // If profile exists but user is not admin, don't render anything (redirect will happen in useEffect)
+  if (profile && profile.role !== 'admin') {
+    return null
   }
 
   return (

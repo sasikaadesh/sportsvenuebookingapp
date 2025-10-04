@@ -113,7 +113,7 @@ The system sends two types of emails:
 ### User Confirmation Email
 - **Subject**: "Thank you for contacting us!"
 - **Content**: Includes message details and 24-hour response promise
-- **Sender**: `Sports Venue <noreply@sportsvenue.com>`
+- **Sender**: `SportsVenueBookings <noreply@sportsvenuebookings.com>`
 
 ### Admin Notification Email
 - **Subject**: "New Contact Form Submission: [Subject]"

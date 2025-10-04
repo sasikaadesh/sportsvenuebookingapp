@@ -40,7 +40,7 @@ Your Message Details:
 If you need immediate assistance, please call us at (555) 123-4567.
 
 Best regards,
-The Sports Venue Team
+The SportsVenueBookings Team
 
 ---
 This is an automated confirmation email.`
@@ -49,8 +49,8 @@ This is an automated confirmation email.`
     // Send notification email to admin
     const adminEmailParams = {
       user_name: 'Admin',
-      user_email: process.env.NEXT_PUBLIC_ADMIN_EMAIL || 'admin@sportsvenue.com',
-      from_name: 'Sports Venue Contact Form',
+      user_email: process.env.NEXT_PUBLIC_ADMIN_EMAIL || 'admin@sportsvenuebookings.com',
+      from_name: 'SportsVenueBookings Contact Form',
       reply_to: formData.email,
       subject: `New Contact: ${formData.subject}`,
       message: `New contact form submission:

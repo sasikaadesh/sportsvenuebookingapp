@@ -240,8 +240,22 @@ export default function AdminDashboard() {
     )
   }
 
-  // Don't render anything if user is not authenticated or not admin
-  if (!user || (profile && profile.role !== 'admin')) {
+  // Show loading while auth is loading or profile is null
+  if (loading || !user || profile === null) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">
+            {loading ? 'Loading...' : 'Checking permissions...'}
+          </p>
+        </div>
+      </div>
+    )
+  }
+
+  // If profile exists but user is not admin, don't render anything (redirect will happen in useEffect)
+  if (profile && profile.role !== 'admin') {
     return null
   }
 

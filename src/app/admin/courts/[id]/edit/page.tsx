@@ -324,7 +324,7 @@ export default function EditCourtPage() {
           console.log('Updating pricing rules:', pricingRules)
 
           // Use upsert to handle both insert and update
-          const { error: pricingError } = await supabase
+          const { error: pricingError } = await (supabase as any)
             .from('pricing_rules')
             .upsert(pricingRules, {
               onConflict: 'court_id,duration_hours'

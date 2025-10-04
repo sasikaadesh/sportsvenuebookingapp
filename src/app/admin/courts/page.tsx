@@ -162,7 +162,7 @@ export default function AdminCourtsPage() {
       setLoadingCourts(true)
       console.log('Loading courts from database...')
 
-      const { data, error } = await supabase
+      let { data, error } = await supabase
         .from('courts')
         .select('*')
         .order('created_at', { ascending: false })

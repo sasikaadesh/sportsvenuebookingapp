@@ -93,7 +93,7 @@ export default function CourtDetailPage() {
 
     try {
       // First try to load from database
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('courts')
         .select(`
           *,

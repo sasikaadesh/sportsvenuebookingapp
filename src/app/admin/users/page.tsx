@@ -116,27 +116,68 @@ export default function AdminUsersPage() {
   }
 
   const handleDeleteUser = async (userId: string) => {
-    if (!confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
+    // Debug logging - Step 1
+    console.log('Delete user called with ID:', userId)
+    console.log('All users in state:', users.map(u => ({ id: u.id, email: u.email, name: u.name })))
+
+    const userToDelete = users.find(u => u.id === userId)
+    console.log('User to delete:', userToDelete)
+
+    const userName = userToDelete?.name || userToDelete?.email || 'this user'
+
+    if (!confirm(`Are you sure you want to delete ${userName}? This action cannot be undone and will permanently remove the user from the system.`)) {
       return
     }
 
-    try {
-      const { error } = await supabase
-        .from('users')
-        .delete()
-        .eq('id', userId)
+    if (!user?.id) {
+      toast.error('You must be logged in to delete users')
+      return
+    }
 
-      if (error) {
-        console.error('Error deleting user:', error)
-        toast.error('Failed to delete user')
+    // Prevent admin from deleting themselves
+    if (userId === user.id) {
+      toast.error('You cannot delete your own account')
+      return
+    }
+
+    const loadingToast = toast.loading('Deleting user...')
+
+    try {
+      console.log('Attempting to delete user:', { userId, adminUserId: user.id })
+
+      // Call our API route to properly delete the user from both auth.users and users tables
+      const response = await fetch('/api/admin/delete-user-direct', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId,
+          adminUserId: user.id
+        }),
+      })
+
+      const result = await response.json()
+      console.log('Delete response:', result)
+
+      if (!response.ok) {
+        console.error('Error deleting user:', result.error)
+        toast.error(result.error || 'Failed to delete user', { id: loadingToast })
         return
       }
 
-      setUsers(users.filter(user => user.id !== userId))
-      toast.success('User deleted successfully')
+      // Remove user from local state
+      setUsers(users.filter(u => u.id !== userId))
+      toast.success(`User ${userName} deleted successfully`, { id: loadingToast })
+
+      // Reload users list to ensure consistency
+      setTimeout(() => {
+        loadUsers()
+      }, 1000)
+
     } catch (error) {
       console.error('Exception deleting user:', error)
-      toast.error('An error occurred')
+      toast.error('An error occurred while deleting user', { id: loadingToast })
     }
   }
 

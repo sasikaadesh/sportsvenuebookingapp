@@ -167,8 +167,8 @@ export default function SignUpPage() {
             name: formData.name, // Keep both for compatibility
             phone: formData.phone,
           },
-          // Skip email confirmation for development
-          emailRedirectTo: `${window.location.origin}/auth/callback`
+          // Enable email confirmation for production
+          emailRedirectTo: `https://sportsvenuebookings.com/auth/signin?returnTo=/app`
         }
       })
 

@@ -19,33 +19,38 @@ export async function GET(request: NextRequest) {
     const comparison = {
       public_users_count: publicUsers?.length || 0,
       auth_users_count: authUsers.length,
-      public_users: publicUsers?.map(u => ({
-        id: u.id,
-        email: u.email,
-        name: u.name,
-        role: u.role
-      })) || [],
+      public_users: publicUsers?.map(u => {
+        const user = u as { id: string; email: string; name: string; role: string }
+        return {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          role: user.role
+        }
+      }) || [],
       auth_users: authUsers.map(u => ({
         id: u.id,
         email: u.email,
         created_at: u.created_at,
         last_sign_in_at: u.last_sign_in_at
       })),
-      orphaned_profiles: [],
-      missing_profiles: []
+      orphaned_profiles: [] as Array<{ id: string; email: string; name: string }>,
+      missing_profiles: [] as Array<{ id: string; email: string }>
     }
 
     // Find orphaned profiles (in public.users but not in auth.users)
     if (publicUsers) {
-      comparison.orphaned_profiles = publicUsers.filter(pu => 
+      const typedPublicUsers = publicUsers as Array<{ id: string; email: string; name: string }>
+      comparison.orphaned_profiles = typedPublicUsers.filter(pu =>
         !authUsers.find(au => au.id === pu.id)
       ).map(u => ({ id: u.id, email: u.email, name: u.name }))
     }
 
     // Find missing profiles (in auth.users but not in public.users)
-    comparison.missing_profiles = authUsers.filter(au => 
-      !publicUsers?.find(pu => pu.id === au.id)
-    ).map(u => ({ id: u.id, email: u.email }))
+    const typedPublicUsersForMissing = publicUsers as Array<{ id: string }> | null
+    comparison.missing_profiles = authUsers.filter(au =>
+      !typedPublicUsersForMissing?.find(pu => pu.id === au.id)
+    ).map(u => ({ id: u.id, email: u.email || 'No email' }))
 
     return NextResponse.json({
       success: true,
@@ -58,8 +63,9 @@ export async function GET(request: NextRequest) {
 
   } catch (error) {
     console.error('Exception in debug users API:', error)
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
     return NextResponse.json(
-      { error: 'Internal server error', details: error.message },
+      { error: 'Internal server error', details: errorMessage },
       { status: 500 }
     )
   }

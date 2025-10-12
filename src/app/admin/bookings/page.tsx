@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { 
@@ -63,9 +63,57 @@ export default function AdminBookingsPage() {
     loadAllBookings()
   }, [user, profile, loading, router])
 
+  const filterBookings = useCallback(() => {
+    let filtered = [...bookings]
+
+    // Search filter
+    if (searchTerm) {
+      filtered = filtered.filter(booking =>
+        booking.users?.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        booking.users?.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        booking.courts?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        booking.id.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    }
+
+    // Status filter
+    if (statusFilter !== 'all') {
+      filtered = filtered.filter(booking => booking.status === statusFilter)
+    }
+
+    // Date filter
+    if (dateFilter !== 'all') {
+      const today = new Date()
+      const filterDate = new Date()
+
+      switch (dateFilter) {
+        case 'today':
+          filterDate.setHours(0, 0, 0, 0)
+          filtered = filtered.filter(booking =>
+            new Date(booking.booking_date).toDateString() === today.toDateString()
+          )
+          break
+        case 'week':
+          filterDate.setDate(today.getDate() - 7)
+          filtered = filtered.filter(booking =>
+            new Date(booking.booking_date) >= filterDate
+          )
+          break
+        case 'month':
+          filterDate.setMonth(today.getMonth() - 1)
+          filtered = filtered.filter(booking =>
+            new Date(booking.booking_date) >= filterDate
+          )
+          break
+      }
+    }
+
+    setFilteredBookings(filtered)
+  }, [bookings, searchTerm, statusFilter, dateFilter])
+
   useEffect(() => {
     filterBookings()
-  }, [bookings, searchTerm, statusFilter, dateFilter])
+  }, [filterBookings])
 
   const loadAllBookings = async () => {
     try {
@@ -114,53 +162,7 @@ export default function AdminBookingsPage() {
     }
   }
 
-  const filterBookings = () => {
-    let filtered = [...bookings]
 
-    // Search filter
-    if (searchTerm) {
-      filtered = filtered.filter(booking => 
-        booking.users?.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        booking.users?.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        booking.courts?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        booking.id.toLowerCase().includes(searchTerm.toLowerCase())
-      )
-    }
-
-    // Status filter
-    if (statusFilter !== 'all') {
-      filtered = filtered.filter(booking => booking.status === statusFilter)
-    }
-
-    // Date filter
-    if (dateFilter !== 'all') {
-      const today = new Date()
-      const filterDate = new Date()
-      
-      switch (dateFilter) {
-        case 'today':
-          filterDate.setHours(0, 0, 0, 0)
-          filtered = filtered.filter(booking => 
-            new Date(booking.booking_date).toDateString() === filterDate.toDateString()
-          )
-          break
-        case 'week':
-          filterDate.setDate(today.getDate() - 7)
-          filtered = filtered.filter(booking => 
-            new Date(booking.booking_date) >= filterDate
-          )
-          break
-        case 'month':
-          filterDate.setMonth(today.getMonth() - 1)
-          filtered = filtered.filter(booking => 
-            new Date(booking.booking_date) >= filterDate
-          )
-          break
-      }
-    }
-
-    setFilteredBookings(filtered)
-  }
 
   const updateBookingStatus = async (bookingId: string, newStatus: string) => {
     try {

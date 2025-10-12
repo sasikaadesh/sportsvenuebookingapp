@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { ArrowLeft, MapPin, Star, Clock, CreditCard, Shield } from 'lucide-react'
@@ -43,6 +43,98 @@ export default function BookCourtPage() {
   const [loading, setLoading] = useState(true)
   const [bookingLoading, setBookingLoading] = useState(false)
 
+  const loadCourt = useCallback(async () => {
+    try {
+      const courtId = params.id as string
+      console.log('Loading court with ID:', courtId)
+
+      // Try to load from database first
+      const { data: courtData, error } = await supabase
+        .from('courts')
+        .select(`
+          *,
+          pricing_rules (
+            duration_hours,
+            off_peak_price,
+            peak_price
+          )
+        `)
+        .eq('id', courtId)
+        .single()
+
+      if (error) {
+        console.error('Error loading court:', error)
+        // Fallback to sample data
+        const sampleCourt = {
+          id: courtId,
+          name: 'Sample Tennis Court',
+          type: 'tennis',
+          image_url: 'https://images.unsplash.com/photo-1554068865-24cecd4e34b8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+          description: 'Professional tennis court with premium facilities',
+          amenities: 'Lighting, Seating, Equipment Rental'
+        }
+
+        const transformedSampleCourt = {
+          id: sampleCourt.id,
+          name: sampleCourt.name,
+          type: sampleCourt.type,
+          image: sampleCourt.image_url,
+          location: 'Sports Complex',
+          rating: 4.8,
+          reviews: 124,
+          pricing: [
+            { duration: 1, price: 45 },
+            { duration: 2, price: 80 }
+          ],
+          amenities: sampleCourt.amenities?.split(', ') || [],
+          description: sampleCourt.description
+        }
+
+        console.log('Using sample court data:', transformedSampleCourt)
+        setCourt(transformedSampleCourt)
+        return
+      }
+
+      if (courtData) {
+        console.log('Court data loaded from database:', courtData)
+
+        // Transform the data to match the expected format
+        const typedCourtData = courtData as { id: string; name: string; type: string; image_url: string; pricing_rules: any[] }
+        const transformedCourt = {
+          id: typedCourtData.id,
+          name: typedCourtData.name,
+          type: typedCourtData.type,
+          image: typedCourtData.image_url || 'https://images.unsplash.com/photo-1554068865-24cecd4e34b8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+          location: 'Sports Complex',
+          rating: 4.8,
+          reviews: 124,
+          pricing: typedCourtData.pricing_rules && typedCourtData.pricing_rules.length > 0
+            ? typedCourtData.pricing_rules.map((rule: any) => ({
+                duration: rule.duration_hours,
+                price: rule.off_peak_price
+              }))
+            : [
+                { duration: 1, price: 45 },
+                { duration: 2, price: 80 }
+              ],
+          amenities: (typedCourtData as any).amenities ? (typedCourtData as any).amenities.split(', ') : [],
+          description: (typedCourtData as any).description || 'Professional court with premium facilities'
+        }
+
+        console.log('Transformed court data:', transformedCourt)
+        setCourt(transformedCourt)
+      } else {
+        console.log('No court data found')
+        setCourt(null)
+      }
+    } catch (error) {
+      console.error('Exception loading court:', error)
+      setCourt(null)
+    } finally {
+      setLoading(false)
+    }
+  }, [params.id])
+
   useEffect(() => {
     loadCourt()
 
@@ -55,106 +147,7 @@ export default function BookCourtPage() {
     }, 10000) // 10 second timeout
 
     return () => clearTimeout(timeout)
-  }, [params.id])
-
-  const loadCourt = async () => {
-    try {
-      const courtId = params.id as string
-      console.log('Loading court with ID:', courtId)
-
-      // Try to load from database first
-      console.log('Querying court with ID:', courtId)
-      let { data, error } = await supabase
-        .from('courts')
-        .select(`
-          *,
-          pricing_rules (
-            duration_hours,
-            off_peak_price,
-            peak_price
-          )
-        `)
-        .eq('id', courtId)
-        .eq('is_active', true)
-        .single()
-
-      console.log('Database query result:', { data, error })
-
-      // If not found by ID, try to find by name (for mock data compatibility)
-      if (error && error.code === 'PGRST116') {
-        console.log('Court not found by ID, trying by name...')
-        const { data: nameData, error: nameError } = await supabase
-          .from('courts')
-          .select(`
-            *,
-            pricing_rules (
-              duration_hours,
-              off_peak_price,
-              peak_price
-            )
-          `)
-          .ilike('name', `%${courtId.replace('-', ' ')}%`)
-          .eq('is_active', true)
-          .limit(1)
-          .single()
-
-        data = nameData
-        error = nameError
-      }
-
-      if (error) {
-        console.log('Database error:', error.message)
-        // If not found in database, try mock data
-        const courtData = mockCourtDetails[courtId as keyof typeof mockCourtDetails]
-        if (courtData) {
-          console.log('Using mock data for court:', courtId)
-          setCourt(courtData)
-        } else {
-          console.log('Court not found in mock data either')
-          setCourt(null)
-        }
-      } else if (data) {
-        const courtData = data as any
-        console.log('Found court in database:', courtData.name)
-        // Transform database data
-        const transformedCourt = {
-          id: courtData.id,
-          name: courtData.name,
-          type: courtData.type,
-          image: courtData.image_url || 'https://images.unsplash.com/photo-1554068865-24cecd4e34b8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-          location: 'Sports Complex',
-          rating: 4.8,
-          reviews: 124,
-          pricing: courtData.pricing_rules && courtData.pricing_rules.length > 0
-            ? courtData.pricing_rules.map((rule: any) => ({
-                duration: rule.duration_hours,
-                offPeak: rule.off_peak_price,
-                peak: rule.peak_price
-              }))
-            : [
-                { duration: 1, offPeak: 45, peak: 65 },
-                { duration: 2, offPeak: 85, peak: 120 }
-              ]
-        }
-        setCourt(transformedCourt)
-      } else {
-        console.log('No data returned from database')
-        setCourt(null)
-      }
-    } catch (error) {
-      console.error('Error loading court:', error)
-      // Fallback to mock data
-      const courtId = params.id as string
-      const courtData = mockCourtDetails[courtId as keyof typeof mockCourtDetails]
-      if (courtData) {
-        setCourt(courtData)
-      } else {
-        setCourt(null)
-      }
-    } finally {
-      setLoading(false)
-    }
-  }
+  }, [loadCourt, loading])
 
   useEffect(() => {
     if (!authLoading && !user) {

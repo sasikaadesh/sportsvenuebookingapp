@@ -29,3 +29,5 @@ Thumbs.db
 
 # Supabase local config (if you use supabase CLI)
 .supabase/
+
+build/

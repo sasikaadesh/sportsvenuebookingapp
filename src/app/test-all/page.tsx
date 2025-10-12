@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/components/providers/AuthProvider'
 
@@ -9,7 +9,7 @@ export default function TestAllPage() {
   const [results, setResults] = useState<any>({})
   const [loading, setLoading] = useState(false)
 
-  const runAllTests = async () => {
+  const runAllTests = useCallback(async () => {
     setLoading(true)
     const testResults: any = {}
 
@@ -96,13 +96,13 @@ export default function TestAllPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [user, authLoading])
 
   useEffect(() => {
     if (!authLoading) {
       runAllTests()
     }
-  }, [authLoading, user])
+  }, [authLoading, runAllTests])
 
   const testBookingCreation = async () => {
     if (!user) {

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useAuth } from '@/components/providers/AuthProvider'
 
 export default function TestPerformancePage() {
@@ -9,11 +9,7 @@ export default function TestPerformancePage() {
   const [loadingTests, setLoadingTests] = useState<any[]>([])
   const [refreshCount, setRefreshCount] = useState(0)
 
-  useEffect(() => {
-    runPerformanceTests()
-  }, [])
-
-  const runPerformanceTests = () => {
+  const runPerformanceTests = useCallback(() => {
     // Test loading times
     const startTime = Date.now()
     
@@ -25,7 +21,11 @@ export default function TestPerformancePage() {
     }
     
     setLoadingTests(prev => [loadingTest, ...prev.slice(0, 9)]) // Keep last 10 tests
-  }
+  }, [authLoading, user, refreshCount])
+
+  useEffect(() => {
+    runPerformanceTests()
+  }, [runPerformanceTests])
 
   const testSessionPersistence = () => {
     const sessionTest = {

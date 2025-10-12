@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { motion } from 'framer-motion'
 import {
@@ -54,39 +54,7 @@ export default function EditCourtPage() {
   const [amenityList, setAmenityList] = useState<string[]>([])
   const [newAmenity, setNewAmenity] = useState('')
 
-  // Redirect if not admin
-  useEffect(() => {
-    // Wait for loading to complete
-    if (loading) return
-
-    // If no user, redirect to home
-    if (!user) {
-      console.log('Admin edit court: No user found, redirecting to home')
-      router.push('/')
-      return
-    }
-
-    // If profile is still loading (null), wait
-    if (profile === null) {
-      console.log('Admin edit court: Profile still loading, waiting...')
-      return
-    }
-
-    // If profile exists but no admin role, redirect
-    if (profile && profile.role !== 'admin') {
-      console.log('Admin edit court: User is not admin, role:', profile.role, 'redirecting to home')
-      router.push('/')
-      return
-    }
-
-    // If we get here, user should be admin
-    if (params.id) {
-      console.log('Admin edit court: Loading court for admin user')
-      loadCourt()
-    }
-  }, [user, profile, loading, router, params.id])
-
-  const loadCourt = async () => {
+  const loadCourt = useCallback(async () => {
     try {
       setLoadingCourt(true)
 
@@ -118,35 +86,31 @@ export default function EditCourtPage() {
 
       try {
         // First check if table has correct schema
-        const { data: schemaTest, error: schemaError } = await supabase
+        const { data: schemaCheck } = await supabase
           .from('pricing_rules')
-          .select('off_peak_price')
+          .select('court_id, duration_hours, off_peak_price')
           .limit(1)
 
-        if (schemaError) {
-          console.log('Pricing rules table schema issue:', schemaError.message)
-          // Use defaults
-        } else {
-          // Schema is correct, load pricing data
+        if (schemaCheck !== null) {
+          // Table exists with correct schema, load pricing
           const { data: pricingData, error: pricingError } = await supabase
             .from('pricing_rules')
-            .select('duration_hours, off_peak_price, peak_price')
+            .select('duration_hours, off_peak_price')
             .eq('court_id', params.id as string)
-            .in('duration_hours', [1, 2])
 
           if (!pricingError && pricingData && pricingData.length > 0) {
-            const oneHourRule = (pricingData as any[]).find((rule: any) => rule.duration_hours === 1)
-            const twoHourRule = (pricingData as any[]).find((rule: any) => rule.duration_hours === 2)
+            // Type assertion for pricing data
+            const typedPricingData = pricingData as Array<{ duration_hours: number; off_peak_price: number }>
+            const pricing1hr = typedPricingData.find(p => p.duration_hours === 1)
+            const pricing2hr = typedPricingData.find(p => p.duration_hours === 2)
 
-            if (oneHourRule) price1hr = oneHourRule.off_peak_price || 45
-            if (twoHourRule) price2hr = twoHourRule.off_peak_price || 80
+            if (pricing1hr) price1hr = pricing1hr.off_peak_price
+            if (pricing2hr) price2hr = pricing2hr.off_peak_price
 
             console.log('Loaded pricing from database:', { price1hr, price2hr })
-          } else {
-            console.log('No pricing rules found, using defaults:', { price1hr, price2hr })
           }
         }
-      } catch (pricingException) {
+      } catch (pricingError) {
         console.log('Pricing rules table not available, using defaults:', { price1hr, price2hr })
       }
 
@@ -177,7 +141,39 @@ export default function EditCourtPage() {
     } finally {
       setLoadingCourt(false)
     }
-  }
+  }, [params.id, router])
+
+  // Redirect if not admin
+  useEffect(() => {
+    // Wait for loading to complete
+    if (loading) return
+
+    // If no user, redirect to home
+    if (!user) {
+      console.log('Admin edit court: No user found, redirecting to home')
+      router.push('/')
+      return
+    }
+
+    // If profile is still loading (null), wait
+    if (profile === null) {
+      console.log('Admin edit court: Profile still loading, waiting...')
+      return
+    }
+
+    // If profile exists but no admin role, redirect
+    if (profile && profile.role !== 'admin') {
+      console.log('Admin edit court: User is not admin, role:', profile.role, 'redirecting to home')
+      router.push('/')
+      return
+    }
+
+    // If we get here, user should be admin
+    if (params.id) {
+      console.log('Admin edit court: Loading court for admin user')
+      loadCourt()
+    }
+  }, [user, profile, loading, router, params.id, loadCourt])
 
   if (loading || loadingCourt) {
     return (

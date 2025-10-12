@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { 
@@ -83,17 +83,13 @@ export default function CourtDetailPage() {
   const [isLiked, setIsLiked] = useState(false)
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    loadCourtDetails()
-  }, [params.id])
-
-  const loadCourtDetails = async () => {
+  const loadCourtDetails = useCallback(async () => {
     const courtId = params.id as string
     setLoading(true)
 
     try {
       // First try to load from database
-      const { data, error } = await (supabase as any)
+      const { data: courtData, error } = await supabase
         .from('courts')
         .select(`
           *,
@@ -106,40 +102,33 @@ export default function CourtDetailPage() {
         .eq('id', courtId)
         .single()
 
-      if (error || !data) {
-        console.log('Court not found in database, using mock data')
+      if (error) {
+        console.error('Error loading court:', error)
         // Fallback to mock data
-        const courtData = mockCourtDetails[courtId as keyof typeof mockCourtDetails]
-        if (courtData) {
-          setCourt(courtData)
+        const mockCourt = mockCourtDetails[courtId as keyof typeof mockCourtDetails]
+        if (mockCourt) {
+          setCourt(mockCourt)
         } else {
           setCourt(null)
         }
-      } else {
-        console.log('Found court in database:', data)
-        // Transform database data to match component expectations
+        return
+      }
+
+      if (courtData) {
+        // Transform database data to match expected format
+        const typedCourtData = courtData as { id: string; name: string; type: string; image_url: string; pricing_rules: any[]; amenities: string; description: string }
         const transformedCourt = {
-          id: data.id,
-          name: data.name,
-          type: data.type,
-          image: data.image_url || 'https://images.unsplash.com/photo-1554068865-24cecd4e34b8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+          id: typedCourtData.id,
+          name: typedCourtData.name,
+          type: typedCourtData.type,
+          images: [
+            typedCourtData.image_url || 'https://images.unsplash.com/photo-1554068865-24cecd4e34b8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
+          ],
           location: 'Sports Complex',
-          address: '123 Sports Avenue, Downtown District, City 12345',
           rating: 4.8,
           reviews: 124,
-          description: data.description || 'Professional sports court with state-of-the-art facilities.',
-          amenities: data.amenities ? data.amenities.split(', ') : [
-            'Professional Lighting',
-            'Equipment Rental',
-            'Parking Available',
-            'Changing Rooms',
-            'Water Fountain',
-            'First Aid Kit',
-            'Security Cameras',
-            'Wi-Fi Access'
-          ],
-          pricing: data.pricing_rules && data.pricing_rules.length > 0
-            ? data.pricing_rules.map((rule: any) => ({
+          pricing: typedCourtData.pricing_rules && typedCourtData.pricing_rules.length > 0
+            ? typedCourtData.pricing_rules.map((rule: any) => ({
                 duration: rule.duration_hours,
                 offPeak: rule.off_peak_price,
                 peak: rule.peak_price
@@ -148,25 +137,37 @@ export default function CourtDetailPage() {
                 { duration: 1, offPeak: 45, peak: 65 },
                 { duration: 2, offPeak: 85, peak: 120 }
               ],
-          images: [
-            data.image_url || 'https://images.unsplash.com/photo-1554068865-24cecd4e34b8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
-          ]
+          amenities: typedCourtData.amenities ? typedCourtData.amenities.split(', ') : [],
+          description: typedCourtData.description || 'Professional court with premium facilities',
+          availability: {
+            today: 'Available',
+            tomorrow: 'Available',
+            thisWeek: 'Good availability'
+          }
         }
         setCourt(transformedCourt)
+      } else {
+        setCourt(null)
       }
     } catch (error) {
-      console.error('Error loading court details:', error)
+      console.error('Exception loading court details:', error)
       // Fallback to mock data
-      const courtData = mockCourtDetails[courtId as keyof typeof mockCourtDetails]
-      if (courtData) {
-        setCourt(courtData)
+      const mockCourt = mockCourtDetails[params.id as keyof typeof mockCourtDetails]
+      if (mockCourt) {
+        setCourt(mockCourt)
       } else {
         setCourt(null)
       }
     } finally {
       setLoading(false)
     }
-  }
+  }, [params.id])
+
+  useEffect(() => {
+    loadCourtDetails()
+  }, [loadCourtDetails])
+
+
 
   const handleShare = async () => {
     if (navigator.share) {

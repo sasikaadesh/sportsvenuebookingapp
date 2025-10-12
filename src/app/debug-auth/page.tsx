@@ -62,7 +62,7 @@ export default function DebugAuthPage() {
         timestamp: new Date().toISOString()
       })
     } catch (error) {
-      setAuthCheck({ error: error.message })
+      setAuthCheck({ error: error instanceof Error ? error.message : 'Unknown error' })
     }
     setLoading(false)
   }
@@ -193,7 +193,7 @@ export default function DebugAuthPage() {
             <li>Visit this page and check the auth status</li>
             <li>Note the user ID from the debug info</li>
             <li>Go to admin panel and delete the test user</li>
-            <li>Come back to this page and click "Check Auth Status"</li>
+            <li>Come back to this page and click &quot;Check Auth Status&quot;</li>
             <li>Try to sign in again with the deleted user credentials</li>
             <li>Check the console logs for detailed debugging info</li>
           </ol>

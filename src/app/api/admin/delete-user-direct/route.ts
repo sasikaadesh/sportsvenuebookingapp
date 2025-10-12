@@ -18,13 +18,23 @@ export async function DELETE(request: NextRequest) {
     }
 
     // Simple admin check
-    const { data: adminUser } = await supabaseAdmin
+    const { data: adminUser, error: adminError } = await supabaseAdmin
       .from('users')
       .select('role, email')
       .eq('id', adminUserId)
       .single()
 
-    if (!adminUser || adminUser.role !== 'admin') {
+    if (adminError || !adminUser) {
+      return NextResponse.json(
+        { error: 'Admin access required' },
+        { status: 403 }
+      )
+    }
+
+    // Type assertion after null check
+    const admin = adminUser as { role: string; email: string }
+
+    if (admin.role !== 'admin') {
       return NextResponse.json(
         { error: 'Admin access required' },
         { status: 403 }
@@ -55,7 +65,9 @@ export async function DELETE(request: NextRequest) {
       )
     }
 
-    const userEmail = userToDelete?.email || authUser?.user?.email || 'unknown'
+    // Type assertions for user data
+    const profileUser = userToDelete as { email: string } | null
+    const userEmail = profileUser?.email || authUser?.user?.email || 'unknown'
 
     console.log(`Attempting to delete user: ${userEmail} (${userId})`)
 
@@ -92,12 +104,12 @@ export async function DELETE(request: NextRequest) {
     console.log('Trying manual deletion from both tables...')
     try {
       let deletionResults = {
-        users_table: null,
-        auth_table: null
+        users_table: null as string | null,
+        auth_table: null as string | null
       }
 
       // Delete from users table first
-      if (userToDelete) {
+      if (profileUser) {
         const { error: usersError } = await supabaseAdmin
           .from('users')
           .delete()
@@ -117,7 +129,8 @@ export async function DELETE(request: NextRequest) {
         deletionResults.auth_table = authSqlError ? `Error: ${authSqlError.message}` : 'Success'
         console.log('Auth users deletion result:', deletionResults.auth_table)
       } catch (authSqlException) {
-        console.log('Cannot delete from auth.users via SQL (expected):', authSqlException.message)
+        const errorMessage = authSqlException instanceof Error ? authSqlException.message : 'Unknown error'
+        console.log('Cannot delete from auth.users via SQL (expected):', errorMessage)
         deletionResults.auth_table = 'Cannot access via SQL (normal)'
       }
 
@@ -148,8 +161,9 @@ export async function DELETE(request: NextRequest) {
 
   } catch (error) {
     console.error('Exception in delete user API:', error)
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
     return NextResponse.json(
-      { error: 'Internal server error', details: error.message },
+      { error: 'Internal server error', details: errorMessage },
       { status: 500 }
     )
   }

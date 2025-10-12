@@ -56,9 +56,10 @@ export default function TestEmailConfigPage() {
 
     } catch (error) {
       console.error('Test error:', error)
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error'
       setResult({
         success: false,
-        error: error.message
+        error: errorMessage
       })
       toast.error('Test failed')
     } finally {
@@ -113,8 +114,8 @@ export default function TestEmailConfigPage() {
               <h3 className="font-semibold text-green-600">✅ For Testing (No SMTP needed):</h3>
               <ol className="list-decimal list-inside text-sm space-y-1 ml-4">
                 <li>Go to Supabase Dashboard → Settings → Authentication</li>
-                <li>Make sure "Enable email confirmations" is ✅ checked</li>
-                <li>Go to SMTP Settings and DISABLE "Enable custom SMTP"</li>
+                <li>Make sure &quot;Enable email confirmations&quot; is ✅ checked</li>
+                <li>Go to SMTP Settings and DISABLE &quot;Enable custom SMTP&quot;</li>
                 <li>Test signup above - should get email from noreply@mail.app.supabase.io</li>
               </ol>
             </div>

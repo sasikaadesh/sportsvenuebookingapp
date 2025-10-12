@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { 
@@ -44,6 +44,67 @@ export default function AdminCourtsPage() {
     courtName: ''
   })
 
+  const loadCourts = useCallback(async () => {
+    try {
+      setLoadingCourts(true)
+      console.log('Loading courts from database...')
+
+      let { data, error } = await supabase
+        .from('courts')
+        .select('*')
+        .order('created_at', { ascending: false })
+
+      if (error) {
+        console.error('Error loading courts:', error)
+        toast.error('Failed to load courts')
+        return
+      }
+
+      // If no courts exist, create sample courts
+      if (!data || data.length === 0) {
+        console.log('No courts found in database, creating sample courts...')
+        const created = await createSampleCourts()
+        if (created) {
+          // Reload courts after creating samples
+          const { data: newData, error: newError } = await supabase
+            .from('courts')
+            .select('*')
+            .order('created_at', { ascending: false })
+
+          if (!newError && newData) {
+            data = newData
+          }
+        }
+      }
+
+      // Transform data to match component expectations
+      const transformedCourts = (data || []).map((court: any) => ({
+        id: court.id,
+        name: court.name,
+        type: court.type,
+        location: 'Sports Complex', // Default location
+        status: court.is_active ? 'active' : 'inactive',
+        bookings: 0, // Could be calculated from bookings table
+        revenue: 0, // Could be calculated from bookings table
+        rating: 4.5, // Default rating
+        lastMaintenance: court.updated_at?.split('T')[0] || court.created_at?.split('T')[0],
+        isActive: court.is_active,
+        maintenanceMode: court.maintenance_mode || false,
+        description: court.description,
+        image_url: court.image_url,
+        amenities: court.amenities
+      }))
+
+      console.log('Loaded courts:', transformedCourts)
+      setCourts(transformedCourts)
+    } catch (error) {
+      console.error('Exception loading courts:', error)
+      toast.error('An error occurred while loading courts')
+    } finally {
+      setLoadingCourts(false)
+    }
+  }, [])
+
   useEffect(() => {
     // Wait for loading to complete
     if (loading) return
@@ -71,7 +132,7 @@ export default function AdminCourtsPage() {
     // If we get here, user should be admin
     console.log('Admin courts: Loading courts for admin user')
     loadCourts()
-  }, [user, profile, loading, router])
+  }, [user, profile, loading, router, loadCourts])
 
   const createSampleCourts = async () => {
     try {
@@ -154,67 +215,6 @@ export default function AdminCourtsPage() {
       console.error('Exception creating sample courts:', error)
       toast.error('An error occurred while creating sample courts')
       return false
-    }
-  }
-
-  const loadCourts = async () => {
-    try {
-      setLoadingCourts(true)
-      console.log('Loading courts from database...')
-
-      let { data, error } = await supabase
-        .from('courts')
-        .select('*')
-        .order('created_at', { ascending: false })
-
-      if (error) {
-        console.error('Error loading courts:', error)
-        toast.error('Failed to load courts')
-        return
-      }
-
-      // If no courts exist, create sample courts
-      if (!data || data.length === 0) {
-        console.log('No courts found in database, creating sample courts...')
-        const created = await createSampleCourts()
-        if (created) {
-          // Reload courts after creating samples
-          const { data: newData, error: newError } = await supabase
-            .from('courts')
-            .select('*')
-            .order('created_at', { ascending: false })
-
-          if (!newError && newData) {
-            data = newData
-          }
-        }
-      }
-
-      // Transform data to match component expectations
-      const transformedCourts = (data || []).map((court: any) => ({
-        id: court.id,
-        name: court.name,
-        type: court.type,
-        location: 'Sports Complex', // Default location
-        status: court.is_active ? 'active' : 'inactive',
-        bookings: 0, // Could be calculated from bookings table
-        revenue: 0, // Could be calculated from bookings table
-        rating: 4.5, // Default rating
-        lastMaintenance: court.updated_at?.split('T')[0] || court.created_at?.split('T')[0],
-        isActive: court.is_active,
-        maintenanceMode: court.maintenance_mode || false,
-        description: court.description,
-        image_url: court.image_url,
-        amenities: court.amenities
-      }))
-
-      console.log('Loaded courts:', transformedCourts)
-      setCourts(transformedCourts)
-    } catch (error) {
-      console.error('Exception loading courts:', error)
-      toast.error('An error occurred while loading courts')
-    } finally {
-      setLoadingCourts(false)
     }
   }
 

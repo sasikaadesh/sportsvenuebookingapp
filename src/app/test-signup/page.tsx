@@ -55,9 +55,10 @@ export default function TestSignupPage() {
 
     } catch (error) {
       console.error('Signup test error:', error)
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error'
       setResult({
         success: false,
-        error: error.message,
+        error: errorMessage,
         user: null
       })
       toast.error('Test failed')
@@ -147,7 +148,7 @@ export default function TestSignupPage() {
           <h2 className="text-xl font-semibold mb-4">Testing Steps</h2>
           <ol className="list-decimal list-inside space-y-2 text-sm">
             <li>Enter a test email address above</li>
-            <li>Click "Test Signup" to create a test account</li>
+            <li>Click &quot;Test Signup&quot; to create a test account</li>
             <li>Check the result below for success/failure</li>
             <li>Check your email inbox (and spam folder) for confirmation email</li>
             <li>If no email arrives, check SMTP settings in Supabase dashboard</li>

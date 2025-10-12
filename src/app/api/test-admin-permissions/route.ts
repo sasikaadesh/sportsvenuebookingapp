@@ -43,8 +43,9 @@ export async function GET(request: NextRequest) {
 
   } catch (error) {
     console.error('Admin permissions test failed:', error)
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
     return NextResponse.json(
-      { error: 'Test failed', details: error.message },
+      { error: 'Test failed', details: errorMessage },
       { status: 500 }
     )
   }

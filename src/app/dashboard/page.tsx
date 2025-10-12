@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { Calendar, Clock, MapPin, Star, Filter, Search } from 'lucide-react'
@@ -75,6 +75,62 @@ export default function DashboardPage() {
     return () => clearTimeout(timeout)
   }, [loading])
 
+  const loadUserBookings = useCallback(async () => {
+    if (!user) {
+      console.log('No user available, skipping booking load')
+      setLoadingBookings(false)
+      return
+    }
+
+    try {
+      setLoadingBookings(true)
+      console.log('Loading bookings for user:', user.id)
+
+      const { data, error } = await supabase
+        .from('bookings')
+        .select(`
+          *,
+          courts (
+            name,
+            type,
+            image_url
+          )
+        `)
+        .eq('user_id', user.id)
+        .order('booking_date', { ascending: false })
+
+      if (error) {
+        console.error('Error loading bookings:', error)
+        setBookings([])
+        return
+      }
+
+      console.log('Raw bookings data:', data)
+
+      // Transform the data to match component expectations
+      const transformedBookings = (data || []).map((booking: any) => ({
+        id: booking.id,
+        courtName: booking.courts?.name || 'Unknown Court',
+        courtType: booking.courts?.type || 'unknown',
+        date: booking.booking_date,
+        time: booking.start_time,
+        duration: booking.duration_hours,
+        status: booking.status || 'confirmed',
+        price: booking.total_price || 0,
+        image: booking.courts?.image_url || 'https://images.unsplash.com/photo-1554068865-24cecd4e34b8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
+      }))
+
+      console.log('Transformed bookings:', transformedBookings)
+      setBookings(transformedBookings)
+    } catch (error) {
+      console.error('Exception loading bookings:', error)
+      console.log('Bookings loading timeout/error, showing empty state')
+      setBookings([])
+    } finally {
+      setLoadingBookings(false)
+    }
+  }, [user])
+
   useEffect(() => {
     // Handle auth timeout or completed loading
     if (authTimeout || !loading) {
@@ -90,59 +146,9 @@ export default function DashboardPage() {
       console.log('User found, loading bookings...')
       loadUserBookings()
     }
-  }, [user, loading, authTimeout, router])
+  }, [user, loading, authTimeout, router, loadUserBookings])
 
-  const loadUserBookings = async () => {
-    if (!user) {
-      console.log('No user available, skipping booking load')
-      setLoadingBookings(false)
-      return
-    }
 
-    setLoadingBookings(true)
-    try {
-      console.log('Loading bookings for user:', user.id)
-
-      // Set timeout for faster fallback
-      const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error('Timeout')), 3000)
-      )
-
-      const queryPromise = supabase
-        .from('bookings')
-        .select(`
-          id,
-          booking_date,
-          start_time,
-          duration_hours,
-          total_price,
-          status,
-          payment_status,
-          courts (
-            name,
-            type
-          )
-        `)
-        .eq('user_id', user.id)
-        .order('booking_date', { ascending: false })
-        .limit(10) // Limit for faster loading
-
-      const { data, error } = await Promise.race([queryPromise, timeoutPromise]) as any
-
-      if (error) {
-        console.log('Bookings query error or timeout:', error?.message || 'timeout')
-        setBookings([])
-      } else {
-        console.log('Bookings loaded:', data?.length || 0, 'bookings')
-        setBookings(data || [])
-      }
-    } catch (error) {
-      console.log('Bookings loading timeout/error, showing empty state')
-      setBookings([])
-    } finally {
-      setLoadingBookings(false)
-    }
-  }
 
   if (loading && !authTimeout) {
     return (

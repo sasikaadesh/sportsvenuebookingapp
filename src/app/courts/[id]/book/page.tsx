@@ -111,11 +111,12 @@ export default function BookCourtPage() {
           pricing: typedCourtData.pricing_rules && typedCourtData.pricing_rules.length > 0
             ? typedCourtData.pricing_rules.map((rule: any) => ({
                 duration: rule.duration_hours,
-                price: rule.off_peak_price
+                offPeak: rule.off_peak_price,
+                peak: rule.peak_price
               }))
             : [
-                { duration: 1, price: 45 },
-                { duration: 2, price: 80 }
+                { duration: 1, offPeak: 45, peak: 65 },
+                { duration: 2, offPeak: 85, peak: 120 }
               ],
           amenities: (typedCourtData as any).amenities ? (typedCourtData as any).amenities.split(', ') : [],
           description: (typedCourtData as any).description || 'Professional court with premium facilities'

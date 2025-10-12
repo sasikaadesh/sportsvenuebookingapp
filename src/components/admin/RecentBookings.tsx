@@ -9,6 +9,7 @@ import { getStatusColor } from '@/lib/utils'
 interface Booking {
   id: string
   user: string
+  phone: string
   court: string
   date: string
   time: string
@@ -46,6 +47,7 @@ export function RecentBookings({ bookings }: RecentBookingsProps) {
           <thead>
             <tr className="border-b border-gray-200">
               <th className="text-left py-3 px-4 font-medium text-gray-600">Customer</th>
+              <th className="text-left py-3 px-4 font-medium text-gray-600">Phone</th>
               <th className="text-left py-3 px-4 font-medium text-gray-600">Court</th>
               <th className="text-left py-3 px-4 font-medium text-gray-600">Date & Time</th>
               <th className="text-left py-3 px-4 font-medium text-gray-600">Status</th>
@@ -70,7 +72,11 @@ export function RecentBookings({ bookings }: RecentBookingsProps) {
                     <span className="font-medium text-gray-900">{booking.user}</span>
                   </div>
                 </td>
-                
+
+                <td className="py-4 px-4">
+                  <span className="text-gray-600">{booking.phone}</span>
+                </td>
+
                 <td className="py-4 px-4">
                   <span className="text-gray-900">{booking.court}</span>
                 </td>

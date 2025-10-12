@@ -352,12 +352,12 @@ export default function DashboardPage() {
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
                     <div className="flex items-start space-x-4 mb-4 sm:mb-0">
                       <div className="text-2xl">
-                        {getCourtIcon(booking.courts?.type || 'tennis')}
+                        {getCourtIcon(booking.courtType || 'tennis')}
                       </div>
 
                       <div>
                         <h3 className="font-semibold text-gray-900 dark:text-white">
-                          {booking.courts?.name || 'Court'}
+                          {booking.courtName || 'Court'}
                         </h3>
                         <div className="flex items-center text-gray-600 dark:text-gray-300 text-sm mt-1">
                           <MapPin className="w-4 h-4 mr-1" />
@@ -365,7 +365,7 @@ export default function DashboardPage() {
                         </div>
                         <div className="flex items-center text-gray-600 dark:text-gray-300 text-sm mt-1">
                           <Calendar className="w-4 h-4 mr-1" />
-                          {booking.booking_date} at {booking.start_time} ({booking.duration_hours}h)
+                          {booking.date} at {booking.time} ({booking.duration}h)
                         </div>
                       </div>
                     </div>
@@ -376,7 +376,7 @@ export default function DashboardPage() {
                       </span>
                       <div className="text-right mt-2">
                         <p className="text-lg font-semibold text-gray-900 dark:text-white">
-                          ${booking.total_price?.toFixed(2) || '0.00'}
+                          ${booking.price?.toFixed(2) || '0.00'}
                         </p>
                       </div>
                     </div>

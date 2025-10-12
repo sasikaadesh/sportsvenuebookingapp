@@ -118,6 +118,13 @@ export default function SignUpPage() {
     e.preventDefault()
     setLoading(true)
 
+    // Basic field validation
+    if (!formData.phone.trim()) {
+      toast.error('Phone number is required')
+      setLoading(false)
+      return
+    }
+
     // Comprehensive password validation
     const validation = validatePassword(formData.password, formData.confirmPassword)
 
@@ -345,7 +352,7 @@ export default function SignUpPage() {
             {/* Phone Field */}
             <div>
               <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
-                Phone Number (Optional)
+                Phone Number <span className="text-red-500">*</span>
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -535,9 +542,9 @@ export default function SignUpPage() {
             <Button
               type="submit"
               loading={loading}
-              disabled={loading || !isPasswordValid() || !formData.name || !formData.email}
+              disabled={loading || !isPasswordValid() || !formData.name || !formData.email || !formData.phone}
               className={`w-full py-3 text-white transition-all ${
-                loading || !isPasswordValid() || !formData.name || !formData.email
+                loading || !isPasswordValid() || !formData.name || !formData.email || !formData.phone
                   ? 'bg-gray-400 cursor-not-allowed'
                   : 'bg-blue-600 hover:bg-blue-700'
               }`}

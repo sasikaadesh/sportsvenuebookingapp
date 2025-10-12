@@ -82,6 +82,7 @@ export default function AdminDashboard() {
         {
           id: '1',
           user: 'John Doe',
+          phone: '+1 (555) 123-4567',
           court: 'Tennis Court A',
           date: '2024-01-15',
           time: '14:00',
@@ -91,6 +92,7 @@ export default function AdminDashboard() {
         {
           id: '2',
           user: 'Sarah Johnson',
+          phone: '+1 (555) 987-6543',
           court: 'Basketball Court Pro',
           date: '2024-01-15',
           time: '16:00',
@@ -100,6 +102,7 @@ export default function AdminDashboard() {
         {
           id: '3',
           user: 'Mike Chen',
+          phone: '+1 (555) 456-7890',
           court: 'Cricket Ground Elite',
           date: '2024-01-16',
           time: '10:00',
@@ -150,7 +153,8 @@ export default function AdminDashboard() {
           status,
           users (
             full_name,
-            email
+            email,
+            phone
           ),
           courts (
             name,
@@ -171,6 +175,7 @@ export default function AdminDashboard() {
         const transformedBookings = recentBookingsData.map((booking: any) => ({
           id: booking.id,
           user: booking.users?.full_name || booking.users?.email || 'Unknown User',
+          phone: booking.users?.phone || 'N/A',
           court: booking.courts?.name || 'Unknown Court',
           date: booking.booking_date,
           time: booking.start_time,

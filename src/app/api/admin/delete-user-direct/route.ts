@@ -71,20 +71,58 @@ export async function DELETE(request: NextRequest) {
 
     console.log(`Attempting to delete user: ${userEmail} (${userId})`)
 
+    // IMPORTANT: Delete from users table FIRST to prevent trigger from recreating it
+    console.log('Step 1: Deleting from public.users table first...')
+    if (profileUser) {
+      const { error: usersError } = await supabaseAdmin
+        .from('users')
+        .delete()
+        .eq('id', userId)
+
+      if (usersError) {
+        console.error('Error deleting from users table:', usersError)
+      } else {
+        console.log('Successfully deleted from users table')
+      }
+    }
+
+    // Small delay to ensure database operations complete
+    await new Promise(resolve => setTimeout(resolve, 500))
+
     // Method 1: Direct auth.admin deletion (most reliable)
-    console.log('Trying auth.admin.deleteUser method...')
+    console.log('Step 2: Trying auth.admin.deleteUser method...')
     try {
       const { error: authError } = await supabaseAdmin.auth.admin.deleteUser(userId)
 
       if (!authError) {
         console.log('User deleted successfully via auth admin')
 
+        // Wait a bit for cascading deletes to complete
+        await new Promise(resolve => setTimeout(resolve, 500))
+
         // Verify deletion worked
         const { data: verifyUser } = await supabaseAdmin.auth.admin.getUserById(userId)
+        const { data: verifyProfile } = await supabaseAdmin
+          .from('users')
+          .select('id')
+          .eq('id', userId)
+          .single()
+
         if (verifyUser?.user) {
           console.log('Warning: User still exists in auth.users after deletion')
         } else {
           console.log('Confirmed: User deleted from auth.users')
+        }
+
+        if (verifyProfile) {
+          console.log('Warning: User profile still exists after deletion')
+          // Force delete the profile again
+          await supabaseAdmin
+            .from('users')
+            .delete()
+            .eq('id', userId)
+        } else {
+          console.log('Confirmed: User profile deleted')
         }
 
         return NextResponse.json({

@@ -166,14 +166,14 @@ export default function AdminUsersPage() {
         return
       }
 
-      // Remove user from local state
-      setUsers(users.filter(u => u.id !== userId))
+      // Success - show toast
       toast.success(`User ${userName} deleted successfully`, { id: loadingToast })
 
-      // Reload users list to ensure consistency
-      setTimeout(() => {
-        loadUsers()
-      }, 1000)
+      // Wait a moment for database operations to fully complete
+      await new Promise(resolve => setTimeout(resolve, 800))
+
+      // Reload users list from database to ensure consistency
+      await loadUsers()
 
     } catch (error) {
       console.error('Exception deleting user:', error)

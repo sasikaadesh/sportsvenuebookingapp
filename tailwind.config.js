@@ -12,6 +12,9 @@ module.exports = {
         'poppins': ['var(--font-poppins)', 'sans-serif'],
         'sans': ['var(--font-poppins)', 'Inter', 'sans-serif'],
       },
+      fontWeight: {
+        'bold': '600',
+      },
       colors: {
         primary: {
           50: '#eff6ff',

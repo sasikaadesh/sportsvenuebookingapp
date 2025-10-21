@@ -1,0 +1,37 @@
+<svg width="740" height="180" viewBox="0 0 740 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Sports Court Icon -->
+  <circle cx="90" cy="90" r="85" fill="url(#gradient1)"/>
+  
+  <!-- Gradient Definition -->
+  <defs>
+    <linearGradient id="gradient1" x1="5" y1="5" x2="175" y2="175" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" style="stop-color:#2563eb;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#22c55e;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Basketball Court Elements -->
+  <circle cx="90" cy="90" r="20" stroke="white" stroke-width="3" fill="none"/>
+  <line x1="90" y1="5" x2="90" y2="175" stroke="white" stroke-width="3"/>
+  <line x1="5" y1="90" x2="175" y2="90" stroke="white" stroke-width="3"/>
+  
+  <!-- Top Arc -->
+  <path d="M 50 30 Q 90 10, 130 30" stroke="white" stroke-width="3" fill="none"/>
+  <!-- Bottom Arc -->
+  <path d="M 50 150 Q 90 170, 130 150" stroke="white" stroke-width="3" fill="none"/>
+  
+  <!-- Corner Markers -->
+  <circle cx="30" cy="30" r="8" fill="white"/>
+  <circle cx="150" cy="30" r="8" fill="white"/>
+  <circle cx="30" cy="150" r="8" fill="white"/>
+  <circle cx="150" cy="150" r="8" fill="white"/>
+  
+  <!-- Soccer Ball Icon -->
+  <circle cx="90" cy="150" r="12" fill="#22c55e"/>
+  
+  <!-- Text: SportsVenueBookings -->
+  <text x="200" y="110" font-family="Arial, sans-serif" font-size="48" font-weight="700" fill="#1e293b">
+    SportsVenue<tspan fill="#2563eb">Bookings</tspan>
+  </text>
+</svg>
+

@@ -25,8 +25,11 @@ export function Hero() {
   }, [])
 
   return (
-    <section className="relative min-h-[85vh] flex items-center justify-center overflow-hidden bg-gradient-to-br from-blue-50 via-white to-green-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-20">
+    <section className="relative min-h-[85vh] flex items-center justify-center overflow-hidden bg-gradient-to-r from-blue-600 via-green-500 to-white">
+      {/* Gradient Overlay for softer effect - more visible on left, white on right and bottom */}
+      <div className="absolute inset-0 bg-gradient-to-r from-white/70 via-white/85 to-white"></div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-20 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
 
           {/* Left Content */}
@@ -136,62 +139,93 @@ export function Hero() {
                 <div className="relative bg-gray-900 rounded-[2.5rem] p-3 shadow-2xl">
                   {/* Screen */}
                   <div className="bg-white rounded-[2rem] overflow-hidden aspect-[3/4] relative">
-                    {/* App Screenshot - Sports Booking Interface */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-green-50 p-6">
+                    {/* Admin Dashboard Interface */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-gray-50 to-blue-50 p-6">
                       {/* Header */}
-                      <div className="flex items-center justify-between mb-6">
+                      <div className="flex items-center justify-between mb-5">
                         <div className="flex items-center space-x-2">
-                          <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-green-600 rounded-lg"></div>
-                          <span className="font-bold text-sm">SVB</span>
+                          <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-green-600 rounded-lg flex items-center justify-center text-white text-xs font-bold">
+                            A
+                          </div>
+                          <div>
+                            <div className="font-bold text-sm">Admin Panel</div>
+                            <div className="text-xs text-gray-500">Dashboard</div>
+                          </div>
                         </div>
-                        <div className="w-8 h-8 bg-gray-200 rounded-full"></div>
+                        <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full"></div>
                       </div>
 
-                      {/* Featured Card */}
-                      <div className="bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl p-4 mb-4 text-white">
-                        <div className="text-xs opacity-80 mb-1">Featured Venue</div>
-                        <div className="font-bold text-lg mb-2">Premium Courts</div>
-                        <div className="flex items-center justify-between">
-                          <div className="text-sm">Book Now</div>
-                          <div className="flex space-x-1">
-                            <div className="w-2 h-2 bg-white rounded-full"></div>
-                            <div className="w-2 h-2 bg-white/50 rounded-full"></div>
-                            <div className="w-2 h-2 bg-white/50 rounded-full"></div>
+                      {/* Stats Grid */}
+                      <div className="grid grid-cols-2 gap-2 mb-4">
+                        <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-3 text-white shadow-lg">
+                          <div className="text-xs opacity-90 mb-1">Total Revenue</div>
+                          <div className="text-xl font-bold">$12.5K</div>
+                          <div className="text-xs opacity-80 mt-1">↑ 18% this month</div>
+                        </div>
+                        <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-xl p-3 text-white shadow-lg">
+                          <div className="text-xs opacity-90 mb-1">Bookings</div>
+                          <div className="text-xl font-bold">342</div>
+                          <div className="text-xs opacity-80 mt-1">↑ 12% this week</div>
+                        </div>
+                        <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl p-3 text-white shadow-lg">
+                          <div className="text-xs opacity-90 mb-1">Active Users</div>
+                          <div className="text-xl font-bold">1,248</div>
+                          <div className="text-xs opacity-80 mt-1">↑ 8% growth</div>
+                        </div>
+                        <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl p-3 text-white shadow-lg">
+                          <div className="text-xs opacity-90 mb-1">Courts</div>
+                          <div className="text-xl font-bold">24</div>
+                          <div className="text-xs opacity-80 mt-1">All active</div>
+                        </div>
+                      </div>
+
+                      {/* Recent Activity */}
+                      <div className="bg-white rounded-xl p-3 shadow-md mb-3">
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="font-semibold text-xs text-gray-900">Recent Bookings</div>
+                          <div className="text-xs text-blue-600">View All</div>
+                        </div>
+                        <div className="space-y-2">
+                          <div className="flex items-center space-x-2">
+                            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                            <div className="flex-1">
+                              <div className="text-xs font-medium text-gray-900">Tennis Court A</div>
+                              <div className="text-xs text-gray-500">John Doe • 2:00 PM</div>
+                            </div>
+                            <div className="text-xs font-semibold text-green-600">$7.5</div>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                            <div className="flex-1">
+                              <div className="text-xs font-medium text-gray-900">Basketball Pro</div>
+                              <div className="text-xs text-gray-500">Jane Smith • 3:30 PM</div>
+                            </div>
+                            <div className="text-xs font-semibold text-green-600">$8.5</div>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                            <div className="flex-1">
+                              <div className="text-xs font-medium text-gray-900">Cricket Ground</div>
+                              <div className="text-xs text-gray-500">Mike Johnson • 5:00 PM</div>
+                            </div>
+                            <div className="text-xs font-semibold text-green-600">$25</div>
                           </div>
                         </div>
                       </div>
 
-                      {/* Quick Stats */}
-                      <div className="grid grid-cols-3 gap-2 mb-4">
-                        <div className="bg-white rounded-xl p-3 shadow-sm">
-                          <div className="text-blue-600 font-bold text-lg">24</div>
-                          <div className="text-xs text-gray-500">Venues</div>
+                      {/* Quick Actions */}
+                      <div className="grid grid-cols-3 gap-2">
+                        <div className="bg-white rounded-lg p-2 shadow-sm text-center">
+                          <div className="text-lg mb-1">📊</div>
+                          <div className="text-xs font-medium text-gray-700">Reports</div>
                         </div>
-                        <div className="bg-white rounded-xl p-3 shadow-sm">
-                          <div className="text-green-600 font-bold text-lg">15</div>
-                          <div className="text-xs text-gray-500">Bookings</div>
+                        <div className="bg-white rounded-lg p-2 shadow-sm text-center">
+                          <div className="text-lg mb-1">👥</div>
+                          <div className="text-xs font-medium text-gray-700">Users</div>
                         </div>
-                        <div className="bg-white rounded-xl p-3 shadow-sm">
-                          <div className="text-purple-600 font-bold text-lg">5</div>
-                          <div className="text-xs text-gray-500">Sports</div>
-                        </div>
-                      </div>
-
-                      {/* Venue List */}
-                      <div className="space-y-2">
-                        <div className="bg-white rounded-xl p-3 shadow-sm flex items-center space-x-3">
-                          <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-600 rounded-lg"></div>
-                          <div className="flex-1">
-                            <div className="font-semibold text-xs">Tennis Court A</div>
-                            <div className="text-xs text-gray-500">Available Now</div>
-                          </div>
-                        </div>
-                        <div className="bg-white rounded-xl p-3 shadow-sm flex items-center space-x-3">
-                          <div className="w-12 h-12 bg-gradient-to-br from-green-400 to-green-600 rounded-lg"></div>
-                          <div className="flex-1">
-                            <div className="font-semibold text-xs">Basketball Court</div>
-                            <div className="text-xs text-gray-500">2 slots left</div>
-                          </div>
+                        <div className="bg-white rounded-lg p-2 shadow-sm text-center">
+                          <div className="text-lg mb-1">⚙️</div>
+                          <div className="text-xs font-medium text-gray-700">Settings</div>
                         </div>
                       </div>
                     </div>
@@ -202,7 +236,7 @@ export function Hero() {
                 </div>
               </div>
 
-              {/* Secondary iPad (Overlapping) */}
+              {/* Secondary iPad (Overlapping) - Sports Courts Showcase */}
               <motion.div
                 animate={{
                   y: [0, -15, 0],
@@ -213,49 +247,124 @@ export function Hero() {
                   ease: "easeInOut",
                   delay: 0.5
                 }}
-                className="absolute -right-8 top-12 w-[200px] sm:w-[250px] md:w-[280px] lg:w-[320px] opacity-80"
+                className="absolute -right-8 top-12 w-[200px] sm:w-[250px] md:w-[280px] lg:w-[320px]"
               >
                 <div className="relative bg-gray-900 rounded-[2rem] p-2.5 shadow-2xl transform rotate-6">
                   <div className="bg-white rounded-[1.5rem] overflow-hidden aspect-[3/4] relative">
-                    <div className="absolute inset-0 bg-gradient-to-br from-purple-50 to-pink-50 p-4">
+                    <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-green-50 p-4">
                       {/* Header */}
-                      <div className="flex items-center justify-between mb-4">
-                        <div className="font-bold text-sm text-gray-900">Your Stats</div>
-                        <div className="text-xl">🏆</div>
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="font-bold text-sm text-gray-900">Popular Courts</div>
+                        <div className="text-xl">🏟️</div>
                       </div>
 
-                      {/* Stats Cards */}
-                      <div className="space-y-3">
-                        {/* Total Bookings */}
-                        <div className="bg-gradient-to-br from-purple-600 to-purple-700 rounded-xl p-3 text-white">
-                          <div className="text-xs opacity-80 mb-1">Total Bookings</div>
-                          <div className="text-2xl font-bold">127</div>
-                          <div className="text-xs opacity-80 mt-1">↑ 23% this month</div>
-                        </div>
-
-                        {/* Hours Played */}
-                        <div className="bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl p-3 text-white">
-                          <div className="text-xs opacity-80 mb-1">Hours Played</div>
-                          <div className="text-2xl font-bold">342</div>
-                          <div className="text-xs opacity-80 mt-1">Across 5 sports</div>
-                        </div>
-
-                        {/* Favorite Sport */}
-                        <div className="bg-gradient-to-br from-green-600 to-green-700 rounded-xl p-3 text-white">
-                          <div className="text-xs opacity-80 mb-1">Favorite Sport</div>
-                          <div className="flex items-center space-x-2">
-                            <div className="text-lg">🎾</div>
-                            <div className="font-bold">Tennis</div>
+                      {/* Sports Court Cards */}
+                      <div className="space-y-2.5">
+                        {/* Badminton Court */}
+                        <div className="bg-white rounded-xl overflow-hidden shadow-md">
+                          <div className="relative h-16">
+                            <Image
+                              src="https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+                              alt="Badminton Court"
+                              fill
+                              className="object-cover"
+                            />
+                            <div className="absolute top-1 left-1 bg-blue-600 text-white text-xs px-1.5 py-0.5 rounded-full font-semibold">
+                              🏸 Badminton
+                            </div>
+                            <div className="absolute top-1 right-1 bg-green-500 text-white text-xs px-1.5 py-0.5 rounded-full font-semibold">
+                              Available
+                            </div>
                           </div>
-                          <div className="text-xs opacity-80 mt-1">68 sessions</div>
+                          <div className="p-2 flex items-center justify-between">
+                            <div className="flex-1">
+                              <div className="font-semibold text-xs text-gray-900">Indoor Court A</div>
+                              <div className="text-xs text-gray-500">$6.5/hour</div>
+                            </div>
+                            <button className="bg-blue-600 hover:bg-blue-700 text-white text-xs px-2 py-1 rounded-md font-semibold transition-colors">
+                              Book
+                            </button>
+                          </div>
                         </div>
 
-                        {/* Achievements */}
-                        <div className="bg-white rounded-xl p-3 shadow-sm border border-purple-100">
-                          <div className="text-xs text-gray-600 mb-2">Recent Achievement</div>
-                          <div className="flex items-center space-x-2">
-                            <div className="text-lg">⭐</div>
-                            <div className="text-xs font-semibold text-gray-900">100 Bookings!</div>
+                        {/* Basketball Court */}
+                        <div className="bg-white rounded-xl overflow-hidden shadow-md">
+                          <div className="relative h-16">
+                            <Image
+                              src="https://images.unsplash.com/photo-1546519638-68e109498ffc?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+                              alt="Basketball Court"
+                              fill
+                              className="object-cover"
+                            />
+                            <div className="absolute top-1 left-1 bg-orange-600 text-white text-xs px-1.5 py-0.5 rounded-full font-semibold">
+                              🏀 Basketball
+                            </div>
+                            <div className="absolute top-1 right-1 bg-green-500 text-white text-xs px-1.5 py-0.5 rounded-full font-semibold">
+                              Available
+                            </div>
+                          </div>
+                          <div className="p-2 flex items-center justify-between">
+                            <div className="flex-1">
+                              <div className="font-semibold text-xs text-gray-900">Court Pro</div>
+                              <div className="text-xs text-gray-500">$8.5/hour</div>
+                            </div>
+                            <button className="bg-orange-600 hover:bg-orange-700 text-white text-xs px-2 py-1 rounded-md font-semibold transition-colors">
+                              Book
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Cricket Ground */}
+                        <div className="bg-white rounded-xl overflow-hidden shadow-md">
+                          <div className="relative h-16">
+                            <Image
+                              src="https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+                              alt="Cricket Ground"
+                              fill
+                              className="object-cover"
+                            />
+                            <div className="absolute top-1 left-1 bg-indigo-600 text-white text-xs px-1.5 py-0.5 rounded-full font-semibold">
+                              🏏 Cricket
+                            </div>
+                            <div className="absolute top-1 right-1 bg-green-500 text-white text-xs px-1.5 py-0.5 rounded-full font-semibold">
+                              Available
+                            </div>
+                          </div>
+                          <div className="p-2 flex items-center justify-between">
+                            <div className="flex-1">
+                              <div className="font-semibold text-xs text-gray-900">Ground Elite</div>
+                              <div className="text-xs text-gray-500">$25/hour</div>
+                            </div>
+                            <button className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-2 py-1 rounded-md font-semibold transition-colors">
+                              Book
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Tennis Court */}
+                        <div className="bg-white rounded-xl overflow-hidden shadow-md">
+                          <div className="relative h-16">
+                            <Image
+                              src="https://images.unsplash.com/photo-1554068865-24cecd4e34b8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+                              alt="Tennis Court"
+                              fill
+                              className="object-cover"
+                            />
+                            <div className="absolute top-1 left-1 bg-green-600 text-white text-xs px-1.5 py-0.5 rounded-full font-semibold">
+                              🎾 Tennis
+                            </div>
+                            <div className="absolute top-1 right-1 bg-green-500 text-white text-xs px-1.5 py-0.5 rounded-full font-semibold">
+                              Available
+                            </div>
+                          </div>
+                          <div className="p-2 flex items-center justify-between">
+                            <div className="flex-1">
+                              <div className="font-semibold text-xs text-gray-900">Premium Court A</div>
+                              <div className="text-xs text-gray-500">$7.5/hour</div>
+                            </div>
+                            <button className="bg-green-600 hover:bg-green-700 text-white text-xs px-2 py-1 rounded-md font-semibold transition-colors">
+                              Book
+                            </button>
                           </div>
                         </div>
                       </div>

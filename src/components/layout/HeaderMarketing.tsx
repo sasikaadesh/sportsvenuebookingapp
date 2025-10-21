@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { Menu, X, ArrowRight } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 
@@ -10,38 +11,42 @@ export function HeaderMarketing() {
 
   return (
     <header className="bg-white/90 backdrop-blur-md border-b border-gray-200 sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+      <div className="w-full px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-16 md:h-16">
           {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-green-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-xs">SVB</span>
-            </div>
-            <span className="text-xl font-bold text-gray-900">SportsVenueBookings</span>
+          <Link prefetch href="/" className="flex items-center">
+            <Image
+              src="/SVB_Logo.png"
+              alt="SportsVenueBookings"
+              width={1000}
+              height={250}
+              className="h-24 md:h-28 w-auto shrink-0"
+              priority
+            />
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-8">
-            <Link href="/#features" className="text-gray-700 hover:text-blue-600 transition-colors">
+          <nav className="hidden md:flex items-center md:space-x-6 lg:space-x-8">
+            <Link prefetch href="/#features" className="whitespace-nowrap leading-tight text-gray-700 hover:text-blue-600 transition-colors">
               Features
             </Link>
-            <Link href="/#how-it-works" className="text-gray-700 hover:text-blue-600 transition-colors">
+            <Link prefetch href="/#how-it-works" className="whitespace-nowrap leading-tight text-gray-700 hover:text-blue-600 transition-colors">
               How It Works
             </Link>
-            <Link href="/#testimonials" className="text-gray-700 hover:text-blue-600 transition-colors">
+            <Link prefetch href="/#testimonials" className="whitespace-nowrap leading-tight text-gray-700 hover:text-blue-600 transition-colors">
               Reviews
             </Link>
-            <Link href="/about" className="text-gray-700 hover:text-blue-600 transition-colors">
+            <Link prefetch href="/about" className="whitespace-nowrap leading-tight text-gray-700 hover:text-blue-600 transition-colors">
               About Us
             </Link>
-            <Link href="/contact" className="text-gray-700 hover:text-blue-600 transition-colors">
+            <Link prefetch href="/contact" className="whitespace-nowrap leading-tight text-gray-700 hover:text-blue-600 transition-colors">
               Contact Us
             </Link>
           </nav>
 
           {/* Desktop CTA */}
           <div className="hidden md:flex items-center space-x-4">
-            <Link href="/app">
+            <Link prefetch href="/app">
               <Button className="bg-blue-600 hover:bg-blue-700 text-white flex items-center space-x-2">
                 <span>Try Demo App</span>
                 <ArrowRight className="w-4 h-4" />
@@ -62,35 +67,35 @@ export function HeaderMarketing() {
         {isMenuOpen && (
           <div className="md:hidden py-4 border-t border-gray-200">
             <div className="flex flex-col space-y-4">
-              <Link
+              <Link prefetch
                 href="/#features"
                 className="text-gray-700 hover:text-blue-600 transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Features
               </Link>
-              <Link
+              <Link prefetch
                 href="/#how-it-works"
                 className="text-gray-700 hover:text-blue-600 transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 How It Works
               </Link>
-              <Link
+              <Link prefetch
                 href="/#testimonials"
                 className="text-gray-700 hover:text-blue-600 transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Reviews
               </Link>
-              <Link
+              <Link prefetch
                 href="/about"
                 className="text-gray-700 hover:text-blue-600 transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 About Us
               </Link>
-              <Link
+              <Link prefetch
                 href="/contact"
                 className="text-gray-700 hover:text-blue-600 transition-colors"
                 onClick={() => setIsMenuOpen(false)}
@@ -99,7 +104,7 @@ export function HeaderMarketing() {
               </Link>
               
               <div className="pt-4 border-t border-gray-200">
-                <Link href="/app" onClick={() => setIsMenuOpen(false)}>
+                <Link prefetch href="/app" onClick={() => setIsMenuOpen(false)}>
                   <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center space-x-2">
                     <span>Try Demo App</span>
                     <ArrowRight className="w-4 h-4" />

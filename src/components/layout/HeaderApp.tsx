@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { useAuth } from '@/components/providers/AuthProvider'
 import { useTheme } from '@/components/providers/ThemeProvider'
 import { Menu, X, User, LogOut, Calendar, Settings, Home, Sun, Moon } from 'lucide-react'
@@ -41,41 +42,45 @@ export function HeaderApp({ hideThemeToggle = false }: HeaderAppProps) {
   }
 
   return (
-    <header className="bg-white/90 dark:bg-gray-900/90 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 sticky top-0 z-50 transition-colors duration-200">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+    <header className="bg-white/90 dark:bg-gray-900/90 backdrop-blur-md border-b border-gray-700/60 sticky top-0 z-50 transition-colors duration-200">
+      <div className="w-full px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-16 md:h-16">
           {/* Logo */}
           <Link href="/app" className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-green-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-xs">SVB</span>
-            </div>
-            <span className="text-xl font-bold text-gray-900 dark:text-white">SportsVenueBookings</span>
+            <Image
+              src="/SVB_Logo.png"
+              alt="SportsVenueBookings"
+              width={1000}
+              height={250}
+              className="h-24 md:h-28 w-auto shrink-0"
+              priority
+            />
             <span className="text-xs bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 px-2 py-1 rounded-full font-medium">Demo</span>
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-8">
-            <Link href="/app" className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+          <nav className="hidden md:flex items-center md:space-x-6 lg:space-x-8">
+            <Link href="/app" className="whitespace-nowrap leading-tight text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
               Home
             </Link>
-            <Link href="/courts" className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+            <Link href="/courts" className="whitespace-nowrap leading-tight text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
               Courts
             </Link>
-            <Link href="/" className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex items-center space-x-1">
+            <Link href="/" className="whitespace-nowrap leading-tight text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex items-center space-x-1">
               <Home className="w-4 h-4" />
               <span>Marketing Site</span>
             </Link>
           </nav>
 
           {/* Theme Toggle & Desktop Auth */}
-          <div className="hidden md:flex items-center space-x-4">
+          <div className="hidden md:flex items-center space-x-3">
             {/* Theme Toggle */}
             {!hideThemeToggle && (
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={toggleTheme}
-                className="p-2"
+                className="p-2 whitespace-nowrap"
                 aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
               >
                 {theme === 'light' ? (
@@ -88,7 +93,7 @@ export function HeaderApp({ hideThemeToggle = false }: HeaderAppProps) {
             {user ? (
               <div className="flex items-center space-x-4">
                 <Link href="/dashboard">
-                  <Button variant="ghost" size="sm" className="flex items-center space-x-2">
+                  <Button variant="ghost" size="sm" className="flex items-center space-x-2 whitespace-nowrap">
                     <Calendar className="w-4 h-4" />
                     <span>My Bookings</span>
                   </Button>
@@ -96,7 +101,7 @@ export function HeaderApp({ hideThemeToggle = false }: HeaderAppProps) {
                 
                 {profile?.role === 'admin' && (
                   <Link href="/admin">
-                    <Button variant="ghost" size="sm" className="flex items-center space-x-2">
+                    <Button variant="ghost" size="sm" className="flex items-center space-x-2 whitespace-nowrap">
                       <Settings className="w-4 h-4" />
                       <span>Admin</span>
                     </Button>
@@ -107,7 +112,7 @@ export function HeaderApp({ hideThemeToggle = false }: HeaderAppProps) {
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="flex items-center space-x-2"
+                    className="flex items-center space-x-2 whitespace-nowrap"
                     onClick={() => setIsProfileOpen(!isProfileOpen)}
                   >
                     <User className="w-4 h-4" />

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { useAuth } from '@/components/providers/AuthProvider'
 import { Menu, X, User, LogOut, Calendar, Settings } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
@@ -36,25 +37,29 @@ export function Header() {
 
   return (
     <header className="bg-white/90 backdrop-blur-md border-b border-gray-200 sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+      <div className="w-full px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-16 md:h-16">
           {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-green-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-xs">SVB</span>
-            </div>
-            <span className="text-xl font-bold text-gray-900">SportsVenueBookings</span>
+          <Link href="/" className="flex items-center">
+            <Image
+              src="/SVB_Logo.png"
+              alt="SportsVenueBookings"
+              width={1000}
+              height={250}
+              className="h-24 md:h-28 w-auto shrink-0"
+              priority
+            />
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-8">
-            <Link href="/courts" className="text-gray-700 hover:text-blue-600 transition-colors">
+          <nav className="hidden md:flex items-center md:space-x-6 lg:space-x-8">
+            <Link href="/courts" className="whitespace-nowrap leading-tight text-gray-700 hover:text-blue-600 transition-colors">
               Courts
             </Link>
-            <Link href="/about" className="text-gray-700 hover:text-blue-600 transition-colors">
+            <Link href="/about" className="whitespace-nowrap leading-tight text-gray-700 hover:text-blue-600 transition-colors">
               About
             </Link>
-            <Link href="/contact" className="text-gray-700 hover:text-blue-600 transition-colors">
+            <Link href="/contact" className="whitespace-nowrap leading-tight text-gray-700 hover:text-blue-600 transition-colors">
               Contact
             </Link>
           </nav>
@@ -64,7 +69,7 @@ export function Header() {
             {user ? (
               <div className="flex items-center space-x-4">
                 <Link href="/dashboard">
-                  <Button variant="ghost" size="sm" className="flex items-center space-x-2">
+                  <Button variant="ghost" size="sm" className="flex items-center space-x-2 whitespace-nowrap">
                     <Calendar className="w-4 h-4" />
                     <span>My Bookings</span>
                   </Button>
@@ -72,7 +77,7 @@ export function Header() {
                 
                 {profile?.role === 'admin' && (
                   <Link href="/admin">
-                    <Button variant="ghost" size="sm" className="flex items-center space-x-2">
+                    <Button variant="ghost" size="sm" className="flex items-center space-x-2 whitespace-nowrap">
                       <Settings className="w-4 h-4" />
                       <span>Admin</span>
                     </Button>
@@ -83,7 +88,7 @@ export function Header() {
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="flex items-center space-x-2"
+                    className="flex items-center space-x-2 whitespace-nowrap"
                     onClick={() => setIsProfileOpen(!isProfileOpen)}
                   >
                     <User className="w-4 h-4" />

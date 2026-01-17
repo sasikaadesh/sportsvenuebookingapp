@@ -32,7 +32,7 @@ export function formatTime(time: string): string {
   }
 }
 
-export function formatCurrency(amount: number, currency: string = 'USD'): string {
+export function formatCurrency(amount: number, currency: string = 'LKR'): string {
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency,

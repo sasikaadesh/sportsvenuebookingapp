@@ -12,6 +12,9 @@ import { useAuth } from '@/components/providers/AuthProvider'
 import { getCourtTypeIcon, formatCurrency } from '@/lib/utils'
 import { supabase } from '@/lib/supabase'
 import { sendContactEmails, isEmailJSConfigured } from '@/lib/emailjs'
+import Script from 'next/script'
+// payhere is injected via external script
+declare const payhere: any
 import Image from 'next/image'
 import toast from 'react-hot-toast'
 
@@ -192,7 +195,7 @@ export default function BookCourtPage() {
         return
       }
 
-      // Create booking in database
+      // 1) Create booking in database as pending until payment completes
       const { data, error } = await (supabase as any)
         .from('bookings')
         .insert({
@@ -202,8 +205,8 @@ export default function BookCourtPage() {
           start_time: startTime + ':00', // Ensure HH:MM:SS format
           duration_hours: selectedBooking.duration,
           total_price: selectedBooking.price,
-          status: 'confirmed',
-          payment_status: 'paid'
+          status: 'pending',
+          payment_status: 'pending'
         })
         .select()
         .single()
@@ -214,67 +217,89 @@ export default function BookCourtPage() {
         return
       }
 
-      console.log('Booking created successfully:', data)
-      
-      // Send booking confirmation email
-      if (isEmailJSConfigured() && user?.email) {
-        try {
-          console.log('Sending booking confirmation email...')
-          
-          const bookingDetails = `🎾 BOOKING CONFIRMATION
+      console.log('Booking created successfully (pending payment):', data)
 
-Dear ${user.user_metadata?.full_name || user.email},
+      // 2) Start PayHere payment popup for this booking
+      try {
+        const orderId = data.id as string // Use booking ID so webhook can update this record
+        const amount = Number(selectedBooking.price).toFixed(2)
+        const currency = 'LKR'
 
-Your court booking has been confirmed!
-
-📍 Court: ${court.name}
-🏆 Type: ${court.type?.charAt(0).toUpperCase() + court.type?.slice(1)}
-📅 Date: ${new Date(selectedBooking.date).toLocaleDateString('en-US', { 
-  weekday: 'long', 
-  year: 'numeric', 
-  month: 'long', 
-  day: 'numeric' 
-})}
-⏰ Time: ${startTime}
-⏱️ Duration: ${selectedBooking.duration} hour${selectedBooking.duration > 1 ? 's' : ''}
-💰 Total: $${selectedBooking.price}
-🎫 Booking ID: ${data.id}
-
-IMPORTANT REMINDERS:
-✅ Please arrive 15 minutes before your booking time
-✅ Bring your own equipment or rent on-site  
-✅ Free cancellation up to 24 hours before your booking
-✅ Contact us at (555) 123-4567 for any changes
-
-Thank you for choosing SportsVenueBookings!
-
-Best regards,
-The SportsVenueBookings Team`
-
-          await sendContactEmails({
-            name: user.user_metadata?.full_name || user.email || 'Customer',
-            email: user.email,
-            phone: user.user_metadata?.phone || '',
-            subject: `Booking Confirmed - ${court.name}`,
-            message: bookingDetails,
-            inquiryType: 'booking'
-          })
-          
-          console.log('Booking confirmation email sent successfully')
-          toast.success('Booking confirmed! Check your email for details.')
-        } catch (emailError) {
-          console.error('Email sending failed:', emailError)
-          toast.success('Booking confirmed! Redirecting to dashboard...')
+        // Get hash from our server
+        const res = await fetch('/api/payments/payhere/hash', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ orderId, amount, currency })
+        })
+        const payload = await res.json()
+        if (!res.ok) {
+          console.error('PayHere hash error:', payload)
+          toast.error(payload.error || 'Failed to initialize payment')
+          return
         }
-      } else {
-        console.log('EmailJS not configured or no user email, skipping email')
-        toast.success('Booking confirmed! Redirecting to dashboard...')
-      }
 
-      // Redirect to dashboard after a short delay
-      setTimeout(() => {
-        router.push('/dashboard')
-      }, 2000) // Slightly longer delay to show email success message
+        const origin = window.location.origin
+        const notifyBase = process.env.NEXT_PUBLIC_APP_URL || origin
+
+        // Event handlers
+        payhere.onCompleted = async function (_orderId: string) {
+          toast.success('Payment completed! Redirecting...')
+
+          // Optionally send confirmation email now that payment completed (sandbox flow)
+          if (isEmailJSConfigured() && user?.email) {
+            try {
+              const bookingDetails = `🎾 BOOKING CONFIRMATION\n\nDear ${user.user_metadata?.full_name || user.email},\n\nYour court booking has been confirmed!\n\n📍 Court: ${court.name}\n🏆 Type: ${court.type?.charAt(0).toUpperCase() + court.type?.slice(1)}\n📅 Date: ${new Date(selectedBooking.date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}\n⏰ Time: ${startTime}\n⏱️ Duration: ${selectedBooking.duration} hour${selectedBooking.duration > 1 ? 's' : ''}\n  💰 Total: ${formatCurrency(selectedBooking.price)}\n🎫 Booking ID: ${orderId}`
+
+              await sendContactEmails({
+                name: user.user_metadata?.full_name || user.email || 'Customer',
+                email: user.email,
+                phone: user.user_metadata?.phone || '',
+                subject: `Booking Confirmed - ${court.name}`,
+                message: bookingDetails,
+                inquiryType: 'booking'
+              })
+            } catch (e) {
+              console.warn('Email sending after payment failed:', e)
+            }
+          }
+
+        	// Navigate after short delay; the webhook will update booking status
+          setTimeout(() => router.push('/dashboard'), 1500)
+        }
+        payhere.onDismissed = function () {
+          toast('Payment window closed')
+        }
+        payhere.onError = function (err: string) {
+          console.error('PayHere error:', err)
+          toast.error('Payment error: ' + err)
+        }
+
+        const payment = {
+          sandbox: true,
+          merchant_id: payload.merchantId,
+          return_url: `${origin}/test-payhere/return?order_id=${encodeURIComponent(orderId)}`,
+          cancel_url: `${origin}/test-payhere/cancel?order_id=${encodeURIComponent(orderId)}`,
+          notify_url: `${notifyBase}/api/payments/payhere/notify`,
+          order_id: orderId,
+          items: `Court Booking - ${court.name}`,
+          amount: payload.amount,
+          currency,
+          hash: payload.hash,
+          first_name: user.user_metadata?.full_name?.split(' ')?.[0] || 'User',
+          last_name: user.user_metadata?.full_name?.split(' ')?.slice(1).join(' ') || ' ',
+          email: user.email || 'user@example.com',
+          phone: user.user_metadata?.phone || '0700000000',
+          address: 'N/A',
+          city: 'Colombo',
+          country: 'Sri Lanka'
+        }
+
+        setStep(3)
+        payhere.startPayment(payment)
+      } catch (phErr) {
+        console.error('Failed to start PayHere payment:', phErr)
+        toast.error('Failed to start payment')
+      }
 
     } catch (error) {
       console.error('Booking error:', error)
@@ -329,6 +354,7 @@ The SportsVenueBookings Team`
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50">
+      <Script src="https://www.payhere.lk/lib/payhere.js" strategy="beforeInteractive" />
       <HeaderApp />
       
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

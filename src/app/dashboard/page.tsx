@@ -10,6 +10,7 @@ import { FooterSimple } from '@/components/layout/FooterSimple'
 import { AppLayout } from '@/components/layout/AppLayout'
 import { Button } from '@/components/ui/Button'
 import { supabase } from '@/lib/supabase'
+import { formatCurrency } from '@/lib/utils'
 
 // Mock data - will be replaced with real data from Supabase
 const mockBookings = [
@@ -376,7 +377,7 @@ export default function DashboardPage() {
                       </span>
                       <div className="text-right mt-2">
                         <p className="text-lg font-semibold text-gray-900 dark:text-white">
-                          ${booking.price?.toFixed(2) || '0.00'}
+                          {formatCurrency(booking.price || 0)}
                         </p>
                       </div>
                     </div>

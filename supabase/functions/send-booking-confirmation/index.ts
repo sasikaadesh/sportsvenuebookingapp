@@ -103,7 +103,7 @@ serve(async (req) => {
               </div>
               <div class="detail-row total">
                 <span>Total Amount:</span>
-                <span>$${bookingData.totalPrice.toFixed(2)}</span>
+                <span>LKR ${bookingData.totalPrice.toFixed(2)}</span>
               </div>
             </div>
             

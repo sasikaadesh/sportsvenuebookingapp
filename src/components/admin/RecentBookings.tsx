@@ -4,7 +4,7 @@ import { motion } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 import { Calendar, Clock, User, DollarSign, MoreHorizontal } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
-import { getStatusColor } from '@/lib/utils'
+import { getStatusColor, formatCurrency } from '@/lib/utils'
 
 interface Booking {
   id: string
@@ -99,7 +99,7 @@ export function RecentBookings({ bookings }: RecentBookingsProps) {
                 <td className="py-4 px-4">
                   <div className="flex items-center space-x-1">
                     <DollarSign className="w-4 h-4 text-gray-600" />
-                    <span className="font-medium text-gray-900">{booking.amount}</span>
+                    <span className="font-medium text-gray-900">{formatCurrency(booking.amount)}</span>
                   </div>
                 </td>
                 

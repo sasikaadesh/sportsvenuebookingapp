@@ -6,6 +6,7 @@ import { motion } from 'framer-motion'
 import { MapPin, Star, Clock, Users } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { supabase } from '@/lib/supabase'
+import { formatCurrency } from '@/lib/utils'
 
 // Mock data - will be replaced with real data from Supabase
 const mockFeaturedCourts = [
@@ -82,20 +83,40 @@ export function FeaturedCourts() {
         // Keep mock data as fallback
       } else {
         console.log(`Loaded ${data.length} featured courts from database`)
-        // Quick transformation
-        const transformedCourts = data.map((court: any) => ({
-          id: court.id,
-          name: court.name,
-          type: court.type,
-          image: court.image_url || (court.type === 'badminton' ? 'https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80' : 'https://images.unsplash.com/photo-1554068865-24cecd4e34b8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'),
-          location: 'Sports Complex',
-          rating: 4.8,
-          reviews: 124,
-          price: 45,
-          duration: '1 hour',
-          amenities: court.amenities ? court.amenities.split(', ').slice(0, 3) : ['Professional Equipment'],
-          availability: 'Available Today'
-        }))
+        // Fetch 1-hour off-peak prices for these courts
+        const courtIds = data.map((c: any) => c.id)
+        const { data: pricing, error: pricingError } = await supabase
+          .from('pricing_rules')
+          .select('court_id, duration_hours, off_peak_price')
+          .in('court_id', courtIds)
+          .eq('duration_hours', 1)
+
+        if (pricingError) {
+          console.warn('Pricing lookup failed, falling back to mock prices', pricingError)
+        }
+
+        const priceMap = new Map<string, number>()
+        ;(pricing || []).forEach((row: any) => {
+          priceMap.set(row.court_id, Number(row.off_peak_price))
+        })
+
+        // Build courts with DB prices (LKR)
+        const transformedCourts = data.map((court: any) => {
+          const price = priceMap.get(court.id)
+          return {
+            id: court.id,
+            name: court.name,
+            type: court.type,
+            image: court.image_url || (court.type === 'badminton' ? 'https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80' : 'https://images.unsplash.com/photo-1554068865-24cecd4e34b8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'),
+            location: 'Sports Complex',
+            rating: 4.8,
+            reviews: 124,
+            price: price ?? 0,
+            duration: 'hour',
+            amenities: court.amenities ? court.amenities.split(', ').slice(0, 3) : ['Professional Equipment'],
+            availability: 'Available Today'
+          }
+        })
         setCourts(transformedCourts)
       }
     } catch (error) {
@@ -210,9 +231,9 @@ export function FeaturedCourts() {
                 <div className="flex items-center justify-between">
                   <div>
                     <span className="text-2xl font-bold text-gray-900 dark:text-white">
-                      ${court.price}
+                      {formatCurrency(court.price || 0)}
                     </span>
-                    <span className="text-gray-600 dark:text-gray-300 text-sm">/{court.duration}</span>
+                    <span className="text-gray-600 dark:text-gray-300 text-sm">/{court.duration || 'hour'}</span>
                   </div>
                   
                   <Link href={`/courts/${court.id}/book`}>

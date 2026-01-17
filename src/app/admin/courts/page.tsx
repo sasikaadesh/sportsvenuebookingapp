@@ -24,6 +24,7 @@ import { Button } from '@/components/ui/Button'
 import { useAuth } from '@/components/providers/AuthProvider'
 import { getCourtTypeIcon } from '@/lib/utils'
 import { supabase } from '@/lib/supabase'
+import { formatCurrency } from '@/lib/utils'
 import toast from 'react-hot-toast'
 
 export default function AdminCourtsPage() {
@@ -510,7 +511,7 @@ export default function AdminCourtsPage() {
                     <td className="py-4 px-6">
                       <div className="text-sm">
                         <div className="text-gray-900 font-medium">{court.bookings} bookings</div>
-                        <div className="text-gray-600">${court.revenue} revenue</div>
+                        <div className="text-gray-600">{formatCurrency(court.revenue)} revenue</div>
                       </div>
                     </td>
                     

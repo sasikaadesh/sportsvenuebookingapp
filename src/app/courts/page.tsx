@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/Button'
 import { CourtCard } from '@/components/courts/CourtCard'
 import { CourtFilters } from '@/components/courts/CourtFilters'
 import { supabase } from '@/lib/supabase'
+import { formatCurrency } from '@/lib/utils'
 
 // Helper functions for court data
 const getDefaultImageForType = (type: string) => {
@@ -145,7 +146,7 @@ export default function CourtsPage() {
   const [filteredCourts, setFilteredCourts] = useState<any[]>([])
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedType, setSelectedType] = useState('all')
-  const [priceRange, setPriceRange] = useState([0, 500])
+  const [priceRange, setPriceRange] = useState([0, 10000])
   const [sortBy, setSortBy] = useState('rating')
   const [loading, setLoading] = useState(true)
   const [showFilters, setShowFilters] = useState(false)
@@ -438,7 +439,7 @@ export default function CourtsPage() {
               onClick={() => {
                 setSearchTerm('')
                 setSelectedType('all')
-                setPriceRange([0, 500])
+                setPriceRange([0, 10000])
               }}
             >
               Clear Filters

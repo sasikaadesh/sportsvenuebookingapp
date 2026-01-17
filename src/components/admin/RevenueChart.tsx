@@ -1,6 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import { formatCurrency } from '@/lib/utils'
 import { BarChart3, TrendingUp } from 'lucide-react'
 
 interface RevenueData {
@@ -55,7 +56,7 @@ export function RevenueChart({ data }: RevenueChartProps) {
                   <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 opacity-0 group-hover:opacity-100 transition-opacity">
                     <div className="bg-gray-900 text-white text-xs rounded-lg py-2 px-3 whitespace-nowrap">
                       <div className="font-medium">{item.month}</div>
-                      <div>Revenue: ${item.revenue.toLocaleString()}</div>
+                      <div>Revenue: {formatCurrency(item.revenue)}</div>
                       <div>Bookings: {item.bookings}</div>
                     </div>
                     <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
@@ -101,7 +102,7 @@ export function RevenueChart({ data }: RevenueChartProps) {
       <div className="grid grid-cols-3 gap-4 mt-6 pt-6 border-t border-gray-200">
         <div className="text-center">
           <div className="text-2xl font-bold text-gray-900">
-            ${hasData ? data.reduce((sum, item) => sum + item.revenue, 0).toLocaleString() : '0'}
+            {hasData ? formatCurrency(data.reduce((sum, item) => sum + item.revenue, 0)) : formatCurrency(0)}
           </div>
           <div className="text-sm text-gray-600">Total Revenue</div>
         </div>
@@ -116,11 +117,11 @@ export function RevenueChart({ data }: RevenueChartProps) {
         <div className="text-center">
           <div className="text-2xl font-bold text-gray-900">
             {(() => {
-              if (!hasData) return '$0'
+              if (!hasData) return formatCurrency(0)
               const totalRevenue = data.reduce((sum, item) => sum + item.revenue, 0)
               const totalBookings = data.reduce((sum, item) => sum + item.bookings, 0)
-              if (totalBookings === 0) return '$0'
-              return `$${Math.round(totalRevenue / totalBookings).toLocaleString()}`
+              if (totalBookings === 0) return formatCurrency(0)
+              return formatCurrency(Math.round(totalRevenue / totalBookings))
             })()}
           </div>
           <div className="text-sm text-gray-600">Avg. Booking Value</div>

@@ -1,6 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import { formatCurrency } from '@/lib/utils'
 import { BarChart3, Users, Calendar, DollarSign, TrendingUp, TrendingDown } from 'lucide-react'
 
 interface AdminStatsProps {
@@ -24,7 +25,7 @@ export function AdminStats({ stats }: AdminStatsProps) {
     },
     {
       title: 'Total Revenue',
-      value: `$${stats.totalRevenue.toLocaleString()}`,
+      value: formatCurrency(stats.totalRevenue),
       change: '+18%',
       changeType: 'increase',
       icon: DollarSign,

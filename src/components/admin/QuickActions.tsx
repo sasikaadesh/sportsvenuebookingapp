@@ -13,6 +13,7 @@ import {
   Download
 } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
+import { formatCurrency } from '@/lib/utils'
 import { supabase } from '@/lib/supabase'
 import toast from 'react-hot-toast'
 
@@ -55,7 +56,7 @@ export function QuickActions() {
         booking.booking_date,
         booking.start_time,
         `${booking.duration_hours}h`,
-        `$${booking.total_price || 0}`,
+        `${formatCurrency(booking.total_price || 0)}`,
         booking.status || 'pending',
         booking.payment_status || 'pending'
       ])
@@ -108,9 +109,9 @@ export function QuickActions() {
     doc.text('Key Statistics', 20, 55)
     
     // Statistics boxes
-    const stats = [
+      const stats = [
       { label: 'Total Bookings', value: data.totalBookings.toLocaleString() },
-      { label: 'Total Revenue', value: `$${data.totalRevenue.toLocaleString()}` },
+        { label: 'Total Revenue', value: `${formatCurrency(data.totalRevenue)}` },
       { label: 'Active Users', value: data.activeUsers.toLocaleString() },
       { label: 'Available Courts', value: data.availableCourts.toString() }
     ]
@@ -298,7 +299,7 @@ export function QuickActions() {
           </div>
           <div className="flex justify-between">
             <span className="text-gray-600">Revenue Today</span>
-            <span className="font-medium text-gray-900">$1,240</span>
+            <span className="font-medium text-gray-900">{formatCurrency(1240)}</span>
           </div>
         </div>
       </div>

@@ -6,7 +6,7 @@ import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { MapPin, Star, Clock, Heart, Share2 } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
-import { getCourtTypeIcon } from '@/lib/utils'
+import { getCourtTypeIcon, formatCurrency } from '@/lib/utils'
 
 interface Court {
   id: string
@@ -161,23 +161,27 @@ export function CourtCard({ court }: CourtCardProps) {
         </div>
 
         {/* Price and Actions */}
-        <div className="flex items-center justify-between">
-          <div>
+        <div className="flex flex-col gap-3">
+          <div className="flex items-baseline">
             <span className="text-2xl font-bold text-gray-900 dark:text-white">
-              ${court.priceFrom}
+              {formatCurrency(court.priceFrom)}
             </span>
-            <span className="text-gray-600 dark:text-gray-300 text-sm">/hour</span>
+            <span className="ml-1 text-gray-600 dark:text-gray-300 text-sm">/hour</span>
           </div>
-          
-          <div className="flex space-x-2">
+
+          <div className="flex items-center gap-2">
             <Link href={`/courts/${court.id}`}>
-              <Button variant="outline" size="sm">
+              <Button
+                variant="outline"
+                size="sm"
+                className="whitespace-nowrap justify-center border-blue-600 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30"
+              >
                 View Details
               </Button>
             </Link>
-            
+
             <Link href={`/courts/${court.id}/book`}>
-              <Button size="sm" className="bg-blue-600 hover:bg-blue-700">
+              <Button size="sm" className="bg-blue-600 hover:bg-blue-700 whitespace-nowrap justify-center text-white">
                 Book Now
               </Button>
             </Link>

@@ -88,7 +88,7 @@ export function CourtFilters({
           <div className="flex-1">
             <label className="block text-sm font-medium text-gray-700 mb-1">Min Price</label>
             <div className="relative">
-              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
+              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">LKR</span>
               <input
                 type="number"
                 value={priceRange[0]}
@@ -105,7 +105,7 @@ export function CourtFilters({
           <div className="flex-1">
             <label className="block text-sm font-medium text-gray-700 mb-1">Max Price</label>
             <div className="relative">
-              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
+              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">LKR</span>
               <input
                 type="number"
                 value={priceRange[1]}
@@ -120,17 +120,17 @@ export function CourtFilters({
         
         {/* Price Range Slider */}
         <div className="mt-4">
-          <input
-            type="range"
-            min="0"
-            max="500"
-            value={priceRange[1]}
-            onChange={(e) => handlePriceChange(1, e.target.value)}
-            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
-          />
+            <input
+              type="range"
+              min="0"
+              max="10000"
+              value={priceRange[1]}
+              onChange={(e) => handlePriceChange(1, e.target.value)}
+              className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
+            />
           <div className="flex justify-between text-sm text-gray-500 mt-1">
-            <span>$0</span>
-            <span>$500+</span>
+            <span>LKR 0</span>
+            <span>LKR 10,000+</span>
           </div>
         </div>
       </div>
@@ -189,9 +189,9 @@ export function CourtFilters({
         <motion.button
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          onClick={() => {
+            onClick={() => {
             onTypeChange('all')
-            onPriceRangeChange([0, 500])
+            onPriceRangeChange([0, 10000])
             setSelectedAmenities([])
             setSelectedRating(0)
           }}

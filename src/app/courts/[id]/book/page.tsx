@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { ArrowLeft, MapPin, Star, Clock, CreditCard, Shield } from 'lucide-react'
@@ -13,10 +13,15 @@ import { getCourtTypeIcon, formatCurrency } from '@/lib/utils'
 import { supabase } from '@/lib/supabase'
 import { sendContactEmails, isEmailJSConfigured } from '@/lib/emailjs'
 import Script from 'next/script'
-// payhere is injected via external script
-declare const payhere: any
 import Image from 'next/image'
 import toast from 'react-hot-toast'
+
+// Extend Window interface for PayHere
+declare global {
+  interface Window {
+    payhere?: any
+  }
+}
 
 // Mock court data - same as court detail page
 const mockCourtDetails = {
@@ -45,6 +50,15 @@ export default function BookCourtPage() {
   const [step, setStep] = useState(1) // 1: Calendar, 2: Confirmation, 3: Payment
   const [loading, setLoading] = useState(true)
   const [bookingLoading, setBookingLoading] = useState(false)
+  const [payhereReady, setPayhereReady] = useState(false)
+
+  // Check if PayHere SDK is loaded
+  const handlePayhereScriptLoad = useCallback(() => {
+    if (typeof window !== 'undefined' && window.payhere) {
+      setPayhereReady(true)
+      console.log('PayHere SDK loaded successfully')
+    }
+  }, [])
 
   const loadCourt = useCallback(async () => {
     try {
@@ -221,6 +235,13 @@ export default function BookCourtPage() {
 
       // 2) Start PayHere payment popup for this booking
       try {
+        // Check if PayHere SDK is loaded
+        if (typeof window === 'undefined' || !window.payhere) {
+          console.error('PayHere SDK not loaded')
+          toast.error('Payment system is loading. Please try again in a moment.')
+          return
+        }
+
         const orderId = data.id as string // Use booking ID so webhook can update this record
         const amount = Number(selectedBooking.price).toFixed(2)
         const currency = 'LKR'
@@ -242,7 +263,7 @@ export default function BookCourtPage() {
         const notifyBase = process.env.NEXT_PUBLIC_APP_URL || origin
 
         // Event handlers
-        payhere.onCompleted = async function (_orderId: string) {
+        window.payhere.onCompleted = async function (_orderId: string) {
           toast.success('Payment completed! Redirecting...')
 
           // Optionally send confirmation email now that payment completed (sandbox flow)
@@ -263,19 +284,19 @@ export default function BookCourtPage() {
             }
           }
 
-        	// Navigate after short delay; the webhook will update booking status
+          // Navigate after short delay; the webhook will update booking status
           setTimeout(() => router.push('/dashboard'), 1500)
         }
-        payhere.onDismissed = function () {
+        window.payhere.onDismissed = function () {
           toast('Payment window closed')
         }
-        payhere.onError = function (err: string) {
+        window.payhere.onError = function (err: string) {
           console.error('PayHere error:', err)
           toast.error('Payment error: ' + err)
         }
 
         const payment = {
-          sandbox: true,
+          sandbox: process.env.NEXT_PUBLIC_PAYHERE_SANDBOX === 'true',
           merchant_id: payload.merchantId,
           return_url: `${origin}/test-payhere/return?order_id=${encodeURIComponent(orderId)}`,
           cancel_url: `${origin}/test-payhere/cancel?order_id=${encodeURIComponent(orderId)}`,
@@ -295,7 +316,7 @@ export default function BookCourtPage() {
         }
 
         setStep(3)
-        payhere.startPayment(payment)
+        window.payhere.startPayment(payment)
       } catch (phErr) {
         console.error('Failed to start PayHere payment:', phErr)
         toast.error('Failed to start payment')
@@ -354,7 +375,12 @@ export default function BookCourtPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50">
-      <Script src="https://www.payhere.lk/lib/payhere.js" strategy="beforeInteractive" />
+      <Script
+        src="https://www.payhere.lk/lib/payhere.js"
+        strategy="afterInteractive"
+        onLoad={handlePayhereScriptLoad}
+        onReady={handlePayhereScriptLoad}
+      />
       <HeaderApp />
       
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

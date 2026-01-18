@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
-import { ArrowLeft, MapPin, Star, Clock, CreditCard, Shield } from 'lucide-react'
+import { ArrowLeft, MapPin, Star, Clock, CreditCard, Shield, CheckCircle, Calendar } from 'lucide-react'
 import { HeaderApp } from '@/components/layout/HeaderApp'
 import { FooterSimple } from '@/components/layout/FooterSimple'
 import { Button } from '@/components/ui/Button'
@@ -388,11 +388,21 @@ export default function BookCourtPage() {
         <motion.button
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
-          onClick={() => step > 1 ? setStep(step - 1) : router.back()}
+          onClick={() => {
+            if (step === 3) {
+              router.push('/courts')
+            } else if (step > 1) {
+              setStep(step - 1)
+            } else {
+              router.back()
+            }
+          }}
           className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 mb-6"
         >
           <ArrowLeft className="w-5 h-5" />
-          <span>{step > 1 ? 'Back' : 'Back to Court Details'}</span>
+          <span>
+            {step === 3 ? 'Browse Courts' : step > 1 ? 'Back' : 'Back to Court Details'}
+          </span>
         </motion.button>
 
         {/* Progress Steps */}
@@ -510,6 +520,76 @@ export default function BookCourtPage() {
                     <CreditCard className="w-4 h-4 mr-2" />
                     Confirm Booking & Pay {formatCurrency(selectedBooking.price)}
                   </Button>
+                </div>
+              </motion.div>
+            )}
+
+            {step === 3 && selectedBooking && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-white rounded-xl shadow-lg p-8"
+              >
+                <div className="text-center">
+                  <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <CheckCircle className="w-12 h-12 text-green-600" />
+                  </div>
+                  <h2 className="text-3xl font-bold text-gray-900 mb-3">
+                    Payment Processing
+                  </h2>
+                  <p className="text-lg text-gray-600 mb-6">
+                    Your booking is being confirmed. The PayHere payment window should open shortly.
+                  </p>
+
+                  <div className="bg-blue-50 rounded-lg p-6 mb-6">
+                    <h3 className="font-semibold text-gray-900 mb-4 flex items-center justify-center">
+                      <Calendar className="w-5 h-5 mr-2 text-blue-600" />
+                      Booking Summary
+                    </h3>
+                    <div className="grid grid-cols-2 gap-4 text-sm max-w-md mx-auto">
+                      <div className="text-left">
+                        <span className="text-gray-600">Court:</span>
+                        <div className="font-medium">{court?.name}</div>
+                      </div>
+                      <div className="text-left">
+                        <span className="text-gray-600">Date:</span>
+                        <div className="font-medium">{selectedBooking.date}</div>
+                      </div>
+                      <div className="text-left">
+                        <span className="text-gray-600">Time:</span>
+                        <div className="font-medium">{selectedBooking.startTime}</div>
+                      </div>
+                      <div className="text-left">
+                        <span className="text-gray-600">Duration:</span>
+                        <div className="font-medium">{selectedBooking.duration} hour(s)</div>
+                      </div>
+                    </div>
+                    <div className="mt-4 pt-4 border-t border-blue-200">
+                      <span className="text-gray-600">Total Amount:</span>
+                      <div className="font-bold text-2xl text-blue-600">
+                        {formatCurrency(selectedBooking.price)}
+                      </div>
+                    </div>
+                  </div>
+
+                  <p className="text-sm text-gray-500 mb-6">
+                    If the payment window doesn&apos;t open, please refresh the page and try again.
+                  </p>
+
+                  <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                    <Button
+                      variant="outline"
+                      onClick={() => router.push('/courts')}
+                    >
+                      Browse More Courts
+                    </Button>
+                    <Button
+                      onClick={() => router.push('/dashboard')}
+                      className="bg-blue-600 hover:bg-blue-700"
+                    >
+                      Go to My Bookings
+                    </Button>
+                  </div>
                 </div>
               </motion.div>
             )}

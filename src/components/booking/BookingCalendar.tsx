@@ -154,7 +154,7 @@ export function BookingCalendar({ courtId, pricing, onBookingSelect }: BookingCa
                 <span className="font-medium">{price.duration}h</span>
               </div>
               <div className="text-sm font-semibold text-gray-900">
-                ${price.offPeak}
+                LKR {price.offPeak.toLocaleString()}
               </div>
               <div className="text-xs text-gray-500">
                 per hour
@@ -275,7 +275,7 @@ export function BookingCalendar({ courtId, pricing, onBookingSelect }: BookingCa
                   <div className={`text-sm mt-1 font-semibold ${
                     isPeak ? 'text-orange-600' : 'text-green-600'
                   }`}>
-                    ${price}
+                    LKR {price.toLocaleString()}
                   </div>
                   <div className={`text-xs ${
                     isPeak ? 'text-orange-500' : 'text-green-500'

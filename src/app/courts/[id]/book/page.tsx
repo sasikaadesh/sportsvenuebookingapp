@@ -219,7 +219,7 @@ export default function BookCourtPage() {
           start_time: startTime + ':00', // Ensure HH:MM:SS format
           duration_hours: selectedBooking.duration,
           total_price: selectedBooking.price,
-          status: 'pending',
+          status: 'confirmed',
           payment_status: 'pending'
         })
         .select()

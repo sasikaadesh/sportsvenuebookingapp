@@ -21,14 +21,24 @@ export async function sendContactEmails(formData: ContactFormData) {
   try {
     console.log('Sending emails via EmailJS...')
 
-    // Send confirmation email to user
-    const userEmailParams = {
-      user_name: formData.name,
-      user_email: formData.email,
-      from_name: 'Sports Venue Team',
-      reply_to: 'noreply@sportsvenue.com',
-      subject: 'Thank you for contacting us!',
-      message: `Dear ${formData.name},
+    // Different message based on inquiry type
+    const isBooking = formData.inquiryType === 'booking'
+
+    const bookingMessage = `Dear ${formData.name},
+
+Your court booking has been successfully confirmed!
+
+No further action is required. If the booking must be canceled due to unavoidable reasons, our admin team will contact you. Thank you.
+
+${formData.message}
+
+Best regards,
+The SportsVenueBookings Team
+
+---
+This is an automated confirmation email.`
+
+    const contactMessage = `Dear ${formData.name},
 
 Thank you for your message! We've received your inquiry and will get back to you within 24 hours.
 
@@ -44,6 +54,15 @@ The SportsVenueBookings Team
 
 ---
 This is an automated confirmation email.`
+
+    // Send confirmation email to user
+    const userEmailParams = {
+      user_name: formData.name,
+      user_email: formData.email,
+      from_name: 'Sports Venue Team',
+      reply_to: 'noreply@sportsvenue.com',
+      subject: isBooking ? 'Your Booking is Confirmed!' : 'Thank you for contacting us!',
+      message: isBooking ? bookingMessage : contactMessage
     }
 
     // Send notification email to admin

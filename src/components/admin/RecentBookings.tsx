@@ -1,10 +1,13 @@
 'use client'
 
+import { useState, useRef, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { useRouter } from 'next/navigation'
-import { Calendar, Clock, User, DollarSign, MoreHorizontal } from 'lucide-react'
+import { Calendar, Clock, User, DollarSign, MoreHorizontal, Check, X } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { getStatusColor, formatCurrency } from '@/lib/utils'
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import toast from 'react-hot-toast'
 
 interface Booking {
   id: string
@@ -19,10 +22,51 @@ interface Booking {
 
 interface RecentBookingsProps {
   bookings: Booking[]
+  onStatusChange?: () => void
 }
 
-export function RecentBookings({ bookings }: RecentBookingsProps) {
+export function RecentBookings({ bookings, onStatusChange }: RecentBookingsProps) {
   const router = useRouter()
+  const supabase = createClientComponentClient()
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null)
+  const dropdownRef = useRef<HTMLDivElement>(null)
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setOpenDropdown(null)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
+  const updateBookingStatus = async (bookingId: string, newStatus: string) => {
+    try {
+      const { error } = await supabase
+        .from('bookings')
+        .update({ status: newStatus })
+        .eq('id', bookingId)
+
+      if (error) {
+        toast.error('Failed to update booking status')
+        console.error('Error updating status:', error)
+        return
+      }
+
+      toast.success(`Booking ${newStatus === 'confirmed' ? 'approved' : 'rejected'} successfully`)
+      setOpenDropdown(null)
+
+      // Trigger refresh in parent component
+      if (onStatusChange) {
+        onStatusChange()
+      }
+    } catch (error) {
+      console.error('Error updating booking status:', error)
+      toast.error('Failed to update booking status')
+    }
+  }
 
   return (
     <motion.div
@@ -103,10 +147,34 @@ export function RecentBookings({ bookings }: RecentBookingsProps) {
                   </div>
                 </td>
                 
-                <td className="py-4 px-4">
-                  <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-                    <MoreHorizontal className="w-4 h-4 text-gray-600" />
-                  </button>
+                <td className="py-4 px-4 relative">
+                  <div ref={openDropdown === booking.id ? dropdownRef : null}>
+                    <button
+                      className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                      onClick={() => setOpenDropdown(openDropdown === booking.id ? null : booking.id)}
+                    >
+                      <MoreHorizontal className="w-4 h-4 text-gray-600" />
+                    </button>
+
+                    {openDropdown === booking.id && (
+                      <div className="absolute right-0 top-full mt-1 w-40 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
+                        <button
+                          onClick={() => updateBookingStatus(booking.id, 'confirmed')}
+                          className="w-full flex items-center space-x-2 px-4 py-2 text-sm text-green-600 hover:bg-green-50 transition-colors"
+                        >
+                          <Check className="w-4 h-4" />
+                          <span>Approve</span>
+                        </button>
+                        <button
+                          onClick={() => updateBookingStatus(booking.id, 'cancelled')}
+                          className="w-full flex items-center space-x-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                        >
+                          <X className="w-4 h-4" />
+                          <span>Reject</span>
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </td>
               </motion.tr>
             ))}

@@ -123,14 +123,14 @@ export function CourtFilters({
             <input
               type="range"
               min="0"
-              max="10000"
+              max="25000"
               value={priceRange[1]}
               onChange={(e) => handlePriceChange(1, e.target.value)}
               className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
             />
           <div className="flex justify-between text-sm text-gray-500 mt-1">
             <span>LKR 0</span>
-            <span>LKR 10,000+</span>
+            <span>LKR 25,000+</span>
           </div>
         </div>
       </div>
@@ -191,7 +191,7 @@ export function CourtFilters({
           whileTap={{ scale: 0.98 }}
             onClick={() => {
             onTypeChange('all')
-            onPriceRangeChange([0, 10000])
+            onPriceRangeChange([0, 25000])
             setSelectedAmenities([])
             setSelectedRating(0)
           }}

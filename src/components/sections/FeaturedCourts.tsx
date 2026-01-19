@@ -83,26 +83,37 @@ export function FeaturedCourts() {
         // Keep mock data as fallback
       } else {
         console.log(`Loaded ${data.length} featured courts from database`)
-        // Fetch 1-hour off-peak prices for these courts
+        // Fetch all pricing rules to get the minimum price for each court
         const courtIds = data.map((c: any) => c.id)
         const { data: pricing, error: pricingError } = await supabase
           .from('pricing_rules')
           .select('court_id, duration_hours, off_peak_price')
           .in('court_id', courtIds)
-          .eq('duration_hours', 1)
+          .order('off_peak_price', { ascending: true })
 
         if (pricingError) {
           console.warn('Pricing lookup failed, falling back to mock prices', pricingError)
         }
 
-        const priceMap = new Map<string, number>()
+        // Get minimum price for each court and its duration
+        const priceMap = new Map<string, { price: number; duration: number }>()
         ;(pricing || []).forEach((row: any) => {
-          priceMap.set(row.court_id, Number(row.off_peak_price))
+          const existing = priceMap.get(row.court_id)
+          if (!existing || Number(row.off_peak_price) < existing.price) {
+            priceMap.set(row.court_id, {
+              price: Number(row.off_peak_price),
+              duration: Number(row.duration_hours)
+            })
+          }
         })
 
         // Build courts with DB prices (LKR)
         const transformedCourts = data.map((court: any) => {
-          const price = priceMap.get(court.id)
+          const priceInfo = priceMap.get(court.id)
+          const durationLabel = priceInfo?.duration === 1 ? 'hour' :
+                               priceInfo?.duration === 4 ? 'half day' :
+                               priceInfo?.duration === 8 ? 'full day' :
+                               `${priceInfo?.duration || 1}h`
           return {
             id: court.id,
             name: court.name,
@@ -111,8 +122,8 @@ export function FeaturedCourts() {
             location: 'Sports Complex',
             rating: 4.8,
             reviews: 124,
-            price: price ?? 0,
-            duration: 'hour',
+            price: priceInfo?.price ?? 0,
+            duration: durationLabel,
             amenities: court.amenities ? court.amenities.split(', ').slice(0, 3) : ['Professional Equipment'],
             availability: 'Available Today'
           }

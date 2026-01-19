@@ -146,7 +146,7 @@ export default function CourtsPage() {
   const [filteredCourts, setFilteredCourts] = useState<any[]>([])
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedType, setSelectedType] = useState('all')
-  const [priceRange, setPriceRange] = useState([0, 10000])
+  const [priceRange, setPriceRange] = useState([0, 25000])
   const [sortBy, setSortBy] = useState('rating')
   const [loading, setLoading] = useState(true)
   const [showFilters, setShowFilters] = useState(false)
@@ -439,7 +439,7 @@ export default function CourtsPage() {
               onClick={() => {
                 setSearchTerm('')
                 setSelectedType('all')
-                setPriceRange([0, 10000])
+                setPriceRange([0, 25000])
               }}
             >
               Clear Filters

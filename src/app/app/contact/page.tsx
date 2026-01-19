@@ -112,7 +112,7 @@ export default function AppContactPage() {
     {
       icon: Phone,
       title: 'Support',
-      details: ['+1 (555) 123-4567'],
+      details: ['+94 76 644 4050'],
       description: 'Mon-Sun 6AM-10PM'
     },
     {

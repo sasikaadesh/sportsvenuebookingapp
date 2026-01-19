@@ -128,7 +128,7 @@ export default function ContactPage() {
     {
       icon: Phone,
       title: 'Phone',
-      details: ['+1 (555) 123-4567', '+1 (555) 123-4568'],
+      details: ['+94 76 644 4050', '+1 (555) 123-4568'],
       description: 'Mon-Fri 8AM-8PM, Sat-Sun 9AM-6PM'
     },
     {

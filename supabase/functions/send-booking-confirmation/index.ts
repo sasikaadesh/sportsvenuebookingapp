@@ -121,7 +121,7 @@ serve(async (req) => {
               </a>
             </div>
             
-            <p>If you have any questions or need to make changes to your booking, please contact us at <a href="mailto:support@sportvenue.com">support@sportvenue.com</a> or call us at +1 (555) 123-4567.</p>
+            <p>If you have any questions or need to make changes to your booking, please contact us at <a href="mailto:support@sportvenue.com">support@sportvenue.com</a> or call us at +94 76 644 4050.</p>
             
             <div class="footer">
               <p>Thank you for choosing SportVenue!</p>

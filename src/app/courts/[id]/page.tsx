@@ -62,7 +62,7 @@ const mockCourtDetails = {
       weekends: '7:00 AM - 9:00 PM'
     },
     contact: {
-      phone: '+1 (555) 123-4567',
+      phone: '+94 76 644 4050',
       email: 'tennis@sportscomplex.com'
     },
     rules: [

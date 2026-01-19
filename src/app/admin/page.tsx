@@ -82,7 +82,7 @@ export default function AdminDashboard() {
         {
           id: '1',
           user: 'John Doe',
-          phone: '+1 (555) 123-4567',
+          phone: '+94 76 644 4050',
           court: 'Tennis Court A',
           date: '2024-01-15',
           time: '14:00',

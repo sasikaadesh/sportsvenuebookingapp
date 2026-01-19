@@ -41,6 +41,12 @@ const mockCourtDetails = {
   }
 }
 
+// Cricket-specific duration labels
+const cricketDurationLabels: { [key: number]: string } = {
+  4: 'Half Day (4 hours)',
+  8: 'Full Day (8 hours)'
+}
+
 export default function BookCourtPage() {
   const params = useParams()
   const router = useRouter()
@@ -51,6 +57,14 @@ export default function BookCourtPage() {
   const [loading, setLoading] = useState(true)
   const [bookingLoading, setBookingLoading] = useState(false)
   const [payhereReady, setPayhereReady] = useState(false)
+
+  // Helper to get duration label (cricket vs standard)
+  const getDurationLabel = (duration: number, courtType: string) => {
+    if (courtType?.toLowerCase() === 'cricket' && cricketDurationLabels[duration]) {
+      return cricketDurationLabels[duration]
+    }
+    return `${duration} hour${duration > 1 ? 's' : ''}`
+  }
 
   // Check if PayHere SDK is loaded
   const handlePayhereScriptLoad = useCallback(() => {
@@ -269,7 +283,8 @@ export default function BookCourtPage() {
           // Optionally send confirmation email now that payment completed (sandbox flow)
           if (isEmailJSConfigured() && user?.email) {
             try {
-              const bookingDetails = `🎾 BOOKING CONFIRMATION\n\nDear ${user.user_metadata?.full_name || user.email},\n\nYour court booking has been confirmed!\n\n📍 Court: ${court.name}\n🏆 Type: ${court.type?.charAt(0).toUpperCase() + court.type?.slice(1)}\n📅 Date: ${new Date(selectedBooking.date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}\n⏰ Time: ${startTime}\n⏱️ Duration: ${selectedBooking.duration} hour${selectedBooking.duration > 1 ? 's' : ''}\n  💰 Total: ${formatCurrency(selectedBooking.price)}\n🎫 Booking ID: ${orderId}`
+              const durationText = getDurationLabel(selectedBooking.duration, court.type)
+              const bookingDetails = `🎾 BOOKING CONFIRMATION\n\nDear ${user.user_metadata?.full_name || user.email},\n\nYour court booking has been confirmed!\n\n📍 Court: ${court.name}\n🏆 Type: ${court.type?.charAt(0).toUpperCase() + court.type?.slice(1)}\n📅 Date: ${new Date(selectedBooking.date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}\n⏰ Time: ${startTime}\n⏱️ Duration: ${durationText}\n💰 Total: ${formatCurrency(selectedBooking.price)}\n🎫 Booking ID: ${orderId}`
 
               await sendContactEmails({
                 name: user.user_metadata?.full_name || user.email || 'Customer',
@@ -452,6 +467,7 @@ export default function BookCourtPage() {
                 </h2>
                 <BookingCalendar
                   courtId={court.id}
+                  courtType={court.type}
                   pricing={court.pricing}
                   onBookingSelect={handleBookingSelect}
                 />
@@ -483,7 +499,7 @@ export default function BookCourtPage() {
                       </div>
                       <div>
                         <span className="text-gray-600">Duration:</span>
-                        <div className="font-medium">{selectedBooking.duration} hour(s)</div>
+                        <div className="font-medium">{getDurationLabel(selectedBooking.duration, court.type)}</div>
                       </div>
                       <div>
                         <span className="text-gray-600">Total Price:</span>
@@ -561,7 +577,7 @@ export default function BookCourtPage() {
                       </div>
                       <div className="text-left">
                         <span className="text-gray-600">Duration:</span>
-                        <div className="font-medium">{selectedBooking.duration} hour(s)</div>
+                        <div className="font-medium">{getDurationLabel(selectedBooking.duration, court?.type)}</div>
                       </div>
                     </div>
                     <div className="mt-4 pt-4 border-t border-blue-200">

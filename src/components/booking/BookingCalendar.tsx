@@ -8,6 +8,7 @@ import { formatDate, formatTime, generateTimeSlots, isTimeSlotAvailable, calcula
 
 interface BookingCalendarProps {
   courtId: string
+  courtType?: string
   pricing: Array<{
     duration: number
     offPeak: number
@@ -21,10 +22,22 @@ interface BookingCalendarProps {
   }) => void
 }
 
-export function BookingCalendar({ courtId, pricing, onBookingSelect }: BookingCalendarProps) {
+// Cricket-specific duration options (in hours)
+const cricketDurations = [
+  { duration: 4, label: 'Half Day', description: '4 hours' },
+  { duration: 8, label: 'Full Day', description: '8 hours' }
+]
+
+export function BookingCalendar({ courtId, courtType, pricing, onBookingSelect }: BookingCalendarProps) {
+  const isCricket = courtType?.toLowerCase() === 'cricket'
+
+  // For cricket, default to first cricket duration (4 hours = Half Day)
+  // For other sports, default to first pricing option duration or 1 hour
+  const defaultDuration = isCricket ? cricketDurations[0].duration : (pricing[0]?.duration || 1)
+
   const [selectedDate, setSelectedDate] = useState<string>('')
   const [selectedTime, setSelectedTime] = useState<string>('')
-  const [selectedDuration, setSelectedDuration] = useState<number>(1)
+  const [selectedDuration, setSelectedDuration] = useState<number>(defaultDuration)
   const [currentMonth, setCurrentMonth] = useState(new Date())
   const [availableSlots, setAvailableSlots] = useState<string[]>([])
   const [bookedSlots, setBookedSlots] = useState<string[]>([])
@@ -117,12 +130,35 @@ export function BookingCalendar({ courtId, pricing, onBookingSelect }: BookingCa
   }
 
   const getTimeSlotPrice = (time: string) => {
+    if (isCricket) {
+      // For cricket, calculate based on duration and hourly rate
+      const matchingPrice = pricing.find(p => p.duration === selectedDuration)
+      if (matchingPrice) {
+        const isPeak = isPeakHour(time)
+        return isPeak ? matchingPrice.peak : matchingPrice.offPeak
+      }
+      // Fallback: use first pricing rule and multiply by hours
+      const baseHourlyRate = pricing[0]?.offPeak || 0
+      const isPeak = isPeakHour(time)
+      const hourlyRate = isPeak ? (pricing[0]?.peak || baseHourlyRate) : baseHourlyRate
+      return hourlyRate * selectedDuration
+    }
+
     const pricingRule = pricing.find(p => p.duration === selectedDuration)
     if (pricingRule) {
       const isPeak = isPeakHour(time)
       return isPeak ? pricingRule.peak : pricingRule.offPeak
     }
     return 0
+  }
+
+  // Helper to get duration label for display
+  const getDurationLabel = () => {
+    if (isCricket) {
+      const cricketOption = cricketDurations.find(c => c.duration === selectedDuration)
+      return cricketOption ? `${cricketOption.label} (${cricketOption.description})` : `${selectedDuration} hours`
+    }
+    return `${selectedDuration} hour${selectedDuration > 1 ? 's' : ''}`
   }
 
   const calendarDays = generateCalendarDays()
@@ -134,33 +170,71 @@ export function BookingCalendar({ courtId, pricing, onBookingSelect }: BookingCa
       <div>
         <h3 className="text-lg font-semibold text-gray-900 mb-3">Select Duration</h3>
         <p className="text-sm text-gray-600 mb-4">
-          Choose your booking duration. Time slots will show specific pricing based on peak/off-peak hours.
+          {isCricket
+            ? 'Cricket bookings are available for Half Day (4 hours) or Full Day (8 hours).'
+            : 'Choose your booking duration. Time slots will show specific pricing based on peak/off-peak hours.'
+          }
         </p>
-        <div className="grid grid-cols-3 gap-3">
-          {pricing.map((price) => (
-            <motion.button
-              key={price.duration}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={() => setSelectedDuration(price.duration)}
-              className={`p-3 rounded-lg border-2 transition-all ${
-                selectedDuration === price.duration
-                  ? 'border-blue-500 bg-blue-50 text-blue-700'
-                  : 'border-gray-200 hover:border-gray-300'
-              }`}
-            >
-              <div className="flex items-center justify-center space-x-1 mb-1">
-                <Clock className="w-4 h-4" />
-                <span className="font-medium">{price.duration}h</span>
-              </div>
-              <div className="text-sm font-semibold text-gray-900">
-                LKR {price.offPeak.toLocaleString()}
-              </div>
-              <div className="text-xs text-gray-500">
-                per hour
-              </div>
-            </motion.button>
-          ))}
+        <div className={`grid gap-3 ${isCricket ? 'grid-cols-2' : 'grid-cols-3'}`}>
+          {isCricket ? (
+            // Cricket-specific duration options
+            cricketDurations.map((option) => {
+              // Find matching pricing rule or calculate based on hourly rate
+              const matchingPrice = pricing.find(p => p.duration === option.duration)
+              const basePrice = matchingPrice?.offPeak || (pricing[0]?.offPeak || 0) * option.duration
+
+              return (
+                <motion.button
+                  key={option.duration}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => setSelectedDuration(option.duration)}
+                  className={`p-4 rounded-lg border-2 transition-all ${
+                    selectedDuration === option.duration
+                      ? 'border-green-500 bg-green-50 text-green-700'
+                      : 'border-gray-200 hover:border-gray-300'
+                  }`}
+                >
+                  <div className="flex items-center justify-center space-x-2 mb-2">
+                    <Clock className="w-5 h-5" />
+                    <span className="font-semibold text-lg">{option.label}</span>
+                  </div>
+                  <div className="text-xs text-gray-500 mb-2">
+                    {option.description}
+                  </div>
+                  <div className="text-sm font-semibold text-gray-900">
+                    LKR {basePrice.toLocaleString()}
+                  </div>
+                </motion.button>
+              )
+            })
+          ) : (
+            // Standard hourly options for other sports
+            pricing.map((price) => (
+              <motion.button
+                key={price.duration}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => setSelectedDuration(price.duration)}
+                className={`p-3 rounded-lg border-2 transition-all ${
+                  selectedDuration === price.duration
+                    ? 'border-blue-500 bg-blue-50 text-blue-700'
+                    : 'border-gray-200 hover:border-gray-300'
+                }`}
+              >
+                <div className="flex items-center justify-center space-x-1 mb-1">
+                  <Clock className="w-4 h-4" />
+                  <span className="font-medium">{price.duration}h</span>
+                </div>
+                <div className="text-sm font-semibold text-gray-900">
+                  LKR {price.offPeak.toLocaleString()}
+                </div>
+                <div className="text-xs text-gray-500">
+                  per hour
+                </div>
+              </motion.button>
+            ))
+          )}
         </div>
       </div>
 
@@ -311,7 +385,7 @@ export function BookingCalendar({ courtId, pricing, onBookingSelect }: BookingCa
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">Duration:</span>
-              <span className="font-medium">{selectedDuration} hour{selectedDuration > 1 ? 's' : ''}</span>
+              <span className="font-medium">{getDurationLabel()}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">Price:</span>

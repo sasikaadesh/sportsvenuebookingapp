@@ -151,6 +151,7 @@ export default function AdminDashboard() {
           start_time,
           total_price,
           status,
+          created_at,
           users (
             full_name,
             email,
@@ -180,7 +181,8 @@ export default function AdminDashboard() {
           date: booking.booking_date,
           time: booking.start_time,
           status: booking.status,
-          amount: booking.total_price
+          amount: booking.total_price,
+          createdAt: booking.created_at
         }))
 
         // Update with real data

@@ -118,7 +118,8 @@ export default function DashboardPage() {
         duration: booking.duration_hours,
         status: booking.status || 'confirmed',
         price: booking.total_price || 0,
-        image: booking.courts?.image_url || 'https://images.unsplash.com/photo-1554068865-24cecd4e34b8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
+        image: booking.courts?.image_url || 'https://images.unsplash.com/photo-1554068865-24cecd4e34b8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+        createdAt: booking.created_at
       }))
 
       console.log('Transformed bookings:', transformedBookings)
@@ -368,6 +369,12 @@ export default function DashboardPage() {
                           <Calendar className="w-4 h-4 mr-1" />
                           {booking.date} at {booking.time} ({booking.duration}h)
                         </div>
+                        {booking.createdAt && (
+                          <div className="flex items-center text-gray-500 dark:text-gray-400 text-xs mt-1">
+                            <Clock className="w-3 h-3 mr-1" />
+                            Booked on {new Date(booking.createdAt).toLocaleDateString()}
+                          </div>
+                        )}
                       </div>
                     </div>
 

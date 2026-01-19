@@ -18,6 +18,7 @@ interface Booking {
   time: string
   status: string
   amount: number
+  createdAt?: string
 }
 
 interface RecentBookingsProps {
@@ -94,6 +95,7 @@ export function RecentBookings({ bookings, onStatusChange }: RecentBookingsProps
               <th className="text-left py-3 px-4 font-medium text-gray-600">Phone</th>
               <th className="text-left py-3 px-4 font-medium text-gray-600">Court</th>
               <th className="text-left py-3 px-4 font-medium text-gray-600">Date & Time</th>
+              <th className="text-left py-3 px-4 font-medium text-gray-600">Booked On</th>
               <th className="text-left py-3 px-4 font-medium text-gray-600">Status</th>
               <th className="text-left py-3 px-4 font-medium text-gray-600">Amount</th>
               <th className="text-left py-3 px-4 font-medium text-gray-600">Actions</th>
@@ -133,7 +135,13 @@ export function RecentBookings({ bookings, onStatusChange }: RecentBookingsProps
                     <span className="text-sm">{booking.time}</span>
                   </div>
                 </td>
-                
+
+                <td className="py-4 px-4">
+                  <span className="text-sm text-gray-600">
+                    {booking.createdAt ? new Date(booking.createdAt).toLocaleDateString() : 'N/A'}
+                  </span>
+                </td>
+
                 <td className="py-4 px-4">
                   <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(booking.status)}`}>
                     {booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
@@ -159,15 +167,25 @@ export function RecentBookings({ bookings, onStatusChange }: RecentBookingsProps
                     {openDropdown === booking.id && (
                       <div className="absolute right-0 top-full mt-1 w-40 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
                         <button
-                          onClick={() => updateBookingStatus(booking.id, 'confirmed')}
-                          className="w-full flex items-center space-x-2 px-4 py-2 text-sm text-green-600 hover:bg-green-50 transition-colors"
+                          onClick={() => booking.status !== 'confirmed' && updateBookingStatus(booking.id, 'confirmed')}
+                          disabled={booking.status === 'confirmed'}
+                          className={`w-full flex items-center space-x-2 px-4 py-2 text-sm transition-colors ${
+                            booking.status === 'confirmed'
+                              ? 'text-gray-400 cursor-not-allowed'
+                              : 'text-green-600 hover:bg-green-50'
+                          }`}
                         >
                           <Check className="w-4 h-4" />
                           <span>Approve</span>
                         </button>
                         <button
-                          onClick={() => updateBookingStatus(booking.id, 'cancelled')}
-                          className="w-full flex items-center space-x-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                          onClick={() => booking.status !== 'cancelled' && updateBookingStatus(booking.id, 'cancelled')}
+                          disabled={booking.status === 'cancelled'}
+                          className={`w-full flex items-center space-x-2 px-4 py-2 text-sm transition-colors ${
+                            booking.status === 'cancelled'
+                              ? 'text-gray-400 cursor-not-allowed'
+                              : 'text-red-600 hover:bg-red-50'
+                          }`}
                         >
                           <X className="w-4 h-4" />
                           <span>Reject</span>

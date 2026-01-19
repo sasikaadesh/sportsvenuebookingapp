@@ -38,6 +38,7 @@ export default function AddCourtPage() {
   const { user, profile, loading } = useAuth()
   const router = useRouter()
   const [saving, setSaving] = useState(false)
+  const [uploading, setUploading] = useState(false)
   const [formData, setFormData] = useState({
     name: '',
     type: 'tennis',
@@ -51,6 +52,60 @@ export default function AddCourtPage() {
   })
   const [amenityList, setAmenityList] = useState<string[]>([])
   const [newAmenity, setNewAmenity] = useState('')
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please select an image file')
+      return
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('Image must be less than 5MB')
+      return
+    }
+
+    setUploading(true)
+    try {
+      const fileExt = file.name.split('.').pop()
+      const fileName = `court-${Date.now()}.${fileExt}`
+      const filePath = `courts/${fileName}`
+
+      const { error: uploadError } = await supabase.storage
+        .from('court-images')
+        .upload(filePath, file)
+
+      if (uploadError) {
+        // If bucket doesn't exist, show helpful message
+        if (uploadError.message.includes('bucket') || uploadError.message.includes('not found')) {
+          toast.error('Image storage not configured. Please use URL instead.')
+        } else {
+          toast.error('Failed to upload image: ' + uploadError.message)
+        }
+        return
+      }
+
+      // Get public URL
+      const { data: urlData } = supabase.storage
+        .from('court-images')
+        .getPublicUrl(filePath)
+
+      setFormData(prev => ({
+        ...prev,
+        image_url: urlData.publicUrl
+      }))
+      toast.success('Image uploaded successfully!')
+    } catch (error) {
+      console.error('Upload error:', error)
+      toast.error('Failed to upload image')
+    } finally {
+      setUploading(false)
+    }
+  }
 
   // Redirect if not admin
   if (loading) {
@@ -329,11 +384,42 @@ export default function AddCourtPage() {
               </p>
             </div>
 
-            {/* Image URL */}
+            {/* Court Image */}
             <div>
-              <label htmlFor="image_url" className="block text-sm font-medium text-gray-700 mb-2">
-                Image URL
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Court Image
               </label>
+
+              {/* Upload Option */}
+              <div className="mb-3">
+                <label className="flex items-center justify-center w-full px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition-colors">
+                  <div className="flex items-center space-x-2">
+                    <Upload className="w-5 h-5 text-gray-500" />
+                    <span className="text-sm text-gray-600">
+                      {uploading ? 'Uploading...' : 'Click to upload image'}
+                    </span>
+                  </div>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    className="hidden"
+                    disabled={uploading}
+                  />
+                </label>
+                <p className="mt-1 text-xs text-gray-500">Max 5MB. PNG, JPG, or WebP</p>
+              </div>
+
+              {/* Or use URL */}
+              <div className="relative my-3">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-300"></div>
+                </div>
+                <div className="relative flex justify-center text-sm">
+                  <span className="px-2 bg-white text-gray-500">or enter URL</span>
+                </div>
+              </div>
+
               <input
                 type="url"
                 id="image_url"
@@ -343,14 +429,17 @@ export default function AddCourtPage() {
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Enter image URL"
               />
+
+              {/* Image Preview */}
               {formData.image_url && (
                 <div className="mt-3">
+                  <p className="text-xs text-gray-500 mb-1">Preview:</p>
                   <Image
                     src={formData.image_url}
                     alt="Preview"
-                    width={128}
-                    height={96}
-                    className="w-32 h-24 object-cover rounded-lg border border-gray-300"
+                    width={200}
+                    height={150}
+                    className="w-48 h-36 object-cover rounded-lg border border-gray-300"
                     onError={(e) => {
                       (e.target as HTMLImageElement).src = defaultImages[formData.type as keyof typeof defaultImages]
                     }}

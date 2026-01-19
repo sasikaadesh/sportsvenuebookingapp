@@ -17,6 +17,7 @@ interface Court {
   rating: number
   reviews: number
   priceFrom: number
+  priceDuration?: string
   amenities: string[]
   availability: string
   description: string
@@ -166,7 +167,7 @@ export function CourtCard({ court }: CourtCardProps) {
             <span className="text-2xl font-bold text-gray-900 dark:text-white">
               {formatCurrency(court.priceFrom)}
             </span>
-            <span className="ml-1 text-gray-600 dark:text-gray-300 text-sm">/hour</span>
+            <span className="ml-1 text-gray-600 dark:text-gray-300 text-sm">/{court.priceDuration || 'hour'}</span>
           </div>
 
           <div className="flex items-center gap-2">

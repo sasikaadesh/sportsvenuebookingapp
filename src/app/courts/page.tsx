@@ -195,9 +195,26 @@ export default function CourtsPage() {
         const transformedCourts = data.map((court: any) => {
           // Get the lowest price from pricing rules for "priceFrom"
           let priceFrom = getPriceForType(court.type) // fallback
+          let priceDuration = 'hour'
           if (court.pricing_rules && court.pricing_rules.length > 0) {
-            const prices = court.pricing_rules.map((rule: any) => rule.off_peak_price)
-            priceFrom = Math.min(...prices)
+            // Find the minimum priced rule
+            let minPrice = Infinity
+            let minDuration = 1
+            court.pricing_rules.forEach((rule: any) => {
+              if (rule.off_peak_price < minPrice) {
+                minPrice = rule.off_peak_price
+                minDuration = rule.duration_hours
+              }
+            })
+            priceFrom = minPrice
+            // Map duration_hours to display label
+            if (minDuration === 4) {
+              priceDuration = 'halfday'
+            } else if (minDuration === 8) {
+              priceDuration = 'day'
+            } else {
+              priceDuration = 'hour'
+            }
           }
 
           return {
@@ -209,6 +226,7 @@ export default function CourtsPage() {
             rating: 4.5,
             reviews: 50,
             priceFrom: priceFrom,
+            priceDuration: priceDuration,
             amenities: court.amenities ? court.amenities.split(', ') : getDefaultAmenitiesForType(court.type),
             availability: 'Available Today',
             description: court.description || 'Professional sports court'

@@ -3,8 +3,9 @@
 import { useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import Link from 'next/link'
+import { AdminOnlyPage } from '@/components/admin/AdminOnlyPage'
 
-export default function SimpleDebugPage() {
+function SimpleDebugPageContent() {
   const [results, setResults] = useState<any>(null)
   const [loading, setLoading] = useState(false)
 
@@ -147,5 +148,13 @@ export default function SimpleDebugPage() {
         </ul>
       </div>
     </div>
+  )
+}
+
+export default function SimpleDebugPage() {
+  return (
+    <AdminOnlyPage pageName="Simple Debug">
+      <SimpleDebugPageContent />
+    </AdminOnlyPage>
   )
 }

@@ -3,13 +3,14 @@
 import { useState, useEffect } from 'react'
 import { createClient } from '@supabase/supabase-js'
 import { Button } from '@/components/ui/Button'
+import { AdminOnlyPage } from '@/components/admin/AdminOnlyPage'
 
 // Create a simple client for testing
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 const testClient = createClient(supabaseUrl, supabaseKey)
 
-export default function SimpleTestPage() {
+function SimpleTestPageContent() {
   const [courts, setCourts] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
   const [status, setStatus] = useState('Ready to test')
@@ -126,5 +127,13 @@ export default function SimpleTestPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function SimpleTestPage() {
+  return (
+    <AdminOnlyPage pageName="Simple Test">
+      <SimpleTestPageContent />
+    </AdminOnlyPage>
   )
 }

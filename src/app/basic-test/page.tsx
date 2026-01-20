@@ -2,8 +2,9 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { AdminOnlyPage } from '@/components/admin/AdminOnlyPage'
 
-export default function BasicTestPage() {
+function BasicTestPageContent() {
   const [message, setMessage] = useState('Page loaded successfully!')
   const [count, setCount] = useState(0)
 
@@ -132,5 +133,13 @@ export default function BasicTestPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function BasicTestPage() {
+  return (
+    <AdminOnlyPage pageName="Basic Test">
+      <BasicTestPageContent />
+    </AdminOnlyPage>
   )
 }

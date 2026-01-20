@@ -3,8 +3,9 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '@/components/providers/AuthProvider'
 import { supabase } from '@/lib/supabase'
+import { AdminOnlyPage } from '@/components/admin/AdminOnlyPage'
 
-export default function DebugAuthPage() {
+function DebugAuthPageContent() {
   const { user, profile, session } = useAuth()
   const [authCheck, setAuthCheck] = useState<any>(null)
   const [loading, setLoading] = useState(false)
@@ -200,5 +201,13 @@ export default function DebugAuthPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function DebugAuthPage() {
+  return (
+    <AdminOnlyPage pageName="Debug Auth">
+      <DebugAuthPageContent />
+    </AdminOnlyPage>
   )
 }

@@ -3,8 +3,9 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/components/providers/AuthProvider'
+import { AdminOnlyPage } from '@/components/admin/AdminOnlyPage'
 
-export default function TestSessionPage() {
+function TestSessionPageContent() {
   const { user, loading: authLoading } = useAuth()
   const [sessionInfo, setSessionInfo] = useState<any>(null)
   const [refreshCount, setRefreshCount] = useState(0)
@@ -248,5 +249,13 @@ export default function TestSessionPage() {
         </ol>
       </div>
     </div>
+  )
+}
+
+export default function TestSessionPage() {
+  return (
+    <AdminOnlyPage pageName="Test Session">
+      <TestSessionPageContent />
+    </AdminOnlyPage>
   )
 }

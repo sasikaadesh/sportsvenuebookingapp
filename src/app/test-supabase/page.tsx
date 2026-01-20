@@ -3,8 +3,9 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { Button } from '@/components/ui/Button'
+import { AdminOnlyPage } from '@/components/admin/AdminOnlyPage'
 
-export default function TestSupabasePage() {
+function TestSupabasePageContent() {
   const [status, setStatus] = useState('Testing...')
   const [users, setUsers] = useState<any[]>([])
   const [authUsers, setAuthUsers] = useState<any[]>([])
@@ -109,5 +110,13 @@ export default function TestSupabasePage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function TestSupabasePage() {
+  return (
+    <AdminOnlyPage pageName="Test Supabase">
+      <TestSupabasePageContent />
+    </AdminOnlyPage>
   )
 }

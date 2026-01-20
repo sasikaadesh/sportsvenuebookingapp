@@ -6,8 +6,9 @@ import { supabase } from '@/lib/supabase'
 import { Button } from '@/components/ui/Button'
 import toast from 'react-hot-toast'
 import Link from 'next/link'
+import { AdminOnlyPage } from '@/components/admin/AdminOnlyPage'
 
-export default function TestBookingPage() {
+function TestBookingPageContent() {
   const { user } = useAuth()
   const [loading, setLoading] = useState(false)
   const [bookings, setBookings] = useState<any[]>([])
@@ -199,5 +200,13 @@ export default function TestBookingPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function TestBookingPage() {
+  return (
+    <AdminOnlyPage pageName="Test Booking">
+      <TestBookingPageContent />
+    </AdminOnlyPage>
   )
 }

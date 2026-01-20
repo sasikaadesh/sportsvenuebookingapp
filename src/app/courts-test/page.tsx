@@ -5,8 +5,9 @@ import { useAuth } from '@/components/providers/AuthProvider'
 import { supabase } from '@/lib/supabase'
 import { Button } from '@/components/ui/Button'
 import Link from 'next/link'
+import { AdminOnlyPage } from '@/components/admin/AdminOnlyPage'
 
-export default function CourtsTestPage() {
+function CourtsTestPageContent() {
   const { user, loading: authLoading } = useAuth()
   const [courts, setCourts] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
@@ -176,5 +177,13 @@ export default function CourtsTestPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function CourtsTestPage() {
+  return (
+    <AdminOnlyPage pageName="Courts Test">
+      <CourtsTestPageContent />
+    </AdminOnlyPage>
   )
 }

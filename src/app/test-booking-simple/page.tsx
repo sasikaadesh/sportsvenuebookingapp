@@ -3,8 +3,9 @@
 import { useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/components/providers/AuthProvider'
+import { AdminOnlyPage } from '@/components/admin/AdminOnlyPage'
 
-export default function TestBookingSimplePage() {
+function TestBookingSimplePageContent() {
   const { user } = useAuth()
   const [result, setResult] = useState<any>(null)
   const [loading, setLoading] = useState(false)
@@ -294,5 +295,13 @@ export default function TestBookingSimplePage() {
         </ol>
       </div>
     </div>
+  )
+}
+
+export default function TestBookingSimplePage() {
+  return (
+    <AdminOnlyPage pageName="Test Booking Simple">
+      <TestBookingSimplePageContent />
+    </AdminOnlyPage>
   )
 }

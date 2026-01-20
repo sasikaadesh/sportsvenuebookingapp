@@ -4,8 +4,9 @@ import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { Button } from '@/components/ui/Button'
 import Link from 'next/link'
+import { AdminOnlyPage } from '@/components/admin/AdminOnlyPage'
 
-export default function CourtsDiagnosticPage() {
+function CourtsDiagnosticPageContent() {
   const [results, setResults] = useState<any>({})
   const [loading, setLoading] = useState(false)
   const [status, setStatus] = useState('Ready to test database connection...')
@@ -265,5 +266,13 @@ export default function CourtsDiagnosticPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function CourtsDiagnosticPage() {
+  return (
+    <AdminOnlyPage pageName="Courts Diagnostic">
+      <CourtsDiagnosticPageContent />
+    </AdminOnlyPage>
   )
 }

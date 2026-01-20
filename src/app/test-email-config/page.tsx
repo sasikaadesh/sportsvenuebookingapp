@@ -3,8 +3,9 @@
 import { useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import toast from 'react-hot-toast'
+import { AdminOnlyPage } from '@/components/admin/AdminOnlyPage'
 
-export default function TestEmailConfigPage() {
+function TestEmailConfigPageContent() {
   const [email, setEmail] = useState('')
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState<any>(null)
@@ -159,5 +160,13 @@ export default function TestEmailConfigPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function TestEmailConfigPage() {
+  return (
+    <AdminOnlyPage pageName="Test Email Config">
+      <TestEmailConfigPageContent />
+    </AdminOnlyPage>
   )
 }

@@ -7,8 +7,9 @@ import { Header } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
 import { Button } from '@/components/ui/Button'
 import { supabase } from '@/lib/supabase'
+import { AdminOnlyPage } from '@/components/admin/AdminOnlyPage'
 
-export default function SimpleCourtsPage() {
+function SimpleCourtsPageContent() {
   const [courts, setCourts] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -193,5 +194,13 @@ export default function SimpleCourtsPage() {
 
       <Footer />
     </div>
+  )
+}
+
+export default function SimpleCourtsPage() {
+  return (
+    <AdminOnlyPage pageName="Simple Courts">
+      <SimpleCourtsPageContent />
+    </AdminOnlyPage>
   )
 }

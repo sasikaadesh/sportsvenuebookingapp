@@ -2,8 +2,9 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useAuth } from '@/components/providers/AuthProvider'
+import { AdminOnlyPage } from '@/components/admin/AdminOnlyPage'
 
-export default function TestPerformancePage() {
+function TestPerformancePageContent() {
   const { user, loading: authLoading } = useAuth()
   const [sessionTests, setSessionTests] = useState<any[]>([])
   const [loadingTests, setLoadingTests] = useState<any[]>([])
@@ -245,5 +246,13 @@ export default function TestPerformancePage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function TestPerformancePage() {
+  return (
+    <AdminOnlyPage pageName="Test Performance">
+      <TestPerformancePageContent />
+    </AdminOnlyPage>
   )
 }

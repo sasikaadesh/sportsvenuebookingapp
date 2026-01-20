@@ -5,11 +5,12 @@ import Script from 'next/script'
 import { HeaderMarketing } from '@/components/layout/HeaderMarketing'
 import { FooterSimple } from '@/components/layout/FooterSimple'
 import { Button } from '@/components/ui/Button'
+import { AdminOnlyPage } from '@/components/admin/AdminOnlyPage'
 
 // payhere is injected via external script
 declare const payhere: any
 
-export default function TestPayHerePage() {
+function TestPayHerePageContent() {
   const [amount, setAmount] = useState('1000.00')
   const [message, setMessage] = useState<string>('')
 
@@ -98,6 +99,14 @@ export default function TestPayHerePage() {
       </main>
       <FooterSimple />
     </>
+  )
+}
+
+export default function TestPayHerePage() {
+  return (
+    <AdminOnlyPage pageName="Test PayHere">
+      <TestPayHerePageContent />
+    </AdminOnlyPage>
   )
 }
 

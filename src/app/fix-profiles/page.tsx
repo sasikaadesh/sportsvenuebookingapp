@@ -3,8 +3,9 @@
 import { useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { Button } from '@/components/ui/Button'
+import { AdminOnlyPage } from '@/components/admin/AdminOnlyPage'
 
-export default function FixProfilesPage() {
+function FixProfilesPageContent() {
   const [status, setStatus] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -245,5 +246,13 @@ export default function FixProfilesPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function FixProfilesPage() {
+  return (
+    <AdminOnlyPage pageName="Fix Profiles">
+      <FixProfilesPageContent />
+    </AdminOnlyPage>
   )
 }

@@ -3,8 +3,9 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/components/providers/AuthProvider'
+import { AdminOnlyPage } from '@/components/admin/AdminOnlyPage'
 
-export default function TestAllPage() {
+function TestAllPageContent() {
   const { user, loading: authLoading } = useAuth()
   const [results, setResults] = useState<any>({})
   const [loading, setLoading] = useState(false)
@@ -309,5 +310,13 @@ export default function TestAllPage() {
         </ol>
       </div>
     </div>
+  )
+}
+
+export default function TestAllPage() {
+  return (
+    <AdminOnlyPage pageName="Test All">
+      <TestAllPageContent />
+    </AdminOnlyPage>
   )
 }

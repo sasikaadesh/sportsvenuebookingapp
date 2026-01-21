@@ -3,6 +3,8 @@
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
+import logoLight from '@/assets/images/SVB_Logo.png'
+import logoDark from '@/assets/images/SVB_Logo_white.png'
 import { useAuth } from '@/components/providers/AuthProvider'
 import { useTheme } from '@/components/providers/ThemeProvider'
 import { Menu, X, User, LogOut, Calendar, Settings, Home, Sun, Moon } from 'lucide-react'
@@ -47,14 +49,15 @@ export function HeaderApp({ hideThemeToggle = false }: HeaderAppProps) {
         <div className="flex justify-between items-center h-16 md:h-16">
           {/* Logo */}
           <Link href="/app" className="flex items-center space-x-2">
-            <Image
-              src="/SVB_Logo.png"
-              alt="SportsVenueBookings"
-              width={1000}
-              height={250}
-              className="h-24 md:h-28 w-auto shrink-0"
-              priority
-            />
+            <div className="relative h-12 md:h-14 w-[200px] md:w-[240px] shrink-0">
+              <Image
+                src={theme === 'dark' ? logoDark : logoLight}
+                alt="SportsVenueBookings"
+                fill
+                className="object-contain object-left"
+                priority
+              />
+            </div>
             <span className="text-xs bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 px-2 py-1 rounded-full font-medium">Demo</span>
           </Link>
 

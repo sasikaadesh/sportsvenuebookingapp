@@ -160,6 +160,8 @@ export default function CourtDetailPage() {
 
 
   const handleShare = async () => {
+    if (!court) return
+
     if (navigator.share) {
       try {
         await navigator.share({

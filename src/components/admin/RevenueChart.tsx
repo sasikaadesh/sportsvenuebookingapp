@@ -25,14 +25,14 @@ export function RevenueChart({ data }: RevenueChartProps) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, delay: 0.2 }}
-      className="bg-white rounded-xl shadow-lg p-6"
+      className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 transition-colors duration-200"
     >
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h2 className="text-xl font-semibold text-gray-900 mb-1">Revenue Overview</h2>
-          <p className="text-gray-600">Monthly revenue and booking trends</p>
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-1">Revenue Overview</h2>
+          <p className="text-gray-600 dark:text-gray-300">Monthly revenue and booking trends</p>
         </div>
-        <div className="flex items-center space-x-2 text-green-600">
+        <div className="flex items-center space-x-2 text-green-600 dark:text-green-400">
           <TrendingUp className="w-5 h-5" />
           <span className="font-medium">+23% vs last period</span>
         </div>
@@ -67,17 +67,17 @@ export function RevenueChart({ data }: RevenueChartProps) {
           </div>
         ) : (
           <div className="absolute inset-0 flex items-center justify-center">
-            <div className="text-center text-gray-500">
+            <div className="text-center text-gray-500 dark:text-gray-400">
               <BarChart3 className="w-16 h-16 mx-auto mb-4 opacity-30" />
               <p className="text-lg font-medium">No Revenue Data Available</p>
               <p className="text-sm">Data will appear here once bookings are made</p>
             </div>
           </div>
         )}
-        
+
         {/* Y-axis labels */}
         {hasData && (
-          <div className="absolute left-0 top-0 h-full flex flex-col justify-between text-xs text-gray-500 -ml-12">
+          <div className="absolute left-0 top-0 h-full flex flex-col justify-between text-xs text-gray-500 dark:text-gray-400 -ml-12">
             <span>${(safeMaxRevenue / 1000).toFixed(0)}k</span>
             <span>${(safeMaxRevenue * 0.75 / 1000).toFixed(0)}k</span>
             <span>${(safeMaxRevenue * 0.5 / 1000).toFixed(0)}k</span>
@@ -89,7 +89,7 @@ export function RevenueChart({ data }: RevenueChartProps) {
 
       {/* X-axis labels */}
       {hasData && (
-        <div className="flex justify-between text-sm text-gray-600">
+        <div className="flex justify-between text-sm text-gray-600 dark:text-gray-300">
           {data.map((item) => (
             <span key={item.month} className="flex-1 text-center">
               {item.month}
@@ -99,23 +99,23 @@ export function RevenueChart({ data }: RevenueChartProps) {
       )}
 
       {/* Summary Stats */}
-      <div className="grid grid-cols-3 gap-4 mt-6 pt-6 border-t border-gray-200">
+      <div className="grid grid-cols-3 gap-4 mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
         <div className="text-center">
-          <div className="text-2xl font-bold text-gray-900">
+          <div className="text-2xl font-bold text-gray-900 dark:text-white">
             {hasData ? formatCurrency(data.reduce((sum, item) => sum + item.revenue, 0)) : formatCurrency(0)}
           </div>
-          <div className="text-sm text-gray-600">Total Revenue</div>
+          <div className="text-sm text-gray-600 dark:text-gray-300">Total Revenue</div>
         </div>
-        
+
         <div className="text-center">
-          <div className="text-2xl font-bold text-gray-900">
+          <div className="text-2xl font-bold text-gray-900 dark:text-white">
             {hasData ? data.reduce((sum, item) => sum + item.bookings, 0).toLocaleString() : '0'}
           </div>
-          <div className="text-sm text-gray-600">Total Bookings</div>
+          <div className="text-sm text-gray-600 dark:text-gray-300">Total Bookings</div>
         </div>
-        
+
         <div className="text-center">
-          <div className="text-2xl font-bold text-gray-900">
+          <div className="text-2xl font-bold text-gray-900 dark:text-white">
             {(() => {
               if (!hasData) return formatCurrency(0)
               const totalRevenue = data.reduce((sum, item) => sum + item.revenue, 0)
@@ -124,7 +124,7 @@ export function RevenueChart({ data }: RevenueChartProps) {
               return formatCurrency(Math.round(totalRevenue / totalBookings))
             })()}
           </div>
-          <div className="text-sm text-gray-600">Avg. Booking Value</div>
+          <div className="text-sm text-gray-600 dark:text-gray-300">Avg. Booking Value</div>
         </div>
       </div>
     </motion.div>

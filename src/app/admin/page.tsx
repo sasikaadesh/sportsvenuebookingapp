@@ -238,10 +238,10 @@ export default function AdminDashboard() {
   // Show loading while authentication is being checked
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading admin dashboard...</p>
+          <p className="text-gray-600 dark:text-gray-400">Loading admin dashboard...</p>
         </div>
       </div>
     )
@@ -250,10 +250,10 @@ export default function AdminDashboard() {
   // Show loading while auth is loading or profile is null
   if (loading || !user || profile === null) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">
+          <p className="text-gray-600 dark:text-gray-400">
             {loading ? 'Loading...' : 'Checking permissions...'}
           </p>
         </div>
@@ -268,8 +268,8 @@ export default function AdminDashboard() {
 
   return (
     <AdminLayout>
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50">
-        <HeaderApp hideThemeToggle />
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+        <HeaderApp />
       
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Page Header */}
@@ -280,10 +280,10 @@ export default function AdminDashboard() {
           className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8"
         >
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
               Admin Dashboard
             </h1>
-            <p className="text-gray-600">
+            <p className="text-gray-600 dark:text-gray-300">
               Welcome back, {profile?.full_name || 'Admin'}! Here&apos;s what&apos;s happening with your venues.
             </p>
           </div>
@@ -336,31 +336,31 @@ export default function AdminDashboard() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
-            className="bg-white rounded-xl shadow-lg p-6"
+            className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 transition-colors duration-200"
           >
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">Court Status</h3>
-              <MapPin className="w-5 h-5 text-gray-600" />
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Court Status</h3>
+              <MapPin className="w-5 h-5 text-gray-600 dark:text-gray-400" />
             </div>
-            
+
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-gray-600">Available</span>
-                <span className="text-green-600 font-medium">8</span>
+                <span className="text-gray-600 dark:text-gray-300">Available</span>
+                <span className="text-green-600 dark:text-green-400 font-medium">8</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-gray-600">Booked</span>
-                <span className="text-blue-600 font-medium">3</span>
+                <span className="text-gray-600 dark:text-gray-300">Booked</span>
+                <span className="text-blue-600 dark:text-blue-400 font-medium">3</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-gray-600">Maintenance</span>
-                <span className="text-orange-600 font-medium">1</span>
+                <span className="text-gray-600 dark:text-gray-300">Maintenance</span>
+                <span className="text-orange-600 dark:text-orange-400 font-medium">1</span>
               </div>
             </div>
-            
-            <Button 
-              variant="outline" 
-              size="sm" 
+
+            <Button
+              variant="outline"
+              size="sm"
               className="w-full mt-4"
               onClick={() => router.push('/admin/courts')}
             >
@@ -373,29 +373,29 @@ export default function AdminDashboard() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.5 }}
-            className="bg-white rounded-xl shadow-lg p-6"
+            className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 transition-colors duration-200"
           >
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">Popular Times</h3>
-              <Clock className="w-5 h-5 text-gray-600" />
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Popular Times</h3>
+              <Clock className="w-5 h-5 text-gray-600 dark:text-gray-400" />
             </div>
-            
+
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-gray-600">6:00 - 9:00 AM</span>
-                <div className="w-16 bg-gray-200 rounded-full h-2">
+                <span className="text-gray-600 dark:text-gray-300">6:00 - 9:00 AM</span>
+                <div className="w-16 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                   <div className="bg-blue-600 h-2 rounded-full" style={{ width: '60%' }}></div>
                 </div>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-gray-600">5:00 - 8:00 PM</span>
-                <div className="w-16 bg-gray-200 rounded-full h-2">
+                <span className="text-gray-600 dark:text-gray-300">5:00 - 8:00 PM</span>
+                <div className="w-16 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                   <div className="bg-blue-600 h-2 rounded-full" style={{ width: '90%' }}></div>
                 </div>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-gray-600">12:00 - 2:00 PM</span>
-                <div className="w-16 bg-gray-200 rounded-full h-2">
+                <span className="text-gray-600 dark:text-gray-300">12:00 - 2:00 PM</span>
+                <div className="w-16 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                   <div className="bg-blue-600 h-2 rounded-full" style={{ width: '40%' }}></div>
                 </div>
               </div>
@@ -407,29 +407,29 @@ export default function AdminDashboard() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.6 }}
-            className="bg-white rounded-xl shadow-lg p-6"
+            className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 transition-colors duration-200"
           >
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">Satisfaction</h3>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Satisfaction</h3>
               <Star className="w-5 h-5 text-yellow-400 fill-current" />
             </div>
-            
+
             <div className="text-center">
-              <div className="text-3xl font-bold text-gray-900 mb-2">4.8</div>
+              <div className="text-3xl font-bold text-gray-900 dark:text-white mb-2">4.8</div>
               <div className="flex justify-center mb-2">
                 {[1, 2, 3, 4, 5].map((star) => (
-                  <Star 
-                    key={star} 
-                    className="w-4 h-4 text-yellow-400 fill-current" 
+                  <Star
+                    key={star}
+                    className="w-4 h-4 text-yellow-400 fill-current"
                   />
                 ))}
               </div>
-              <p className="text-gray-600 text-sm">Based on 1,247 reviews</p>
+              <p className="text-gray-600 dark:text-gray-300 text-sm">Based on 1,247 reviews</p>
             </div>
-            
-            <Button 
-              variant="outline" 
-              size="sm" 
+
+            <Button
+              variant="outline"
+              size="sm"
               className="w-full mt-4"
               onClick={() => router.push('/admin/reviews')}
             >

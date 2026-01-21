@@ -104,45 +104,6 @@
   background: #9ca3af;
 }
 
-/* Admin Layout - Force Light Mode */
-.admin-layout,
-.admin-layout * {
-  /* Override dark mode backgrounds */
-  --tw-bg-opacity: 1 !important;
-}
-
-.admin-layout .dark\:bg-gray-800 {
-  background-color: rgb(255 255 255) !important;
-}
-
-.admin-layout .dark\:bg-gray-700 {
-  background-color: rgb(255 255 255) !important;
-}
-
-.admin-layout .dark\:bg-gray-900 {
-  background-color: rgb(255 255 255) !important;
-}
-
-.admin-layout .dark\:text-white {
-  color: rgb(17 24 39) !important;
-}
-
-.admin-layout .dark\:text-gray-300 {
-  color: rgb(75 85 99) !important;
-}
-
-.admin-layout .dark\:text-gray-400 {
-  color: rgb(156 163 175) !important;
-}
-
-.admin-layout .dark\:border-gray-600 {
-  border-color: rgb(209 213 219) !important;
-}
-
-.admin-layout .dark\:border-gray-700 {
-  border-color: rgb(209 213 219) !important;
-}
-
 /* Animations */
 @keyframes fadeInUp {
   from {

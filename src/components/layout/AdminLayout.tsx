@@ -1,36 +1,22 @@
 'use client'
 
-import { ReactNode, useEffect } from 'react'
+import { ReactNode } from 'react'
+import { ThemeProvider } from '@/components/providers/ThemeProvider'
 
 interface AdminLayoutProps {
   children: ReactNode
 }
 
 /**
- * AdminLayout component that forces light mode for admin pages only
- * This wrapper ensures admin pages always display in light mode regardless of the global theme setting
+ * AdminLayout component that wraps admin pages with ThemeProvider
+ * This enables light/dark mode support for admin pages
  */
 export function AdminLayout({ children }: AdminLayoutProps) {
-  useEffect(() => {
-    // Force light mode by removing dark class from html element for admin pages
-    const htmlElement = document.documentElement
-    const originalClass = htmlElement.className
-
-    // Remove dark class if present
-    htmlElement.classList.remove('dark')
-
-    // Cleanup function to restore original theme when leaving admin page
-    return () => {
-      // Only restore dark class if it was originally there
-      if (originalClass.includes('dark')) {
-        htmlElement.classList.add('dark')
-      }
-    }
-  }, [])
-
   return (
-    <div className="admin-layout">
-      {children}
-    </div>
+    <ThemeProvider>
+      <div className="min-h-screen transition-colors duration-200">
+        {children}
+      </div>
+    </ThemeProvider>
   )
 }

@@ -88,7 +88,7 @@ export function RecentBookings({ bookings, onStatusChange }: RecentBookingsProps
       </div>
 
       <div className="overflow-x-auto">
-        <table className="w-full">
+        <table className="w-full" style={{fontSize: "80%"}}>
           <thead>
             <tr className="border-b border-gray-200 dark:border-gray-700">
               <th className="text-left py-3 px-4 font-medium text-gray-600 dark:text-gray-300">Customer</th>
@@ -150,7 +150,7 @@ export function RecentBookings({ bookings, onStatusChange }: RecentBookingsProps
 
                 <td className="py-4 px-4">
                   <div className="flex items-center space-x-1">
-                    <DollarSign className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+                    {/* <DollarSign className="w-4 h-4 text-gray-600 dark:text-gray-400" /> */}
                     <span className="font-medium text-gray-900 dark:text-white">{formatCurrency(booking.amount)}</span>
                   </div>
                 </td>

@@ -26,31 +26,7 @@ export default function AdminBlockSlotsPage() {
   const [availableSlots, setAvailableSlots] = useState<string[]>([])
   const [blocking, setBlocking] = useState(false)
 
-  useEffect(() => {
-    if (loading) return
-    if (!user) {
-      router.push('/')
-      return
-    }
-    if (profile === null) return
-    if (profile && profile.role !== 'admin') {
-      router.push('/')
-      return
-    }
-    loadCourts()
-  }, [user, profile, loading, router])
-
-  useEffect(() => {
-    if (selectedCourt && selectedDate) {
-      loadBookedSlots()
-    }
-  }, [selectedCourt, selectedDate, loadBookedSlots])
-
-  useEffect(() => {
-    const slots = generateTimeSlots(6, 22, 60)
-    setAvailableSlots(slots)
-  }, [])
-
+  // Define functions before useEffect hooks
   const loadCourts = async () => {
     try {
       const { data, error } = await supabase
@@ -101,6 +77,32 @@ export default function AdminBlockSlotsPage() {
       console.error('Exception loading booked slots:', error)
     }
   }, [selectedCourt, selectedDate])
+
+  // useEffect hooks after function declarations
+  useEffect(() => {
+    if (loading) return
+    if (!user) {
+      router.push('/')
+      return
+    }
+    if (profile === null) return
+    if (profile && profile.role !== 'admin') {
+      router.push('/')
+      return
+    }
+    loadCourts()
+  }, [user, profile, loading, router])
+
+  useEffect(() => {
+    if (selectedCourt && selectedDate) {
+      loadBookedSlots()
+    }
+  }, [selectedCourt, selectedDate, loadBookedSlots])
+
+  useEffect(() => {
+    const slots = generateTimeSlots(6, 22, 60)
+    setAvailableSlots(slots)
+  }, [])
 
   const handleBlockSlot = async () => {
     if (!selectedCourt || !selectedDate || !selectedTime || !user) {

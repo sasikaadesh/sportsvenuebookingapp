@@ -45,7 +45,7 @@ export default function AddCourtPage() {
     type: 'tennis',
     description: '',
     location: 'Sports Complex',
-    image_url: defaultImages.tennis,
+    images: [defaultImages.tennis],
     amenities: '',
     price_1hr: 45,
     price_2hr: 80,
@@ -53,6 +53,7 @@ export default function AddCourtPage() {
   })
   const [amenityList, setAmenityList] = useState<string[]>([])
   const [newAmenity, setNewAmenity] = useState('')
+  const [imageUrls, setImageUrls] = useState<string[]>([''])
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -108,6 +109,34 @@ export default function AddCourtPage() {
     }
   }
 
+  const handleImageUrlChange = (index: number, url: string) => {
+    const newImages = [...formData.images]
+    newImages[index] = url
+    setFormData(prev => ({
+      ...prev,
+      images: newImages
+    }))
+  }
+
+  const addImageSlot = () => {
+    if (formData.images.length < 3) {
+      setFormData(prev => ({
+        ...prev,
+        images: [...prev.images, '']
+      }))
+    }
+  }
+
+  const removeImageSlot = (index: number) => {
+    if (formData.images.length > 1) {
+      const newImages = formData.images.filter((_, i) => i !== index)
+      setFormData(prev => ({
+        ...prev,
+        images: newImages
+      }))
+    }
+  }
+
   // Redirect if not admin
   if (loading) {
     return (
@@ -132,11 +161,13 @@ export default function AddCourtPage() {
       [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value
     }))
 
-    // Auto-update image when type changes
+    // Auto-update first image when type changes
     if (name === 'type') {
+      const newImages = [...formData.images]
+      newImages[0] = defaultImages[value as keyof typeof defaultImages]
       setFormData(prev => ({
         ...prev,
-        image_url: defaultImages[value as keyof typeof defaultImages]
+        images: newImages
       }))
     }
   }
@@ -181,12 +212,21 @@ export default function AddCourtPage() {
         return
       }
 
+      // Filter out empty image URLs
+      const validImages = formData.images.filter(img => img && img.trim() !== '')
+
+      if (validImages.length === 0) {
+        toast.error('Please add at least one court image')
+        setSaving(false)
+        return
+      }
+
       // Prepare data for database
       const courtData = {
         name: formData.name.trim(),
         type: formData.type,
         description: formData.description.trim(),
-        image_url: formData.image_url,
+        images: validImages,
         amenities: formData.amenities,
         is_active: formData.is_active
       }
@@ -386,68 +426,95 @@ export default function AddCourtPage() {
                 </p>
               </div>
 
-              {/* Court Image */}
+              {/* Court Images (1-3) */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Court Image
+                  Court Images (1-3 images) *
                 </label>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
+                  Add 1 to 3 high-quality images of your court. These will be displayed in a carousel on the court details page.
+                </p>
 
-                {/* Upload Option */}
-                <div className="mb-3">
-                  <label className="flex items-center justify-center w-full px-4 py-3 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-gray-700 transition-colors">
-                    <div className="flex items-center space-x-2">
-                      <Upload className="w-5 h-5 text-gray-500 dark:text-gray-400" />
-                      <span className="text-sm text-gray-600 dark:text-gray-300">
-                        {uploading ? 'Uploading...' : 'Click to upload image'}
+                {formData.images.map((image, index) => (
+                  <div key={index} className="mb-4 p-4 border border-gray-200 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700/50">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Image {index + 1}
                       </span>
+                      {formData.images.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => removeImageSlot(index)}
+                          className="text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      )}
                     </div>
+
+                    {/* Image Preview */}
+                    {image && (
+                      <div className="mb-3 relative h-32 rounded-lg overflow-hidden">
+                        <Image
+                          src={image}
+                          alt={`Court preview ${index + 1}`}
+                          fill
+                          className="object-cover"
+                        />
+                      </div>
+                    )}
+
+                    {/* Upload Option */}
+                    <div className="mb-3">
+                      <label className="flex items-center justify-center w-full px-4 py-2 border-2 border-dashed border-gray-300 dark:border-gray-500 rounded-lg cursor-pointer hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-gray-600 transition-colors">
+                        <div className="flex items-center space-x-2">
+                          <Upload className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                          <span className="text-xs text-gray-600 dark:text-gray-300">
+                            {uploading ? 'Uploading...' : 'Upload image'}
+                          </span>
+                        </div>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => handleImageUpload(e, index)}
+                          className="hidden"
+                          disabled={uploading}
+                        />
+                      </label>
+                    </div>
+
+                    {/* Or use URL */}
+                    <div className="relative my-2">
+                      <div className="absolute inset-0 flex items-center">
+                        <div className="w-full border-t border-gray-300 dark:border-gray-500"></div>
+                      </div>
+                      <div className="relative flex justify-center text-xs">
+                        <span className="px-2 bg-gray-50 dark:bg-gray-700/50 text-gray-500 dark:text-gray-400">or enter URL</span>
+                      </div>
+                    </div>
+
                     <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleImageUpload}
-                      className="hidden"
-                      disabled={uploading}
-                    />
-                  </label>
-                  <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">Max 5MB. PNG, JPG, or WebP</p>
-                </div>
-
-                {/* Or use URL */}
-                <div className="relative my-3">
-                  <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-gray-300 dark:border-gray-600"></div>
-                  </div>
-                  <div className="relative flex justify-center text-sm">
-                    <span className="px-2 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400">or enter URL</span>
-                  </div>
-                </div>
-
-                <input
-                  type="url"
-                  id="image_url"
-                  name="image_url"
-                  value={formData.image_url}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200"
-                  placeholder="Enter image URL"
-                />
-
-                {/* Image Preview */}
-                {formData.image_url && (
-                  <div className="mt-3">
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Preview:</p>
-                    <Image
-                      src={formData.image_url}
-                      alt="Preview"
-                      width={200}
-                      height={150}
-                      className="w-48 h-36 object-cover rounded-lg border border-gray-300 dark:border-gray-600"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src = defaultImages[formData.type as keyof typeof defaultImages]
-                      }}
+                      type="url"
+                      value={image}
+                      onChange={(e) => handleImageUrlChange(index, e.target.value)}
+                      className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-500 bg-white dark:bg-gray-600 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200"
+                      placeholder="Enter image URL"
                     />
                   </div>
+                ))}
+
+                {/* Add Image Button */}
+                {formData.images.length < 3 && (
+                  <button
+                    type="button"
+                    onClick={addImageSlot}
+                    className="w-full px-4 py-2 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg text-sm text-gray-600 dark:text-gray-300 hover:border-blue-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex items-center justify-center space-x-2"
+                  >
+                    <Plus className="w-4 h-4" />
+                    <span>Add another image ({formData.images.length}/3)</span>
+                  </button>
                 )}
+                <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">Max 5MB per image. PNG, JPG, or WebP</p>
               </div>
 
               {/* Amenities */}

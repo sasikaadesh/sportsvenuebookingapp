@@ -167,7 +167,7 @@ export default function CourtsPage() {
       const { data, error } = await supabase
         .from('courts')
         .select(`
-          id, name, type, description, image_url, amenities, is_active,
+          id, name, type, description, image_url, images, amenities, is_active,
           pricing_rules (
             duration_hours,
             off_peak_price,
@@ -217,11 +217,19 @@ export default function CourtsPage() {
             }
           }
 
+          // Get court image - support both new images array and old image_url
+          let courtImage = getDefaultImageForType(court.type)
+          if (court.images && Array.isArray(court.images) && court.images.length > 0) {
+            courtImage = court.images[0] // Use first image from array
+          } else if (court.image_url) {
+            courtImage = court.image_url
+          }
+
           return {
             id: court.id,
             name: court.name,
             type: court.type,
-            image: court.image_url || getDefaultImageForType(court.type),
+            image: courtImage,
             location: 'Sports Complex',
             rating: 4.5,
             reviews: 50,

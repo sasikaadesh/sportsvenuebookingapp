@@ -55,7 +55,7 @@ export default function AddCourtPage() {
   const [newAmenity, setNewAmenity] = useState('')
   const [imageUrls, setImageUrls] = useState<string[]>([''])
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
     const file = e.target.files?.[0]
     if (!file) return
 
@@ -96,9 +96,12 @@ export default function AddCourtPage() {
         .from('court-images')
         .getPublicUrl(filePath)
 
+      // Update the specific image in the array
+      const newImages = [...formData.images]
+      newImages[index] = urlData.publicUrl
       setFormData(prev => ({
         ...prev,
-        image_url: urlData.publicUrl
+        images: newImages
       }))
       toast.success('Image uploaded successfully!')
     } catch (error) {

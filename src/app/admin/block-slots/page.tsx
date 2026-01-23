@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { ArrowLeft, Calendar, Clock, Ban, Plus } from 'lucide-react'
@@ -44,7 +44,7 @@ export default function AdminBlockSlotsPage() {
     if (selectedCourt && selectedDate) {
       loadBookedSlots()
     }
-  }, [selectedCourt, selectedDate])
+  }, [selectedCourt, selectedDate, loadBookedSlots])
 
   useEffect(() => {
     const slots = generateTimeSlots(6, 22, 60)
@@ -72,7 +72,7 @@ export default function AdminBlockSlotsPage() {
     }
   }
 
-  const loadBookedSlots = async () => {
+  const loadBookedSlots = useCallback(async () => {
     try {
       const { data, error } = await supabase
         .from('bookings')
@@ -100,7 +100,7 @@ export default function AdminBlockSlotsPage() {
     } catch (error) {
       console.error('Exception loading booked slots:', error)
     }
-  }
+  }, [selectedCourt, selectedDate])
 
   const handleBlockSlot = async () => {
     if (!selectedCourt || !selectedDate || !selectedTime || !user) {

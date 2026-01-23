@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { motion } from 'framer-motion'
 import { ChevronLeft, ChevronRight, Clock, Users, DollarSign } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
@@ -64,7 +64,7 @@ export function BookingCalendar({ courtId, courtType, pricing, onBookingSelect }
   }
 
   // Fetch booked slots from database
-  const getBookedSlots = async (date: string) => {
+  const getBookedSlots = useCallback(async (date: string) => {
     try {
       const { data, error } = await supabase
         .from('bookings')
@@ -95,13 +95,13 @@ export function BookingCalendar({ courtId, courtType, pricing, onBookingSelect }
       console.error('Exception loading booked slots:', error)
       setBookedSlots([])
     }
-  }
+  }, [courtId])
 
   useEffect(() => {
     if (selectedDate && courtId) {
       getBookedSlots(selectedDate)
     }
-  }, [selectedDate, courtId])
+  }, [selectedDate, courtId, getBookedSlots])
 
   useEffect(() => {
     const slots = generateTimeSlots(6, 22, 60)

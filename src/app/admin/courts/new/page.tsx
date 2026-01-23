@@ -10,8 +10,9 @@ import {
   Plus,
   X
 } from 'lucide-react'
-import { Header } from '@/components/layout/Header'
-import { Footer } from '@/components/layout/Footer'
+import { HeaderApp } from '@/components/layout/HeaderApp'
+import { FooterSimple } from '@/components/layout/FooterSimple'
+import { AdminLayout } from '@/components/layout/AdminLayout'
 import { Button } from '@/components/ui/Button'
 import { useAuth } from '@/components/providers/AuthProvider'
 import { supabase } from '@/lib/supabase'
@@ -247,306 +248,308 @@ export default function AddCourtPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50">
-      <Header />
-      
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Page Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="flex items-center justify-between mb-8"
-        >
-          <div className="flex items-center space-x-4">
-            <Button
-              variant="outline"
-              onClick={() => router.back()}
-              className="flex items-center space-x-2"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              <span>Back</span>
-            </Button>
-            
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">Add New Court</h1>
-              <p className="text-gray-600">Create a new sports venue</p>
-            </div>
-          </div>
-        </motion.div>
+    <AdminLayout>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-200">
+        <HeaderApp />
 
-        {/* Form */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.1 }}
-          className="bg-white rounded-xl shadow-lg"
-        >
-          <form onSubmit={handleSubmit} className="p-8 space-y-6">
-            {/* Basic Information */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
-                  Court Name *
-                </label>
-                <input
-                  type="text"
-                  id="name"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="Enter court name"
-                  required
-                />
-              </div>
-
-              <div>
-                <label htmlFor="type" className="block text-sm font-medium text-gray-700 mb-2">
-                  Court Type *
-                </label>
-                <select
-                  id="type"
-                  name="type"
-                  value={formData.type}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  required
-                >
-                  {courtTypes.map(type => (
-                    <option key={type.value} value={type.value}>
-                      {type.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            {/* Description */}
-            <div>
-              <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2">
-                Description *
-              </label>
-              <textarea
-                id="description"
-                name="description"
-                value={formData.description}
-                onChange={handleInputChange}
-                rows={3}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Enter court description"
-                required
-              />
-            </div>
-
-            {/* Pricing */}
-            <div>
-              <h3 className="text-lg font-medium text-gray-900 mb-4">Pricing</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label htmlFor="price_1hr" className="block text-sm font-medium text-gray-700 mb-2">
-                    1 Hour Rate ($) *
-                  </label>
-                  <input
-                    type="number"
-                    id="price_1hr"
-                    name="price_1hr"
-                    value={formData.price_1hr}
-                    onChange={handleInputChange}
-                    min="0"
-                    step="0.01"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="Enter 1 hour rate"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label htmlFor="price_2hr" className="block text-sm font-medium text-gray-700 mb-2">
-                    2 Hour Rate ($) *
-                  </label>
-                  <input
-                    type="number"
-                    id="price_2hr"
-                    name="price_2hr"
-                    value={formData.price_2hr}
-                    onChange={handleInputChange}
-                    min="0"
-                    step="0.01"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="Enter 2 hour rate"
-                    required
-                  />
-                </div>
-              </div>
-              <p className="mt-2 text-sm text-gray-500">
-                Set competitive rates for your court bookings. 2-hour rate is typically discounted.
-              </p>
-            </div>
-
-            {/* Court Image */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Court Image
-              </label>
-
-              {/* Upload Option */}
-              <div className="mb-3">
-                <label className="flex items-center justify-center w-full px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition-colors">
-                  <div className="flex items-center space-x-2">
-                    <Upload className="w-5 h-5 text-gray-500" />
-                    <span className="text-sm text-gray-600">
-                      {uploading ? 'Uploading...' : 'Click to upload image'}
-                    </span>
-                  </div>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageUpload}
-                    className="hidden"
-                    disabled={uploading}
-                  />
-                </label>
-                <p className="mt-1 text-xs text-gray-500">Max 5MB. PNG, JPG, or WebP</p>
-              </div>
-
-              {/* Or use URL */}
-              <div className="relative my-3">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-gray-300"></div>
-                </div>
-                <div className="relative flex justify-center text-sm">
-                  <span className="px-2 bg-white text-gray-500">or enter URL</span>
-                </div>
-              </div>
-
-              <input
-                type="url"
-                id="image_url"
-                name="image_url"
-                value={formData.image_url}
-                onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Enter image URL"
-              />
-
-              {/* Image Preview */}
-              {formData.image_url && (
-                <div className="mt-3">
-                  <p className="text-xs text-gray-500 mb-1">Preview:</p>
-                  <Image
-                    src={formData.image_url}
-                    alt="Preview"
-                    width={200}
-                    height={150}
-                    className="w-48 h-36 object-cover rounded-lg border border-gray-300"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src = defaultImages[formData.type as keyof typeof defaultImages]
-                    }}
-                  />
-                </div>
-              )}
-            </div>
-
-            {/* Amenities */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Amenities
-              </label>
-              
-              <div className="flex space-x-2 mb-3">
-                <input
-                  type="text"
-                  value={newAmenity}
-                  onChange={(e) => setNewAmenity(e.target.value)}
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="Enter amenity"
-                  onKeyPress={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault()
-                      addAmenity()
-                    }
-                  }}
-                />
-                <Button
-                  type="button"
-                  onClick={addAmenity}
-                  size="sm"
-                  className="bg-blue-600 hover:bg-blue-700"
-                >
-                  <Plus className="w-4 h-4" />
-                </Button>
-              </div>
-
-              {amenityList.length > 0 && (
-                <div className="flex flex-wrap gap-2">
-                  {amenityList.map((amenity, index) => (
-                    <span
-                      key={index}
-                      className="inline-flex items-center bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm"
-                    >
-                      {amenity}
-                      <button
-                        type="button"
-                        onClick={() => removeAmenity(index)}
-                        className="ml-2 text-gray-500 hover:text-red-500"
-                      >
-                        <X className="w-3 h-3" />
-                      </button>
-                    </span>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Status */}
-            <div className="flex items-center">
-              <input
-                type="checkbox"
-                id="is_active"
-                name="is_active"
-                checked={formData.is_active}
-                onChange={handleInputChange}
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-              />
-              <label htmlFor="is_active" className="ml-2 block text-sm text-gray-700">
-                Court is active and available for booking
-              </label>
-            </div>
-
-            {/* Submit Buttons */}
-            <div className="flex justify-end space-x-4 pt-6 border-t border-gray-200">
+        <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {/* Page Header */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="flex items-center justify-between mb-8"
+          >
+            <div className="flex items-center space-x-4">
               <Button
-                type="button"
                 variant="outline"
                 onClick={() => router.back()}
+                className="flex items-center space-x-2"
               >
-                Cancel
+                <ArrowLeft className="w-4 h-4" />
+                <span>Back</span>
               </Button>
-              
-              <Button
-                type="submit"
-                disabled={saving}
-                className="bg-blue-600 hover:bg-blue-700 flex items-center space-x-2"
-              >
-                {saving ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                    <span>Creating...</span>
-                  </>
-                ) : (
-                  <>
-                    <Save className="w-4 h-4" />
-                    <span>Create Court</span>
-                  </>
-                )}
-              </Button>
-            </div>
-          </form>
-        </motion.div>
-      </main>
 
-      <Footer />
-    </div>
+              <div>
+                <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Add New Court</h1>
+                <p className="text-gray-600 dark:text-gray-300">Create a new sports venue</p>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Form */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="bg-white dark:bg-gray-800 rounded-xl shadow-lg transition-colors duration-200"
+          >
+            <form onSubmit={handleSubmit} className="p-8 space-y-6">
+              {/* Basic Information */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Court Name *
+                  </label>
+                  <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleInputChange}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200"
+                    placeholder="Enter court name"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="type" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Court Type *
+                  </label>
+                  <select
+                    id="type"
+                    name="type"
+                    value={formData.type}
+                    onChange={handleInputChange}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200"
+                    required
+                  >
+                    {courtTypes.map(type => (
+                      <option key={type.value} value={type.value}>
+                        {type.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Description */}
+              <div>
+                <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Description *
+                </label>
+                <textarea
+                  id="description"
+                  name="description"
+                  value={formData.description}
+                  onChange={handleInputChange}
+                  rows={3}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200"
+                  placeholder="Enter court description"
+                  required
+                />
+              </div>
+
+              {/* Pricing */}
+              <div>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Pricing</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label htmlFor="price_1hr" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      1 Hour Rate ($) *
+                    </label>
+                    <input
+                      type="number"
+                      id="price_1hr"
+                      name="price_1hr"
+                      value={formData.price_1hr}
+                      onChange={handleInputChange}
+                      min="0"
+                      step="0.01"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200"
+                      placeholder="Enter 1 hour rate"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="price_2hr" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      2 Hour Rate ($) *
+                    </label>
+                    <input
+                      type="number"
+                      id="price_2hr"
+                      name="price_2hr"
+                      value={formData.price_2hr}
+                      onChange={handleInputChange}
+                      min="0"
+                      step="0.01"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200"
+                      placeholder="Enter 2 hour rate"
+                      required
+                    />
+                  </div>
+                </div>
+                <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                  Set competitive rates for your court bookings. 2-hour rate is typically discounted.
+                </p>
+              </div>
+
+              {/* Court Image */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Court Image
+                </label>
+
+                {/* Upload Option */}
+                <div className="mb-3">
+                  <label className="flex items-center justify-center w-full px-4 py-3 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-gray-700 transition-colors">
+                    <div className="flex items-center space-x-2">
+                      <Upload className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+                      <span className="text-sm text-gray-600 dark:text-gray-300">
+                        {uploading ? 'Uploading...' : 'Click to upload image'}
+                      </span>
+                    </div>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      className="hidden"
+                      disabled={uploading}
+                    />
+                  </label>
+                  <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">Max 5MB. PNG, JPG, or WebP</p>
+                </div>
+
+                {/* Or use URL */}
+                <div className="relative my-3">
+                  <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-gray-300 dark:border-gray-600"></div>
+                  </div>
+                  <div className="relative flex justify-center text-sm">
+                    <span className="px-2 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400">or enter URL</span>
+                  </div>
+                </div>
+
+                <input
+                  type="url"
+                  id="image_url"
+                  name="image_url"
+                  value={formData.image_url}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200"
+                  placeholder="Enter image URL"
+                />
+
+                {/* Image Preview */}
+                {formData.image_url && (
+                  <div className="mt-3">
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Preview:</p>
+                    <Image
+                      src={formData.image_url}
+                      alt="Preview"
+                      width={200}
+                      height={150}
+                      className="w-48 h-36 object-cover rounded-lg border border-gray-300 dark:border-gray-600"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = defaultImages[formData.type as keyof typeof defaultImages]
+                      }}
+                    />
+                  </div>
+                )}
+              </div>
+
+              {/* Amenities */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Amenities
+                </label>
+
+                <div className="flex space-x-2 mb-3">
+                  <input
+                    type="text"
+                    value={newAmenity}
+                    onChange={(e) => setNewAmenity(e.target.value)}
+                    className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200"
+                    placeholder="Enter amenity"
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault()
+                        addAmenity()
+                      }
+                    }}
+                  />
+                  <Button
+                    type="button"
+                    onClick={addAmenity}
+                    size="sm"
+                    className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800"
+                  >
+                    <Plus className="w-4 h-4" />
+                  </Button>
+                </div>
+
+                {amenityList.length > 0 && (
+                  <div className="flex flex-wrap gap-2">
+                    {amenityList.map((amenity, index) => (
+                      <span
+                        key={index}
+                        className="inline-flex items-center bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-3 py-1 rounded-full text-sm"
+                      >
+                        {amenity}
+                        <button
+                          type="button"
+                          onClick={() => removeAmenity(index)}
+                          className="ml-2 text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Status */}
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  id="is_active"
+                  name="is_active"
+                  checked={formData.is_active}
+                  onChange={handleInputChange}
+                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600 rounded"
+                />
+                <label htmlFor="is_active" className="ml-2 block text-sm text-gray-700 dark:text-gray-300">
+                  Court is active and available for booking
+                </label>
+              </div>
+
+              {/* Submit Buttons */}
+              <div className="flex justify-end space-x-4 pt-6 border-t border-gray-200 dark:border-gray-700">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => router.back()}
+                >
+                  Cancel
+                </Button>
+
+                <Button
+                  type="submit"
+                  disabled={saving}
+                  className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 flex items-center space-x-2"
+                >
+                  {saving ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                      <span>Creating...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Save className="w-4 h-4" />
+                      <span>Create Court</span>
+                    </>
+                  )}
+                </Button>
+              </div>
+            </form>
+          </motion.div>
+        </main>
+
+        <FooterSimple />
+      </div>
+    </AdminLayout>
   )
 }

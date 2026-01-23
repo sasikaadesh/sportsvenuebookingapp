@@ -364,7 +364,7 @@ export default function AdminBookingsPage() {
                     <th className="text-left py-3 px-6 font-medium text-gray-600">Customer</th>
                     <th className="text-left py-3 px-6 font-medium text-gray-600">Court</th>
                     <th className="text-left py-3 px-6 font-medium text-gray-600">Date & Time</th>
-                    <th className="text-left py-3 px-6 font-medium text-gray-600">Duration</th>
+                    <th className="text-left py-3 px-6 font-medium text-gray-600">Booked On</th>
                     <th className="text-left py-3 px-6 font-medium text-gray-600">Amount</th>
                     <th className="text-left py-3 px-6 font-medium text-gray-600">Status</th>
                     <th className="text-left py-3 px-6 font-medium text-gray-600">Actions</th>
@@ -398,18 +398,23 @@ export default function AdminBookingsPage() {
                       <td className="py-4 px-6">
                         <div>
                           <div className="font-medium text-gray-900">
-                            {new Date(booking.booking_date).toLocaleDateString()}
+                            {new Date(booking.booking_date).toLocaleDateString()} at {booking.start_time?.substring(0, 5) || booking.start_time} ({booking.duration_hours}h)
                           </div>
                           <div className="text-sm text-gray-600">
-                            {booking.start_time}
+                            {new Date(booking.booking_date).toLocaleDateString('en-US', { weekday: 'short' })}
                           </div>
                         </div>
                       </td>
-                      
+
                       <td className="py-4 px-6">
-                        <span className="text-gray-900">
-                          {booking.duration_hours}h
-                        </span>
+                        <div>
+                          <div className="text-sm text-gray-900">
+                            {new Date(booking.created_at).toLocaleDateString()}
+                          </div>
+                          <div className="text-xs text-gray-600">
+                            {new Date(booking.created_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+                          </div>
+                        </div>
                       </td>
                       
                       <td className="py-4 px-6">

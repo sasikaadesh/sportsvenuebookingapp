@@ -3,13 +3,13 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
-import { 
+import {
   ArrowLeft,
-  Search, 
-  Filter, 
-  Edit, 
-  Trash2, 
-  Eye, 
+  Search,
+  Filter,
+  Edit,
+  Trash2,
+  Eye,
   UserCheck,
   UserX,
   Mail,
@@ -21,6 +21,7 @@ import {
 import { Header } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
 import { Button } from '@/components/ui/Button'
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { useAuth } from '@/components/providers/AuthProvider'
 import { supabase } from '@/lib/supabase'
 import toast from 'react-hot-toast'
@@ -32,6 +33,18 @@ export default function AdminUsersPage() {
   const [loadingUsers, setLoadingUsers] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
   const [filterRole, setFilterRole] = useState('all')
+  const [confirmDialog, setConfirmDialog] = useState<{
+    isOpen: boolean
+    type: 'makeAdmin' | 'makeUser' | 'delete'
+    userId: string
+    userName: string
+  }>({
+    isOpen: false,
+    type: 'delete',
+    userId: '',
+    userName: ''
+  })
+  const [actionLoading, setActionLoading] = useState(false)
 
   useEffect(() => {
     // Wait for loading to complete
@@ -89,13 +102,29 @@ export default function AdminUsersPage() {
   }
 
   const handleToggleRole = async (userId: string, currentRole: string) => {
+    const userToUpdate = users.find(u => u.id === userId)
+    const userName = userToUpdate?.full_name || userToUpdate?.email || 'this user'
+    const newRole = currentRole === 'admin' ? 'user' : 'admin'
+
+    setConfirmDialog({
+      isOpen: true,
+      type: newRole === 'admin' ? 'makeAdmin' : 'makeUser',
+      userId,
+      userName
+    })
+  }
+
+  const confirmToggleRole = async () => {
+    setActionLoading(true)
     try {
+      const userToUpdate = users.find(u => u.id === confirmDialog.userId)
+      const currentRole = userToUpdate?.role
       const newRole = currentRole === 'admin' ? 'user' : 'admin'
-      
+
       const { error } = await (supabase as any)
         .from('users')
         .update({ role: newRole })
-        .eq('id', userId)
+        .eq('id', confirmDialog.userId)
 
       if (error) {
         console.error('Error updating user role:', error)
@@ -103,31 +132,30 @@ export default function AdminUsersPage() {
         return
       }
 
-      setUsers(users.map(user => 
-        user.id === userId 
+      setUsers(users.map(user =>
+        user.id === confirmDialog.userId
           ? { ...user, role: newRole }
           : user
       ))
       toast.success(`User role updated to ${newRole}`)
+      setConfirmDialog({ isOpen: false, type: 'delete', userId: '', userName: '' })
     } catch (error) {
       console.error('Exception updating user role:', error)
       toast.error('An error occurred')
+    } finally {
+      setActionLoading(false)
     }
   }
 
   const handleDeleteUser = async (userId: string) => {
     // Debug logging - Step 1
     console.log('Delete user called with ID:', userId)
-    console.log('All users in state:', users.map(u => ({ id: u.id, email: u.email, name: u.name })))
+    console.log('All users in state:', users.map(u => ({ id: u.id, email: u.email, full_name: u.full_name })))
 
     const userToDelete = users.find(u => u.id === userId)
     console.log('User to delete:', userToDelete)
 
-    const userName = userToDelete?.name || userToDelete?.email || 'this user'
-
-    if (!confirm(`Are you sure you want to delete ${userName}? This action cannot be undone and will permanently remove the user from the system.`)) {
-      return
-    }
+    const userName = userToDelete?.full_name || userToDelete?.email || 'this user'
 
     if (!user?.id) {
       toast.error('You must be logged in to delete users')
@@ -140,10 +168,20 @@ export default function AdminUsersPage() {
       return
     }
 
+    setConfirmDialog({
+      isOpen: true,
+      type: 'delete',
+      userId,
+      userName
+    })
+  }
+
+  const confirmDeleteUser = async () => {
+    setActionLoading(true)
     const loadingToast = toast.loading('Deleting user...')
 
     try {
-      console.log('Attempting to delete user:', { userId, adminUserId: user.id })
+      console.log('Attempting to delete user:', { userId: confirmDialog.userId, adminUserId: user?.id })
 
       // Call our API route to properly delete the user from both auth.users and users tables
       const response = await fetch('/api/admin/delete-user-direct', {
@@ -152,8 +190,8 @@ export default function AdminUsersPage() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          userId,
-          adminUserId: user.id
+          userId: confirmDialog.userId,
+          adminUserId: user?.id
         }),
       })
 
@@ -167,7 +205,10 @@ export default function AdminUsersPage() {
       }
 
       // Success - show toast
-      toast.success(`User ${userName} deleted successfully`, { id: loadingToast })
+      toast.success(`User ${confirmDialog.userName} deleted successfully`, { id: loadingToast })
+
+      // Close dialog
+      setConfirmDialog({ isOpen: false, type: 'delete', userId: '', userName: '' })
 
       // Wait a moment for database operations to fully complete
       await new Promise(resolve => setTimeout(resolve, 800))
@@ -178,6 +219,8 @@ export default function AdminUsersPage() {
     } catch (error) {
       console.error('Exception deleting user:', error)
       toast.error('An error occurred while deleting user', { id: loadingToast })
+    } finally {
+      setActionLoading(false)
     }
   }
 
@@ -420,6 +463,36 @@ export default function AdminUsersPage() {
       </main>
 
       <Footer />
+
+      {/* Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={confirmDialog.isOpen}
+        onClose={() => setConfirmDialog({ isOpen: false, type: 'delete', userId: '', userName: '' })}
+        onConfirm={confirmDialog.type === 'delete' ? confirmDeleteUser : confirmToggleRole}
+        title={
+          confirmDialog.type === 'delete'
+            ? 'Delete User'
+            : confirmDialog.type === 'makeAdmin'
+            ? 'Make Admin'
+            : 'Remove Admin'
+        }
+        message={
+          confirmDialog.type === 'delete'
+            ? `Are you sure you want to delete ${confirmDialog.userName}? This action cannot be undone and will permanently remove the user from the system.`
+            : confirmDialog.type === 'makeAdmin'
+            ? `Are you sure you want to make ${confirmDialog.userName} an admin? They will have full access to the admin dashboard.`
+            : `Are you sure you want to remove admin privileges from ${confirmDialog.userName}? They will be converted to a regular user.`
+        }
+        confirmText={
+          confirmDialog.type === 'delete'
+            ? 'Delete User'
+            : confirmDialog.type === 'makeAdmin'
+            ? 'Make Admin'
+            : 'Remove Admin'
+        }
+        variant={confirmDialog.type === 'delete' ? 'danger' : 'warning'}
+        loading={actionLoading}
+      />
     </div>
   )
 }

@@ -149,6 +149,7 @@ export default function AdminDashboard() {
           id,
           booking_date,
           start_time,
+          duration_hours,
           total_price,
           status,
           created_at,
@@ -180,6 +181,7 @@ export default function AdminDashboard() {
           court: booking.courts?.name || 'Unknown Court',
           date: booking.booking_date,
           time: booking.start_time,
+          duration: booking.duration_hours,
           status: booking.status,
           amount: booking.total_price,
           createdAt: booking.created_at
@@ -288,7 +290,16 @@ export default function AdminDashboard() {
             </p>
           </div>
           
-          <div className="mt-4 sm:mt-0 flex space-x-3">
+          <div className="mt-4 sm:mt-0 flex flex-wrap gap-3">
+            <Button
+              variant="outline"
+              onClick={() => router.push('/admin/block-slots')}
+              className="flex items-center space-x-2 border-red-300 text-red-600 hover:bg-red-50 dark:border-red-700 dark:text-red-400 dark:hover:bg-red-900/30"
+            >
+              <Calendar className="w-4 h-4" />
+              <span>Block Slots</span>
+            </Button>
+
             <Button
               variant="outline"
               onClick={() => router.push('/admin/courts')}
@@ -297,7 +308,7 @@ export default function AdminDashboard() {
               <Settings className="w-4 h-4" />
               <span>Manage Courts</span>
             </Button>
-            
+
             <Button
               onClick={() => router.push('/admin/courts/new')}
               className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700"

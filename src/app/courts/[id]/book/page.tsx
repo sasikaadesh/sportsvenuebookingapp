@@ -278,6 +278,8 @@ export default function BookCourtPage() {
 
         // Event handlers
         window.payhere.onCompleted = async function (_orderId: string) {
+          // Show step 3 confirmation message only after payment is completed
+          setStep(3)
           toast.success('Payment completed! Redirecting...')
 
           // Optionally send confirmation email now that payment completed (sandbox flow)
@@ -330,7 +332,8 @@ export default function BookCourtPage() {
           country: 'Sri Lanka'
         }
 
-        setStep(3)
+        // Don't set step to 3 here - only set it after payment is completed
+        // setStep(3) is now called in payhere.onCompleted callback
         window.payhere.startPayment(payment)
       } catch (phErr) {
         console.error('Failed to start PayHere payment:', phErr)
@@ -490,18 +493,14 @@ export default function BookCourtPage() {
                     <h3 className="font-semibold text-gray-900 mb-3">Booking Details</h3>
                     <div className="grid grid-cols-2 gap-4 text-sm">
                       <div>
-                        <span className="text-gray-600">Date:</span>
-                        <div className="font-medium">{selectedBooking.date}</div>
-                      </div>
-                      <div>
-                        <span className="text-gray-600">Time:</span>
-                        <div className="font-medium">{selectedBooking.startTime}</div>
+                        <span className="text-gray-600">Date & Time:</span>
+                        <div className="font-medium">{selectedBooking.date} at {selectedBooking.startTime}</div>
                       </div>
                       <div>
                         <span className="text-gray-600">Duration:</span>
                         <div className="font-medium">{getDurationLabel(selectedBooking.duration, court.type)}</div>
                       </div>
-                      <div>
+                      <div className="col-span-2">
                         <span className="text-gray-600">Total Price:</span>
                         <div className="font-medium text-lg">{formatCurrency(selectedBooking.price)}</div>
                       </div>
@@ -568,14 +567,10 @@ export default function BookCourtPage() {
                         <div className="font-medium">{court?.name}</div>
                       </div>
                       <div className="text-left">
-                        <span className="text-gray-600">Date:</span>
-                        <div className="font-medium">{selectedBooking.date}</div>
+                        <span className="text-gray-600">Date & Time:</span>
+                        <div className="font-medium">{selectedBooking.date} at {selectedBooking.startTime}</div>
                       </div>
-                      <div className="text-left">
-                        <span className="text-gray-600">Time:</span>
-                        <div className="font-medium">{selectedBooking.startTime}</div>
-                      </div>
-                      <div className="text-left">
+                      <div className="text-left col-span-2">
                         <span className="text-gray-600">Duration:</span>
                         <div className="font-medium">{getDurationLabel(selectedBooking.duration, court?.type)}</div>
                       </div>
@@ -655,12 +650,8 @@ export default function BookCourtPage() {
                   <h4 className="font-semibold text-gray-900 mb-3">Your Selection</h4>
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Date:</span>
-                      <span className="font-medium">{selectedBooking.date}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Time:</span>
-                      <span className="font-medium">{selectedBooking.startTime}</span>
+                      <span className="text-gray-600">Date & Time:</span>
+                      <span className="font-medium">{selectedBooking.date} at {selectedBooking.startTime}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600">Duration:</span>

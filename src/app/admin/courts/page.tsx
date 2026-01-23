@@ -3,13 +3,13 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
-import { 
-  Plus, 
-  Search, 
-  Filter, 
-  Edit, 
-  Trash2, 
-  Eye, 
+import {
+  Plus,
+  Search,
+  Filter,
+  Edit,
+  Trash2,
+  Eye,
   MoreHorizontal,
   MapPin,
   Star,
@@ -21,6 +21,7 @@ import { Header } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
 import { AdminLayout } from '@/components/layout/AdminLayout'
 import { Button } from '@/components/ui/Button'
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { useAuth } from '@/components/providers/AuthProvider'
 import { getCourtTypeIcon } from '@/lib/utils'
 import { supabase } from '@/lib/supabase'
@@ -35,15 +36,18 @@ export default function AdminCourtsPage() {
   const [searchTerm, setSearchTerm] = useState('')
   const [filterType, setFilterType] = useState('all')
   const [filterStatus, setFilterStatus] = useState('all')
-  const [deleteConfirmation, setDeleteConfirmation] = useState<{
+  const [confirmDialog, setConfirmDialog] = useState<{
     isOpen: boolean
-    courtId: string | null
+    type: 'deactivate' | 'activate' | 'delete'
+    courtId: string
     courtName: string
   }>({
     isOpen: false,
-    courtId: null,
+    type: 'delete',
+    courtId: '',
     courtName: ''
   })
+  const [actionLoading, setActionLoading] = useState(false)
 
   const loadCourts = useCallback(async () => {
     try {
@@ -220,14 +224,27 @@ export default function AdminCourtsPage() {
   }
 
   const handleToggleStatus = async (courtId: string) => {
+    const court = courts.find(c => c.id === courtId)
+    if (!court) return
+
+    setConfirmDialog({
+      isOpen: true,
+      type: court.isActive ? 'deactivate' : 'activate',
+      courtId,
+      courtName: court.name
+    })
+  }
+
+  const confirmToggleStatus = async () => {
+    setActionLoading(true)
     try {
-      const court = courts.find(c => c.id === courtId)
+      const court = courts.find(c => c.id === confirmDialog.courtId)
       if (!court) return
 
       const { error } = await (supabase as any)
         .from('courts')
         .update({ is_active: !court.isActive })
-        .eq('id', courtId)
+        .eq('id', confirmDialog.courtId)
 
       if (error) {
         console.error('Error updating court status:', error)
@@ -235,15 +252,18 @@ export default function AdminCourtsPage() {
         return
       }
 
-      setCourts(courts.map(court => 
-        court.id === courtId 
+      setCourts(courts.map(court =>
+        court.id === confirmDialog.courtId
           ? { ...court, isActive: !court.isActive, status: !court.isActive ? 'active' : 'inactive' }
           : court
       ))
-      toast.success('Court status updated successfully')
+      toast.success(`Court ${confirmDialog.type === 'deactivate' ? 'deactivated' : 'activated'} successfully`)
+      setConfirmDialog({ isOpen: false, type: 'delete', courtId: '', courtName: '' })
     } catch (error) {
       console.error('Exception updating court status:', error)
       toast.error('An error occurred')
+    } finally {
+      setActionLoading(false)
     }
   }
 
@@ -279,22 +299,21 @@ export default function AdminCourtsPage() {
     const court = courts.find(c => c.id === courtId)
     if (!court) return
 
-    setDeleteConfirmation({
+    setConfirmDialog({
       isOpen: true,
+      type: 'delete',
       courtId: courtId,
       courtName: court.name
     })
   }
 
   const confirmDeleteCourt = async () => {
-    const { courtId } = deleteConfirmation
-    if (!courtId) return
-
+    setActionLoading(true)
     try {
       const { error } = await supabase
         .from('courts')
         .delete()
-        .eq('id', courtId)
+        .eq('id', confirmDialog.courtId)
 
       if (error) {
         console.error('Error deleting court:', error)
@@ -302,17 +321,15 @@ export default function AdminCourtsPage() {
         return
       }
 
-      setCourts(courts.filter(court => court.id !== courtId))
+      setCourts(courts.filter(court => court.id !== confirmDialog.courtId))
       toast.success('Court deleted successfully')
-      setDeleteConfirmation({ isOpen: false, courtId: null, courtName: '' })
+      setConfirmDialog({ isOpen: false, type: 'delete', courtId: '', courtName: '' })
     } catch (error) {
       console.error('Exception deleting court:', error)
       toast.error('An error occurred')
+    } finally {
+      setActionLoading(false)
     }
-  }
-
-  const cancelDeleteCourt = () => {
-    setDeleteConfirmation({ isOpen: false, courtId: null, courtName: '' })
   }
 
   const handleEditCourt = (courtId: string) => {
@@ -593,51 +610,35 @@ export default function AdminCourtsPage() {
         <Footer />
       </div>
 
-      {/* Delete Confirmation Modal */}
-      {deleteConfirmation.isOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="bg-white rounded-xl shadow-xl p-6 max-w-md w-full mx-4"
-          >
-            <div className="flex items-center space-x-3 mb-4">
-              <div className="flex-shrink-0">
-                <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
-                  <Trash2 className="w-5 h-5 text-red-600" />
-                </div>
-              </div>
-              <div>
-                <h3 className="text-lg font-medium text-gray-900">Delete Court</h3>
-                <p className="text-sm text-gray-500">This action cannot be undone</p>
-              </div>
-            </div>
-
-            <div className="mb-6">
-              <p className="text-gray-700">
-                Are you sure you want to delete <span className="font-semibold">&quot;{deleteConfirmation.courtName}&quot;</span>?
-                This will permanently remove the court and all associated data.
-              </p>
-            </div>
-
-            <div className="flex space-x-3 justify-end">
-              <Button
-                variant="outline"
-                onClick={cancelDeleteCourt}
-                className="px-4 py-2"
-              >
-                Cancel
-              </Button>
-              <Button
-                onClick={confirmDeleteCourt}
-                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white"
-              >
-                Delete Court
-              </Button>
-            </div>
-          </motion.div>
-        </div>
-      )}
+      {/* Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={confirmDialog.isOpen}
+        onClose={() => setConfirmDialog({ isOpen: false, type: 'delete', courtId: '', courtName: '' })}
+        onConfirm={confirmDialog.type === 'delete' ? confirmDeleteCourt : confirmToggleStatus}
+        title={
+          confirmDialog.type === 'delete'
+            ? 'Delete Court'
+            : confirmDialog.type === 'deactivate'
+            ? 'Deactivate Court'
+            : 'Activate Court'
+        }
+        message={
+          confirmDialog.type === 'delete'
+            ? `Are you sure you want to delete "${confirmDialog.courtName}"? This will permanently remove the court and all associated data.`
+            : confirmDialog.type === 'deactivate'
+            ? `Are you sure you want to deactivate "${confirmDialog.courtName}"? Users will not be able to book this court until it is reactivated.`
+            : `Are you sure you want to activate "${confirmDialog.courtName}"? Users will be able to book this court.`
+        }
+        confirmText={
+          confirmDialog.type === 'delete'
+            ? 'Delete Court'
+            : confirmDialog.type === 'deactivate'
+            ? 'Deactivate'
+            : 'Activate'
+        }
+        variant={confirmDialog.type === 'delete' ? 'danger' : 'warning'}
+        loading={actionLoading}
+      />
     </AdminLayout>
   )
 }

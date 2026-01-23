@@ -5,6 +5,7 @@ import { motion } from 'framer-motion'
 import { ChevronLeft, ChevronRight, Clock, Users, DollarSign } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { formatDate, formatTime, generateTimeSlots, isTimeSlotAvailable, calculateEndTime, isPeakHour } from '@/lib/utils'
+import { supabase } from '@/lib/supabase'
 
 interface BookingCalendarProps {
   courtId: string
@@ -62,18 +63,45 @@ export function BookingCalendar({ courtId, courtType, pricing, onBookingSelect }
     return days
   }
 
-  // Mock function to get booked slots - replace with actual API call
+  // Fetch booked slots from database
   const getBookedSlots = async (date: string) => {
-    // Simulate API call
-    const mockBookedSlots = ['09:00', '14:00', '16:00', '18:00']
-    setBookedSlots(mockBookedSlots)
+    try {
+      const { data, error } = await supabase
+        .from('bookings')
+        .select('start_time, duration_hours')
+        .eq('court_id', courtId)
+        .eq('booking_date', date)
+        .in('status', ['confirmed', 'pending'])
+
+      if (error) {
+        console.error('Error loading booked slots:', error)
+        setBookedSlots([])
+        return
+      }
+
+      const slots: string[] = []
+      data?.forEach((booking: any) => {
+        const startHour = parseInt(booking.start_time.split(':')[0])
+        const startMinute = parseInt(booking.start_time.split(':')[1])
+        const duration = booking.duration_hours
+        for (let i = 0; i < duration; i++) {
+          const hour = startHour + i
+          slots.push(`${hour.toString().padStart(2, '0')}:${startMinute.toString().padStart(2, '0')}`)
+        }
+      })
+
+      setBookedSlots(slots)
+    } catch (error) {
+      console.error('Exception loading booked slots:', error)
+      setBookedSlots([])
+    }
   }
 
   useEffect(() => {
-    if (selectedDate) {
+    if (selectedDate && courtId) {
       getBookedSlots(selectedDate)
     }
-  }, [selectedDate])
+  }, [selectedDate, courtId])
 
   useEffect(() => {
     const slots = generateTimeSlots(6, 22, 60)

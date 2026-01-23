@@ -197,6 +197,13 @@ export function QuickActions() {
 
   const actions = [
     {
+      title: 'Block Time Slots',
+      description: 'Reserve court time without payment',
+      icon: Calendar,
+      color: 'bg-red-500 hover:bg-red-600',
+      onClick: () => router.push('/admin/block-slots')
+    },
+    {
       title: 'Add New Court',
       description: 'Create a new sports venue',
       icon: Plus,

@@ -5,6 +5,7 @@ import { motion } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 import { Calendar, Clock, User, DollarSign, MoreHorizontal, Check, X } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { getStatusColor, formatCurrency } from '@/lib/utils'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import toast from 'react-hot-toast'
@@ -16,6 +17,7 @@ interface Booking {
   court: string
   date: string
   time: string
+  duration: number
   status: string
   amount: number
   createdAt?: string
@@ -31,6 +33,18 @@ export function RecentBookings({ bookings, onStatusChange }: RecentBookingsProps
   const supabase = createClientComponentClient()
   const [openDropdown, setOpenDropdown] = useState<string | null>(null)
   const dropdownRef = useRef<HTMLDivElement>(null)
+  const [confirmDialog, setConfirmDialog] = useState<{
+    isOpen: boolean
+    type: 'approve' | 'reject'
+    bookingId: string
+    userName: string
+  }>({
+    isOpen: false,
+    type: 'approve',
+    bookingId: '',
+    userName: ''
+  })
+  const [actionLoading, setActionLoading] = useState(false)
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -43,12 +57,25 @@ export function RecentBookings({ bookings, onStatusChange }: RecentBookingsProps
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
-  const updateBookingStatus = async (bookingId: string, newStatus: string) => {
+  const handleStatusChange = (bookingId: string, newStatus: string, userName: string) => {
+    setOpenDropdown(null)
+    setConfirmDialog({
+      isOpen: true,
+      type: newStatus === 'confirmed' ? 'approve' : 'reject',
+      bookingId,
+      userName
+    })
+  }
+
+  const confirmStatusChange = async () => {
+    setActionLoading(true)
     try {
+      const newStatus = confirmDialog.type === 'approve' ? 'confirmed' : 'cancelled'
+
       const { error } = await supabase
         .from('bookings')
         .update({ status: newStatus })
-        .eq('id', bookingId)
+        .eq('id', confirmDialog.bookingId)
 
       if (error) {
         toast.error('Failed to update booking status')
@@ -56,8 +83,8 @@ export function RecentBookings({ bookings, onStatusChange }: RecentBookingsProps
         return
       }
 
-      toast.success(`Booking ${newStatus === 'confirmed' ? 'approved' : 'rejected'} successfully`)
-      setOpenDropdown(null)
+      toast.success(`Booking ${confirmDialog.type === 'approve' ? 'approved' : 'rejected'} successfully`)
+      setConfirmDialog({ isOpen: false, type: 'approve', bookingId: '', userName: '' })
 
       // Trigger refresh in parent component
       if (onStatusChange) {
@@ -66,6 +93,8 @@ export function RecentBookings({ bookings, onStatusChange }: RecentBookingsProps
     } catch (error) {
       console.error('Error updating booking status:', error)
       toast.error('Failed to update booking status')
+    } finally {
+      setActionLoading(false)
     }
   }
 
@@ -128,18 +157,21 @@ export function RecentBookings({ bookings, onStatusChange }: RecentBookingsProps
                 </td>
 
                 <td className="py-4 px-4">
-                  <div className="flex items-center space-x-2 text-gray-600 dark:text-gray-300">
-                    <Calendar className="w-4 h-4" />
-                    <span className="text-sm">{booking.date}</span>
-                    <Clock className="w-4 h-4" />
-                    <span className="text-sm">{booking.time}</span>
+                  <div className="text-gray-600 dark:text-gray-300">
+                    <div className="flex items-center space-x-1">
+                      <Calendar className="w-4 h-4" />
+                      <span className="text-sm font-medium">{booking.date} at {booking.time} ({booking.duration}h)</span>
+                    </div>
                   </div>
                 </td>
 
                 <td className="py-4 px-4">
-                  <span className="text-sm text-gray-600 dark:text-gray-300">
-                    {booking.createdAt ? new Date(booking.createdAt).toLocaleDateString() : 'N/A'}
-                  </span>
+                  <div className="text-sm text-gray-600 dark:text-gray-300">
+                    <div>{booking.createdAt ? new Date(booking.createdAt).toLocaleDateString() : 'N/A'}</div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400">
+                      {booking.createdAt ? new Date(booking.createdAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : ''}
+                    </div>
+                  </div>
                 </td>
 
                 <td className="py-4 px-4">
@@ -167,7 +199,7 @@ export function RecentBookings({ bookings, onStatusChange }: RecentBookingsProps
                     {openDropdown === booking.id && (
                       <div className="absolute right-0 top-full mt-1 w-40 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-1 z-50">
                         <button
-                          onClick={() => booking.status !== 'confirmed' && updateBookingStatus(booking.id, 'confirmed')}
+                          onClick={() => booking.status !== 'confirmed' && handleStatusChange(booking.id, 'confirmed', booking.user)}
                           disabled={booking.status === 'confirmed'}
                           className={`w-full flex items-center space-x-2 px-4 py-2 text-sm transition-colors ${
                             booking.status === 'confirmed'
@@ -179,7 +211,7 @@ export function RecentBookings({ bookings, onStatusChange }: RecentBookingsProps
                           <span>Approve</span>
                         </button>
                         <button
-                          onClick={() => booking.status !== 'cancelled' && updateBookingStatus(booking.id, 'cancelled')}
+                          onClick={() => booking.status !== 'cancelled' && handleStatusChange(booking.id, 'cancelled', booking.user)}
                           disabled={booking.status === 'cancelled'}
                           className={`w-full flex items-center space-x-2 px-4 py-2 text-sm transition-colors ${
                             booking.status === 'cancelled'
@@ -207,6 +239,22 @@ export function RecentBookings({ bookings, onStatusChange }: RecentBookingsProps
           <p className="text-gray-600 dark:text-gray-300">Bookings will appear here once customers start making reservations.</p>
         </div>
       )}
+
+      {/* Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={confirmDialog.isOpen}
+        onClose={() => setConfirmDialog({ isOpen: false, type: 'approve', bookingId: '', userName: '' })}
+        onConfirm={confirmStatusChange}
+        title={confirmDialog.type === 'approve' ? 'Approve Booking' : 'Reject Booking'}
+        message={
+          confirmDialog.type === 'approve'
+            ? `Are you sure you want to approve the booking for ${confirmDialog.userName}? This will confirm their reservation.`
+            : `Are you sure you want to reject the booking for ${confirmDialog.userName}? This action will cancel their reservation.`
+        }
+        confirmText={confirmDialog.type === 'approve' ? 'Approve' : 'Reject'}
+        variant={confirmDialog.type === 'approve' ? 'info' : 'danger'}
+        loading={actionLoading}
+      />
     </motion.div>
   )
 }

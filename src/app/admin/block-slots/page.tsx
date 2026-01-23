@@ -4,8 +4,8 @@ import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { ArrowLeft, Calendar, Clock, Ban, Plus } from 'lucide-react'
-import { Header } from '@/components/layout/Header'
-import { Footer } from '@/components/layout/Footer'
+import { HeaderApp } from '@/components/layout/HeaderApp'
+import { FooterSimple } from '@/components/layout/FooterSimple'
 import { AdminLayout } from '@/components/layout/AdminLayout'
 import { Button } from '@/components/ui/Button'
 import { useAuth } from '@/components/providers/AuthProvider'
@@ -178,8 +178,8 @@ export default function AdminBlockSlotsPage() {
 
   return (
     <AdminLayout>
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
-        <Header />
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-200">
+        <HeaderApp />
 
         <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Page Header */}
@@ -343,7 +343,7 @@ export default function AdminBlockSlotsPage() {
           </motion.div>
         </main>
 
-        <Footer />
+        <FooterSimple />
       </div>
     </AdminLayout>
   )

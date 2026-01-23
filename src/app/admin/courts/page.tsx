@@ -17,8 +17,8 @@ import {
   Power,
   PowerOff
 } from 'lucide-react'
-import { Header } from '@/components/layout/Header'
-import { Footer } from '@/components/layout/Footer'
+import { HeaderApp } from '@/components/layout/HeaderApp'
+import { FooterSimple } from '@/components/layout/FooterSimple'
 import { AdminLayout } from '@/components/layout/AdminLayout'
 import { Button } from '@/components/ui/Button'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
@@ -369,8 +369,8 @@ export default function AdminCourtsPage() {
 
   return (
     <AdminLayout>
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50">
-        <Header />
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-200">
+        <HeaderApp />
       
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Page Header */}
@@ -381,14 +381,14 @@ export default function AdminCourtsPage() {
           className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8"
         >
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
               Court Management
             </h1>
-            <p className="text-gray-600">
+            <p className="text-gray-600 dark:text-gray-300">
               Manage your sports venues and track their performance
             </p>
           </div>
-          
+
           <div className="mt-4 sm:mt-0 flex space-x-3">
             <Button
               variant="outline"
@@ -398,10 +398,10 @@ export default function AdminCourtsPage() {
               <Settings className="w-4 h-4" />
               <span>Dashboard</span>
             </Button>
-            
+
             <Button
               onClick={() => router.push('/admin/courts/new')}
-              className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700"
+              className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800"
             >
               <Plus className="w-4 h-4" />
               <span>Add Court</span>
@@ -414,18 +414,18 @@ export default function AdminCourtsPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1 }}
-          className="bg-white rounded-xl shadow-lg p-6 mb-8"
+          className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-8 transition-colors duration-200"
         >
           <div className="flex flex-col lg:flex-row gap-4">
             {/* Search */}
             <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-5 h-5" />
               <input
                 type="text"
                 placeholder="Search courts by name or location..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200"
               />
             </div>
 
@@ -433,7 +433,7 @@ export default function AdminCourtsPage() {
             <select
               value={filterType}
               onChange={(e) => setFilterType(e.target.value)}
-              className="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200"
             >
               <option value="all">All Types</option>
               <option value="tennis">Tennis</option>
@@ -447,7 +447,7 @@ export default function AdminCourtsPage() {
             <select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
-              className="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200"
             >
               <option value="all">All Status</option>
               <option value="active">Active</option>
@@ -462,18 +462,18 @@ export default function AdminCourtsPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="bg-white rounded-xl shadow-lg overflow-hidden"
+          className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden transition-colors duration-200"
         >
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gray-50">
+              <thead className="bg-gray-50 dark:bg-gray-700">
                 <tr>
-                  <th className="text-left py-4 px-6 font-medium text-gray-600">Court</th>
-                  <th className="text-left py-4 px-6 font-medium text-gray-600">Type</th>
-                  <th className="text-left py-4 px-6 font-medium text-gray-600">Location</th>
-                  <th className="text-left py-4 px-6 font-medium text-gray-600">Status</th>
-                  <th className="text-left py-4 px-6 font-medium text-gray-600">Performance</th>
-                  <th className="text-left py-4 px-6 font-medium text-gray-600">Actions</th>
+                  <th className="text-left py-4 px-6 font-medium text-gray-600 dark:text-gray-300">Court</th>
+                  <th className="text-left py-4 px-6 font-medium text-gray-600 dark:text-gray-300">Type</th>
+                  <th className="text-left py-4 px-6 font-medium text-gray-600 dark:text-gray-300">Location</th>
+                  <th className="text-left py-4 px-6 font-medium text-gray-600 dark:text-gray-300">Status</th>
+                  <th className="text-left py-4 px-6 font-medium text-gray-600 dark:text-gray-300">Performance</th>
+                  <th className="text-left py-4 px-6 font-medium text-gray-600 dark:text-gray-300">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -483,29 +483,29 @@ export default function AdminCourtsPage() {
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.4, delay: index * 0.1 }}
-                    className="border-b border-gray-100 hover:bg-gray-50"
+                    className="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200"
                   >
                     <td className="py-4 px-6">
                       <div className="flex items-center space-x-3">
                         <span className="text-2xl">{getCourtTypeIcon(court.type)}</span>
                         <div>
-                          <div className="font-medium text-gray-900">{court.name}</div>
+                          <div className="font-medium text-gray-900 dark:text-white">{court.name}</div>
                           <div className="flex items-center space-x-1 mt-1">
                             <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                            <span className="text-sm text-gray-600">{court.rating}</span>
+                            <span className="text-sm text-gray-600 dark:text-gray-400">{court.rating}</span>
                           </div>
                         </div>
                       </div>
                     </td>
-                    
+
                     <td className="py-4 px-6">
-                      <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-sm font-medium capitalize">
+                      <span className="bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400 px-2 py-1 rounded-full text-sm font-medium capitalize">
                         {court.type}
                       </span>
                     </td>
-                    
+
                     <td className="py-4 px-6">
-                      <div className="flex items-center space-x-1 text-gray-600">
+                      <div className="flex items-center space-x-1 text-gray-600 dark:text-gray-400">
                         <MapPin className="w-4 h-4" />
                         <span className="text-sm">{court.location}</span>
                       </div>
@@ -514,51 +514,51 @@ export default function AdminCourtsPage() {
                     <td className="py-4 px-6">
                       <div className="flex flex-col space-y-1">
                         <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          court.maintenanceMode 
-                            ? 'bg-orange-100 text-orange-800'
+                          court.maintenanceMode
+                            ? 'bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-400'
                             : court.isActive
-                            ? 'bg-green-100 text-green-800'
-                            : 'bg-red-100 text-red-800'
+                            ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400'
+                            : 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400'
                         }`}>
                           {court.maintenanceMode ? 'Maintenance' : court.isActive ? 'Active' : 'Inactive'}
                         </span>
                       </div>
                     </td>
-                    
+
                     <td className="py-4 px-6">
                       <div className="text-sm">
-                        <div className="text-gray-900 font-medium">{court.bookings} bookings</div>
-                        <div className="text-gray-600">{formatCurrency(court.revenue)} revenue</div>
+                        <div className="text-gray-900 dark:text-white font-medium">{court.bookings} bookings</div>
+                        <div className="text-gray-600 dark:text-gray-400">{formatCurrency(court.revenue)} revenue</div>
                       </div>
                     </td>
-                    
+
                     <td className="py-4 px-6">
                       <div className="flex items-center space-x-2">
                         <button
                           onClick={() => router.push(`/courts/${court.id}`)}
-                          className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                          className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
                           title="View Court"
                         >
-                          <Eye className="w-4 h-4 text-gray-600" />
+                          <Eye className="w-4 h-4 text-gray-600 dark:text-gray-400" />
                         </button>
-                        
+
                         <button
                           onClick={() => router.push(`/admin/courts/${court.id}/edit`)}
-                          className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                          className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
                           title="Edit Court"
                         >
-                          <Edit className="w-4 h-4 text-gray-600" />
+                          <Edit className="w-4 h-4 text-gray-600 dark:text-gray-400" />
                         </button>
-                        
+
                         <button
                           onClick={() => handleToggleStatus(court.id)}
-                          className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                          className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
                           title={court.isActive ? 'Deactivate' : 'Activate'}
                         >
                           {court.isActive ? (
-                            <PowerOff className="w-4 h-4 text-red-600" />
+                            <PowerOff className="w-4 h-4 text-red-600 dark:text-red-400" />
                           ) : (
-                            <Power className="w-4 h-4 text-green-600" />
+                            <Power className="w-4 h-4 text-green-600 dark:text-green-400" />
                           )}
                         </button>
                         
@@ -573,10 +573,10 @@ export default function AdminCourtsPage() {
                         
                         <button
                           onClick={() => handleDeleteCourt(court.id)}
-                          className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                          className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
                           title="Delete Court"
                         >
-                          <Trash2 className="w-4 h-4 text-red-600" />
+                          <Trash2 className="w-4 h-4 text-red-600 dark:text-red-400" />
                         </button>
                       </div>
                     </td>
@@ -589,8 +589,8 @@ export default function AdminCourtsPage() {
           {filteredCourts.length === 0 && (
             <div className="text-center py-12">
               <div className="text-6xl mb-4">🏟️</div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No courts found</h3>
-              <p className="text-gray-600 mb-6">
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No courts found</h3>
+              <p className="text-gray-600 dark:text-gray-400 mb-6">
                 {searchTerm || filterType !== 'all' || filterStatus !== 'all'
                   ? 'Try adjusting your search criteria'
                   : 'Get started by adding your first court'
@@ -607,7 +607,7 @@ export default function AdminCourtsPage() {
         </motion.div>
       </main>
 
-        <Footer />
+        <FooterSimple />
       </div>
 
       {/* Confirmation Dialog */}

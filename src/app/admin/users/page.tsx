@@ -18,8 +18,9 @@ import {
   Shield,
   User
 } from 'lucide-react'
-import { Header } from '@/components/layout/Header'
-import { Footer } from '@/components/layout/Footer'
+import { HeaderApp } from '@/components/layout/HeaderApp'
+import { FooterSimple } from '@/components/layout/FooterSimple'
+import { AdminLayout } from '@/components/layout/AdminLayout'
 import { Button } from '@/components/ui/Button'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { useAuth } from '@/components/providers/AuthProvider'
@@ -261,52 +262,53 @@ export default function AdminUsersPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50">
-      <Header />
-      
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Page Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8"
-        >
-          <div className="flex items-center space-x-4">
-            <Button
-              variant="outline"
-              onClick={() => router.push('/admin')}
-              className="flex items-center space-x-2"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              <span>Back to Dashboard</span>
-            </Button>
-            
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">User Management</h1>
-              <p className="text-gray-600">Manage user accounts and permissions</p>
+    <AdminLayout>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-200">
+        <HeaderApp />
+
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {/* Page Header */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8"
+          >
+            <div className="flex items-center space-x-4">
+              <Button
+                variant="outline"
+                onClick={() => router.push('/admin')}
+                className="flex items-center space-x-2"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                <span>Back to Dashboard</span>
+              </Button>
+
+              <div>
+                <h1 className="text-3xl font-bold text-gray-900 dark:text-white">User Management</h1>
+                <p className="text-gray-600 dark:text-gray-300">Manage user accounts and permissions</p>
+              </div>
             </div>
-          </div>
-        </motion.div>
+          </motion.div>
 
         {/* Filters and Search */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1 }}
-          className="bg-white rounded-xl shadow-lg p-6 mb-8"
+          className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-8 transition-colors duration-200"
         >
           <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0 md:space-x-4">
             {/* Search */}
             <div className="flex-1 max-w-md">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-5 h-5" />
                 <input
                   type="text"
                   placeholder="Search users..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="pl-10 pr-4 py-2 w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200"
                 />
               </div>
             </div>
@@ -314,11 +316,11 @@ export default function AdminUsersPage() {
             {/* Role Filter */}
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2">
-                <Filter className="w-5 h-5 text-gray-600" />
+                <Filter className="w-5 h-5 text-gray-600 dark:text-gray-400" />
                 <select
                   value={filterRole}
                   onChange={(e) => setFilterRole(e.target.value)}
-                  className="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200"
                 >
                   <option value="all">All Roles</option>
                   <option value="user">Users</option>
@@ -334,78 +336,78 @@ export default function AdminUsersPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="bg-white rounded-xl shadow-lg overflow-hidden"
+          className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden transition-colors duration-200"
         >
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900">
+          <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
               Users ({filteredUsers.length})
             </h2>
           </div>
 
           {filteredUsers.length === 0 ? (
             <div className="text-center py-12">
-              <User className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-500 text-lg">No users found</p>
-              <p className="text-gray-400 text-sm">Try adjusting your search criteria</p>
+              <User className="w-12 h-12 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
+              <p className="text-gray-500 dark:text-gray-400 text-lg">No users found</p>
+              <p className="text-gray-400 dark:text-gray-500 text-sm">Try adjusting your search criteria</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-gray-50">
+                <thead className="bg-gray-50 dark:bg-gray-700">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                       User
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                       Contact
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                       Role
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                       Joined
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                       Actions
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                   {filteredUsers.map((user, index) => (
                     <motion.tr
                       key={user.id}
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.4, delay: index * 0.05 }}
-                      className="hover:bg-gray-50"
+                      className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200"
                     >
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           <div className="flex-shrink-0 h-10 w-10">
-                            <div className="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
-                              <User className="w-5 h-5 text-gray-600" />
+                            <div className="h-10 w-10 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center">
+                              <User className="w-5 h-5 text-gray-600 dark:text-gray-300" />
                             </div>
                           </div>
                           <div className="ml-4">
-                            <div className="text-sm font-medium text-gray-900">
+                            <div className="text-sm font-medium text-gray-900 dark:text-white">
                               {user.full_name || user.name || 'No name'}
                             </div>
-                            <div className="text-sm text-gray-500">
+                            <div className="text-sm text-gray-500 dark:text-gray-400">
                               ID: {user.id.slice(0, 8)}...
                             </div>
                           </div>
                         </div>
                       </td>
-                      
+
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">
+                        <div className="text-sm text-gray-900 dark:text-white">
                           <div className="flex items-center mb-1">
-                            <Mail className="w-4 h-4 mr-2 text-gray-400" />
+                            <Mail className="w-4 h-4 mr-2 text-gray-400 dark:text-gray-500" />
                             {user.email}
                           </div>
                           {user.phone && (
                             <div className="flex items-center">
-                              <Phone className="w-4 h-4 mr-2 text-gray-400" />
+                              <Phone className="w-4 h-4 mr-2 text-gray-400 dark:text-gray-500" />
                               {user.phone}
                             </div>
                           )}
@@ -414,16 +416,16 @@ export default function AdminUsersPage() {
 
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          user.role === 'admin' 
-                            ? 'bg-red-100 text-red-800' 
-                            : 'bg-green-100 text-green-800'
+                          user.role === 'admin'
+                            ? 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400'
+                            : 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400'
                         }`}>
                           {user.role === 'admin' && <Shield className="w-3 h-3 mr-1" />}
                           {user.role || 'user'}
                         </span>
                       </td>
 
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                         <div className="flex items-center">
                           <Calendar className="w-4 h-4 mr-2" />
                           {formatDate(user.created_at)}
@@ -434,22 +436,22 @@ export default function AdminUsersPage() {
                         <div className="flex items-center space-x-2">
                           <button
                             onClick={() => handleToggleRole(user.id, user.role || 'user')}
-                            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
                             title={`Make ${user.role === 'admin' ? 'User' : 'Admin'}`}
                           >
                             {user.role === 'admin' ? (
-                              <UserX className="w-4 h-4 text-orange-600" />
+                              <UserX className="w-4 h-4 text-orange-600 dark:text-orange-400" />
                             ) : (
-                              <UserCheck className="w-4 h-4 text-green-600" />
+                              <UserCheck className="w-4 h-4 text-green-600 dark:text-green-400" />
                             )}
                           </button>
-                          
+
                           <button
                             onClick={() => handleDeleteUser(user.id)}
-                            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
                             title="Delete User"
                           >
-                            <Trash2 className="w-4 h-4 text-red-600" />
+                            <Trash2 className="w-4 h-4 text-red-600 dark:text-red-400" />
                           </button>
                         </div>
                       </td>
@@ -460,39 +462,40 @@ export default function AdminUsersPage() {
             </div>
           )}
         </motion.div>
-      </main>
+        </main>
 
-      <Footer />
+        <FooterSimple />
 
-      {/* Confirmation Dialog */}
-      <ConfirmDialog
-        isOpen={confirmDialog.isOpen}
-        onClose={() => setConfirmDialog({ isOpen: false, type: 'delete', userId: '', userName: '' })}
-        onConfirm={confirmDialog.type === 'delete' ? confirmDeleteUser : confirmToggleRole}
-        title={
-          confirmDialog.type === 'delete'
-            ? 'Delete User'
-            : confirmDialog.type === 'makeAdmin'
-            ? 'Make Admin'
-            : 'Remove Admin'
-        }
-        message={
-          confirmDialog.type === 'delete'
-            ? `Are you sure you want to delete ${confirmDialog.userName}? This action cannot be undone and will permanently remove the user from the system.`
-            : confirmDialog.type === 'makeAdmin'
-            ? `Are you sure you want to make ${confirmDialog.userName} an admin? They will have full access to the admin dashboard.`
-            : `Are you sure you want to remove admin privileges from ${confirmDialog.userName}? They will be converted to a regular user.`
-        }
-        confirmText={
-          confirmDialog.type === 'delete'
-            ? 'Delete User'
-            : confirmDialog.type === 'makeAdmin'
-            ? 'Make Admin'
-            : 'Remove Admin'
-        }
-        variant={confirmDialog.type === 'delete' ? 'danger' : 'warning'}
-        loading={actionLoading}
-      />
-    </div>
+        {/* Confirmation Dialog */}
+        <ConfirmDialog
+          isOpen={confirmDialog.isOpen}
+          onClose={() => setConfirmDialog({ isOpen: false, type: 'delete', userId: '', userName: '' })}
+          onConfirm={confirmDialog.type === 'delete' ? confirmDeleteUser : confirmToggleRole}
+          title={
+            confirmDialog.type === 'delete'
+              ? 'Delete User'
+              : confirmDialog.type === 'makeAdmin'
+              ? 'Make Admin'
+              : 'Remove Admin'
+          }
+          message={
+            confirmDialog.type === 'delete'
+              ? `Are you sure you want to delete ${confirmDialog.userName}? This action cannot be undone and will permanently remove the user from the system.`
+              : confirmDialog.type === 'makeAdmin'
+              ? `Are you sure you want to make ${confirmDialog.userName} an admin? They will have full access to the admin dashboard.`
+              : `Are you sure you want to remove admin privileges from ${confirmDialog.userName}? They will be converted to a regular user.`
+          }
+          confirmText={
+            confirmDialog.type === 'delete'
+              ? 'Delete User'
+              : confirmDialog.type === 'makeAdmin'
+              ? 'Make Admin'
+              : 'Remove Admin'
+          }
+          variant={confirmDialog.type === 'delete' ? 'danger' : 'warning'}
+          loading={actionLoading}
+        />
+      </div>
+    </AdminLayout>
   )
 }

@@ -14,7 +14,7 @@ export function HeaderMarketing() {
       <div className="w-full px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16 md:h-16">
           {/* Logo */}
-          <Link prefetch href="/" className="flex items-center">
+          <Link href="/" className="flex items-center">
             <Image
               src="/SVB_Logo.png"
               alt="SportsVenueBookings"
@@ -27,26 +27,26 @@ export function HeaderMarketing() {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center md:space-x-6 lg:space-x-8">
-            <Link prefetch href="/#features" className="whitespace-nowrap leading-tight text-gray-700 hover:text-blue-600 transition-colors">
+            <Link href="/#features" className="whitespace-nowrap leading-tight text-gray-700 hover:text-blue-600 transition-colors">
               Features
             </Link>
-            <Link prefetch href="/#how-it-works" className="whitespace-nowrap leading-tight text-gray-700 hover:text-blue-600 transition-colors">
+            <Link href="/#how-it-works" className="whitespace-nowrap leading-tight text-gray-700 hover:text-blue-600 transition-colors">
               How It Works
             </Link>
-            <Link prefetch href="/#testimonials" className="whitespace-nowrap leading-tight text-gray-700 hover:text-blue-600 transition-colors">
+            <Link href="/#testimonials" className="whitespace-nowrap leading-tight text-gray-700 hover:text-blue-600 transition-colors">
               Reviews
             </Link>
-            <Link prefetch href="/about" className="whitespace-nowrap leading-tight text-gray-700 hover:text-blue-600 transition-colors">
+            <Link href="/about" className="whitespace-nowrap leading-tight text-gray-700 hover:text-blue-600 transition-colors">
               About Us
             </Link>
-            <Link prefetch href="/contact" className="whitespace-nowrap leading-tight text-gray-700 hover:text-blue-600 transition-colors">
+            <Link href="/contact" className="whitespace-nowrap leading-tight text-gray-700 hover:text-blue-600 transition-colors">
               Contact Us
             </Link>
           </nav>
 
           {/* Desktop CTA */}
           <div className="hidden md:flex items-center space-x-4">
-            <Link prefetch href="/app">
+            <Link href="/app">
               <Button className="bg-blue-600 hover:bg-blue-700 text-white flex items-center space-x-2">
                 <span>Try Demo App</span>
                 <ArrowRight className="w-4 h-4" />
@@ -67,44 +67,44 @@ export function HeaderMarketing() {
         {isMenuOpen && (
           <div className="md:hidden py-4 border-t border-gray-200">
             <div className="flex flex-col space-y-4">
-              <Link prefetch
+              <Link
                 href="/#features"
                 className="text-gray-700 hover:text-blue-600 transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Features
               </Link>
-              <Link prefetch
+              <Link
                 href="/#how-it-works"
                 className="text-gray-700 hover:text-blue-600 transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 How It Works
               </Link>
-              <Link prefetch
+              <Link
                 href="/#testimonials"
                 className="text-gray-700 hover:text-blue-600 transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Reviews
               </Link>
-              <Link prefetch
+              <Link
                 href="/about"
                 className="text-gray-700 hover:text-blue-600 transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 About Us
               </Link>
-              <Link prefetch
+              <Link
                 href="/contact"
                 className="text-gray-700 hover:text-blue-600 transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Contact Us
               </Link>
-              
+
               <div className="pt-4 border-t border-gray-200">
-                <Link prefetch href="/app" onClick={() => setIsMenuOpen(false)}>
+                <Link href="/app" onClick={() => setIsMenuOpen(false)}>
                   <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center space-x-2">
                     <span>Try Demo App</span>
                     <ArrowRight className="w-4 h-4" />

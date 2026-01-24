@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
-import { Calendar, Clock, MapPin, Star, Filter, Search } from 'lucide-react'
+import { Calendar, CheckCircle, XCircle, Clock, MapPin, Star, Filter, Search } from 'lucide-react'
 import { useAuth } from '@/components/providers/AuthProvider'
 import { HeaderApp } from '@/components/layout/HeaderApp'
 import { FooterSimple } from '@/components/layout/FooterSimple'
@@ -168,19 +168,22 @@ export default function DashboardPage() {
     return null
   }
 
-  const filteredBookings = bookings.filter(booking => {
-    const matchesFilter = filter === 'all' || booking.status === filter
+  // Filter out pending bookings and apply user filters
+  const filteredBookings = bookings
+    .filter(booking => booking.status !== 'pending') // Exclude pending bookings
+    .filter(booking => {
+      const matchesFilter = filter === 'all' || booking.status === filter
 
-    // Handle both court object and court name scenarios
-    const courtName = booking.courts?.name || booking.court?.name || 'Unknown Court'
-    const courtLocation = booking.courts?.location || booking.court?.location || ''
+      // Handle both court object and court name scenarios
+      const courtName = booking.courts?.name || booking.court?.name || 'Unknown Court'
+      const courtLocation = booking.courts?.location || booking.court?.location || ''
 
-    const matchesSearch = searchTerm === '' ||
-                         courtName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         courtLocation.toLowerCase().includes(searchTerm.toLowerCase())
+      const matchesSearch = searchTerm === '' ||
+                           courtName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           courtLocation.toLowerCase().includes(searchTerm.toLowerCase())
 
-    return matchesFilter && matchesSearch
-  })
+      return matchesFilter && matchesSearch
+    })
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -249,20 +252,8 @@ export default function DashboardPage() {
               </div>
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Total Bookings</p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">{bookings.length}</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 transition-colors duration-200">
-            <div className="flex items-center">
-              <div className="p-3 bg-green-100 dark:bg-green-900 rounded-lg">
-                <Clock className="w-6 h-6 text-green-600 dark:text-green-400" />
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Upcoming</p>
                 <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                  {bookings.filter(b => b.status === 'confirmed' || b.status === 'pending').length}
+                  {bookings.filter(b => b.status !== 'pending').length}
                 </p>
               </div>
             </div>
@@ -270,13 +261,27 @@ export default function DashboardPage() {
 
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 transition-colors duration-200">
             <div className="flex items-center">
-              <div className="p-3 bg-purple-100 dark:bg-purple-900 rounded-lg">
-                <Star className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+              <div className="p-3 bg-green-100 dark:bg-green-900 rounded-lg">
+                <CheckCircle className="w-6 h-6 text-green-600 dark:text-green-400" />
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Completed</p>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Confirmed</p>
                 <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                  {bookings.filter(b => b.status === 'completed').length}
+                  {bookings.filter(b => b.status === 'confirmed').length}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 transition-colors duration-200">
+            <div className="flex items-center">
+              <div className="p-3 bg-red-100 dark:bg-red-900 rounded-lg">
+                <XCircle className="w-6 h-6 text-red-600 dark:text-red-400" />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Cancelled</p>
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                  {bookings.filter(b => b.status === 'cancelled').length}
                 </p>
               </div>
             </div>
@@ -318,8 +323,6 @@ export default function DashboardPage() {
                 >
                   <option value="all">All Bookings</option>
                   <option value="confirmed">Confirmed</option>
-                  <option value="pending">Pending</option>
-                  <option value="completed">Completed</option>
                   <option value="cancelled">Cancelled</option>
                 </select>
               </div>

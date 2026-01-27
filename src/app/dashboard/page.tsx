@@ -98,7 +98,7 @@ export default function DashboardPage() {
           )
         `)
         .eq('user_id', user.id)
-        .order('booking_date', { ascending: false })
+        .order('created_at', { ascending: false })
 
       if (error) {
         console.error('Error loading bookings:', error)
@@ -174,13 +174,13 @@ export default function DashboardPage() {
     .filter(booking => {
       const matchesFilter = filter === 'all' || booking.status === filter
 
-      // Handle both court object and court name scenarios
-      const courtName = booking.courts?.name || booking.court?.name || 'Unknown Court'
-      const courtLocation = booking.courts?.location || booking.court?.location || ''
+      // Get court type label for search (e.g., "basketball" -> "Basketball")
+      const courtTypeLabel = booking.courtType ?
+        booking.courtType.charAt(0).toUpperCase() + booking.courtType.slice(1) : ''
 
       const matchesSearch = searchTerm === '' ||
-                           courtName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           courtLocation.toLowerCase().includes(searchTerm.toLowerCase())
+                           (booking.courtName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           courtTypeLabel.toLowerCase().includes(searchTerm.toLowerCase())
 
       return matchesFilter && matchesSearch
     })

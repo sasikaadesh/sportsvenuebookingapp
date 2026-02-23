@@ -1,10 +1,9 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { Eye, EyeOff, Lock, CheckCircle, AlertCircle } from 'lucide-react'
-import { supabase } from '@/lib/supabase'
 import { Button } from '@/components/ui/Button'
 import toast from 'react-hot-toast'
 
@@ -15,7 +14,9 @@ export default function ResetPasswordPage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [validToken, setValidToken] = useState<boolean | null>(null)
+  const [token, setToken] = useState<string | null>(null)
   const router = useRouter()
+  const searchParams = useSearchParams()
 
   // Password validation
   const passwordRequirements = {
@@ -31,21 +32,60 @@ export default function ResetPasswordPage() {
   }
 
   useEffect(() => {
-    // Check if we have a valid session (user clicked the reset link)
-    const checkSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession()
-      setValidToken(!!session)
-      
-      if (!session) {
-        toast.error('Invalid or expired reset link. Please request a new one.')
+    // Get token from URL query parameter
+    const tokenFromUrl = searchParams.get('token')
+
+    if (!tokenFromUrl) {
+      console.log('❌ No token found in URL')
+      setValidToken(false)
+      toast.error('Invalid reset link. Please request a new one.')
+      setTimeout(() => {
+        router.push('/auth/forgot-password')
+      }, 3000)
+      return
+    }
+
+    setToken(tokenFromUrl)
+    console.log('🔍 Verifying reset token:', tokenFromUrl.substring(0, 10) + '...')
+
+    // Verify token with our API
+    const verifyToken = async () => {
+      try {
+        const response = await fetch('/api/auth/verify-reset-token', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ token: tokenFromUrl }),
+        })
+
+        const result = await response.json()
+
+        console.log('📧 Token verification result:', result)
+
+        if (!response.ok || !result.valid) {
+          console.log('❌ Token is invalid:', result.error)
+          setValidToken(false)
+          toast.error(result.error || 'Invalid or expired reset link')
+          setTimeout(() => {
+            router.push('/auth/forgot-password')
+          }, 3000)
+        } else {
+          console.log('✅ Token is valid')
+          setValidToken(true)
+        }
+      } catch (error) {
+        console.error('❌ Error verifying token:', error)
+        setValidToken(false)
+        toast.error('Failed to verify reset link')
         setTimeout(() => {
           router.push('/auth/forgot-password')
         }, 3000)
       }
     }
 
-    checkSession()
-  }, [router])
+    verifyToken()
+  }, [router, searchParams])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -55,30 +95,48 @@ export default function ResetPasswordPage() {
       return
     }
 
+    if (!token) {
+      toast.error('Invalid reset token')
+      return
+    }
+
     setLoading(true)
 
     try {
-      const { error } = await supabase.auth.updateUser({
-        password: password
+      console.log('🔐 Resetting password with token:', token.substring(0, 10) + '...')
+
+      // Call our custom API to reset password
+      const response = await fetch('/api/auth/reset-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          token: token,
+          password: password
+        }),
       })
 
-      if (error) {
-        console.error('Password update error:', error)
-        toast.error(error.message || 'Failed to reset password')
+      const result = await response.json()
+
+      console.log('📧 Password reset result:', result)
+
+      if (!response.ok || !result.success) {
+        console.error('❌ Password reset error:', result.error)
+        toast.error(result.error || 'Failed to reset password')
+        setLoading(false)
         return
       }
 
+      console.log('✅ Password reset successfully!')
       toast.success('Password reset successfully!')
-      
-      // Sign out to ensure clean state
-      await supabase.auth.signOut()
-      
+
       // Redirect to sign in
       setTimeout(() => {
         router.push('/auth/signin')
       }, 1500)
     } catch (error) {
-      console.error('Unexpected error:', error)
+      console.error('❌ Unexpected error:', error)
       toast.error('An unexpected error occurred')
     } finally {
       setLoading(false)

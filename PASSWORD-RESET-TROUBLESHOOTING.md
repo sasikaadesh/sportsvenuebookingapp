@@ -99,13 +99,17 @@ Reply to: {{reply_to}}
 4. Add/verify these variables:
 
 ```
-NEXT_PUBLIC_EMAILJS_SERVICE_ID=service_290uqkk
-NEXT_PUBLIC_EMAILJS_TEMPLATE_ID=template_9f2olnc
-NEXT_PUBLIC_EMAILJS_PUBLIC_KEY=POiM46Nge2eU-gYrC
-NEXT_PUBLIC_ADMIN_EMAIL=sasikaadesh@gmail.com
+NEXT_PUBLIC_EMAILJS_SERVICE_ID=your_emailjs_service_id
+NEXT_PUBLIC_EMAILJS_TEMPLATE_ID=your_emailjs_template_id
+NEXT_PUBLIC_EMAILJS_PUBLIC_KEY=your_emailjs_public_key
+NEXT_PUBLIC_ADMIN_EMAIL=your_admin_email@example.com
 NEXT_PUBLIC_APP_URL=https://your-app-url.vercel.app
-SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx6cXd6dWdvY21mZGx2aG1vbGtwIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NjA0ODQyOCwiZXhwIjoyMDcxNjI0NDI4fQ.A4_8sqoGIuxvlmTcksHZf3RqZqK9NQnZE7MsbHyl64k
+SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key_here
 ```
+
+**⚠️ IMPORTANT:** Replace the placeholder values above with your actual credentials. Get these from:
+- EmailJS values: https://dashboard.emailjs.com/
+- Supabase Service Role Key: https://supabase.com/dashboard → Settings → API
 
 **Important:** After adding/updating environment variables, you must **redeploy** your application for changes to take effect.
 
